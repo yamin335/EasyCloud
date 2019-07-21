@@ -3,9 +3,11 @@ package ltd.royalgreen.pacecloud.dinjectors
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.gson.Gson
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import dagger.Module
 import dagger.Provides
+import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.SHARED_PREFS_KEY
 import ltd.royalgreen.pacecloud.network.ApiService
 import retrofit2.Retrofit
@@ -34,5 +36,13 @@ object AppModule {
     @JvmStatic
     fun provideSharedPreferences(app: Application): SharedPreferences {
         return app.getSharedPreferences(SHARED_PREFS_KEY, Context.MODE_PRIVATE)
+    }
+
+    @Singleton
+    @JvmStatic
+    @Provides
+    fun provideLoggedUser(preference: SharedPreferences): LoggedUser {
+        val loggedUser = preference.getString("LoggedUser", null)
+        return Gson().fromJson(loggedUser, LoggedUser::class.java)
     }
 }

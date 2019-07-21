@@ -2,20 +2,52 @@ package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.os.Bundle
 import android.view.*
+import androidx.databinding.DataBindingComponent
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.dashboard_fragment.view.*
 import ltd.royalgreen.pacecloud.R
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
+import ltd.royalgreen.pacecloud.databinding.DashboardFragmentBinding
+import ltd.royalgreen.pacecloud.dinjectors.Injectable
+import ltd.royalgreen.pacecloud.util.autoCleared
 
 
-class DashboardFragment : Fragment() {
+class DashboardFragment : Fragment(), Injectable {
+
+    private val viewModel: DashboardViewModel by lazy {
+        // Get the ViewModel.
+        ViewModelProviders.of(this).get(DashboardViewModel::class.java)
+    }
+
+    var binding by autoCleared<DashboardFragmentBinding>()
+    var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.dashboard_fragment, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.dashboard_fragment,
+            container,
+            false,
+            dataBindingComponent
+        )
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        binding.setLifecycleOwner(viewLifecycleOwner)
+        binding.viewModel = viewModel
+
+//        val user = viewModel.loggedUser
 
         val NoOfEmp: List<PieEntry>
         NoOfEmp = ArrayList<PieEntry>()
@@ -52,6 +84,5 @@ class DashboardFragment : Fragment() {
         view.osStatusPieChart.description.text="This chart shows the OS usage status at a glance."
         view.osStatusPieChart.isRotationEnabled = false
         view.osStatusPieChart.animateXY(1000, 1000)
-        return view
     }
 }

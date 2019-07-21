@@ -22,9 +22,6 @@ class SplashActivity : AppCompatActivity() {
 
     @Inject
     lateinit var preferences: SharedPreferences
-//
-//    @Inject
-//    lateinit var loggedUser: LoggedUser
 
     private lateinit var animation: Animation
 

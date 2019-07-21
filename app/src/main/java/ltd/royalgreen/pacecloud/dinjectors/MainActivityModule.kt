@@ -7,7 +7,6 @@ import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 import ltd.royalgreen.pacecloud.MainActivity
 import ltd.royalgreen.pacecloud.SplashActivity
-import ltd.royalgreen.pacecloud.loginmodule.FragmentBuildersModule
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
 
@@ -23,16 +22,4 @@ abstract class MainActivityModule {
 
     @ContributesAndroidInjector
     abstract fun splashActivity(): SplashActivity
-
-    @Module
-    companion object {
-        @JvmStatic
-        @Provides
-        fun provideLoggedUser(
-            preference: SharedPreferences
-        ): LoggedUser {
-            val loggedUser = preference.getString("LoggedUser", null)
-            return Gson().fromJson(loggedUser, LoggedUser::class.java)
-        }
-    }
 }

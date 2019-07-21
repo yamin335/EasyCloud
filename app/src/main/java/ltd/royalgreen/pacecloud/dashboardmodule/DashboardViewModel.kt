@@ -1,18 +1,18 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
-import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import ltd.royalgreen.pacecloud.BaseViewModel
+import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.ApiCallStatus
 import ltd.royalgreen.pacecloud.network.ApiService
 import javax.inject.Inject
 
-const val SHARED_PREFS_KEY = "LoginStatus"
-
 class DashboardViewModel : BaseViewModel() {
     @Inject
     lateinit var apiService: ApiService
+
+//    @Inject
+//    lateinit var loggedUser: LoggedUser
 
     val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
