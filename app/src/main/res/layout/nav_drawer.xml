@@ -39,6 +39,9 @@
                 android:id="@+id/bottom_nav"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:itemRippleColor="@color/colorLightGreen"
+                app:itemTextColor="@drawable/bottom_navigation_colors"
+                app:itemIconTint="@drawable/bottom_navigation_colors"
                 app:menu="@menu/bottom_nav"/>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

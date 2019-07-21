@@ -1,8 +1,14 @@
 package ltd.royalgreen.pacecloud
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
@@ -12,20 +18,36 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
+import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.nav_drawer.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
+import javax.inject.Inject
 
 /**
  * An activity that inflates a layout that has a [BottomNavigationView].
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
+
+    @Inject
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+
+    @Inject
+    lateinit var preferences: SharedPreferences
 
     private var currentNavController: LiveData<NavController>? = null
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    override fun supportFragmentInjector() = dispatchingAndroidInjector
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             setupBottomNavigationBar()
         } // Else, need to wait for onRestoreInstanceState
@@ -45,7 +67,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigationBar() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
-        val navGraphIds = listOf(R.navigation.home_graph, R.navigation.service_graph, R.navigation.payment_graph, R.navigation.support_graph)
+        val navGraphIds = listOf(R.navigation.dashboard_graph, R.navigation.service_graph, R.navigation.payment_graph, R.navigation.support_graph)
 
         // Setup the bottom navigation view with a payment_graph of navigation graphs
         val controller = bottomNavigationView.setupWithNavController(
@@ -67,16 +89,59 @@ class MainActivity : AppCompatActivity() {
         currentNavController = controller
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+        currentNavController?.observe(this, Observer { navController ->
+            when(navController.graph.id) {
+                R.id.dashboard_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+                R.id.service_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+                R.id.payment_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+                R.id.support_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+            }
+        })
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.signOut -> doSignOut()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onSupportNavigateUp(): Boolean {
-//        return currentNavController?.value?.navigateUp() ?: false
         return currentNavController?.value?.navigateUp(appBarConfiguration) ?: false || super.onSupportNavigateUp()
+    }
+
+    private fun doSignOut() {
+        val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle("Do you want sign out?")
+            .setIcon(R.mipmap.ic_launcher)
+            .setCancelable(false)
+            .setPositiveButton("Yes") { _, _ ->
+                val handler = CoroutineExceptionHandler { _, exception ->
+                    Toast.makeText(this, "$exception", Toast.LENGTH_LONG).show()
+                }
+                CoroutineScope(Dispatchers.IO).launch(handler) {
+                    preferences.edit().apply {
+                        putBoolean("LoginState", false)
+                        putString("LoggedUser", "")
+                        apply()
+                    }
+                }
+                startActivity(Intent(this@MainActivity, LoginActivity::class.java))
+                finish()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.cancel()
+            }
+        exitDialog.show()
     }
 
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-//            super.onBackPressed()
             val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
                 .setTitle("Do you want to exit?")
                 .setIcon(R.mipmap.ic_launcher)

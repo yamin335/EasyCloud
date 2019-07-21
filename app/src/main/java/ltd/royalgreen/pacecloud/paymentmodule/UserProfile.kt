@@ -1,4 +1,4 @@
-package ltd.royalgreen.pacecloud.listscreen
+package ltd.royalgreen.pacecloud.paymentmodule
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import ltd.royalgreen.pacecloud.listscreen.MyAdapter.Companion.USERNAME_KEY
+import ltd.royalgreen.pacecloud.paymentmodule.MyAdapter.Companion.USERNAME_KEY
 import ltd.royalgreen.pacecloud.R
 
 

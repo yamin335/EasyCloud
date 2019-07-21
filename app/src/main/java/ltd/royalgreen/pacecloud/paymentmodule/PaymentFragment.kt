@@ -1,4 +1,4 @@
-package ltd.royalgreen.pacecloud.listscreen
+package ltd.royalgreen.pacecloud.paymentmodule
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -23,7 +23,7 @@ class Leaderboard : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_leaderboard, container, false)
+        val view = inflater.inflate(R.layout.payment_fragment, container, false)
 
         viewAdapter = MyAdapter(Array(10) { "Person ${it + 1}" })
 

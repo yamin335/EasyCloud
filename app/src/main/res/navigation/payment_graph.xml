@@ -4,21 +4,21 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/payment"
+    android:id="@+id/payment_graph"
     app:startDestination="@+id/leaderboard">
 
     <fragment
             android:id="@+id/leaderboard"
-            android:name="ltd.royalgreen.pacecloud.listscreen.Leaderboard"
-            android:label="@string/title_list"
-            tools:layout="@layout/fragment_leaderboard">
+            android:name="ltd.royalgreen.pacecloud.paymentmodule.Leaderboard"
+            android:label="@string/payment"
+            tools:layout="@layout/payment_fragment">
         <action
-            android:id="@+id/action_leaderboard_to_userProfile"
-            app:destination="@id/userProfile"/>
+                android:id="@+id/action_leaderboard_to_userProfile"
+                app:destination="@id/userProfile"/>
     </fragment>
     <fragment
         android:id="@+id/userProfile"
-        android:name="ltd.royalgreen.pacecloud.listscreen.UserProfile"
+        android:name="ltd.royalgreen.pacecloud.paymentmodule.UserProfile"
         android:label="@string/title_detail"
         tools:layout="@layout/fragment_user_profile">
         <deepLink

@@ -1,4 +1,4 @@
-package ltd.royalgreen.pacecloud.formscreen
+package ltd.royalgreen.pacecloud.supportmodule
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,12 +13,12 @@ import ltd.royalgreen.pacecloud.R
 /**
  * Shows a register support_graph to showcase UI state persistence. It has a button that goes to [Registered]
  */
-class Register : Fragment() {
+class SupportFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_register, container, false)
+        val view = inflater.inflate(R.layout.support_fragment, container, false)
 
         view.findViewById<Button>(R.id.signup_btn).setOnClickListener {
             findNavController().navigate(R.id.action_register_to_registered)

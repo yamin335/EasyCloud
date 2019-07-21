@@ -1,4 +1,4 @@
-package ltd.royalgreen.pacecloud.homescreen
+package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.os.Bundle
 import android.view.LayoutInflater

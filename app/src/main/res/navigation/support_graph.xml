@@ -3,22 +3,22 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/support"
+    android:id="@+id/support_graph"
     app:startDestination="@id/register"
     tools:ignore="UnusedNavigation">
 
     <fragment
             android:id="@+id/register"
-            android:name="ltd.royalgreen.pacecloud.formscreen.Register"
+            android:name="ltd.royalgreen.pacecloud.supportmodule.SupportFragment"
             android:label="@string/support"
-            tools:layout="@layout/fragment_register">
+            tools:layout="@layout/support_fragment">
         <action
             android:id="@+id/action_register_to_registered"
             app:destination="@id/registered"/>
     </fragment>
     <fragment
         android:id="@+id/registered"
-        android:name="ltd.royalgreen.pacecloud.formscreen.Registered"
+        android:name="ltd.royalgreen.pacecloud.supportmodule.Registered"
         android:label="Registered"
         tools:layout="@layout/fragment_registered"/>
 </navigation>

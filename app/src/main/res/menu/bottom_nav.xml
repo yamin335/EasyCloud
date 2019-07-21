@@ -17,23 +17,23 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/home"
-        android:icon="@drawable/ic_home_gray_24dp"
-        android:contentDescription="@string/cd_home"
-        android:title="@string/title_home" />
+        android:id="@+id/dashboard_graph"
+        android:icon="@drawable/ic_dashboard_gray_24dp"
+        android:contentDescription="@string/dashboard_activity"
+        android:title="@string/dashboard" />
     <item
-        android:id="@+id/service"
+        android:id="@+id/service_graph"
         android:icon="@drawable/ic_cloud_done_gray_24dp"
-        android:contentDescription="@string/cd_form"
+        android:contentDescription="@string/list_of_services"
         android:title="@string/services" />
     <item
-        android:id="@+id/payment"
+        android:id="@+id/payment_graph"
         android:icon="@drawable/ic_monetization_on_gray_24dp"
-        android:contentDescription="@string/cd_list"
+        android:contentDescription="@string/user_payment"
         android:title="@string/payment" />
     <item
-        android:id="@+id/support"
+        android:id="@+id/support_graph"
         android:icon="@drawable/ic_mood_gray_24dp"
-        android:contentDescription="@string/cd_form"
+        android:contentDescription="@string/user_support"
         android:title="@string/support" />
 </menu>
