@@ -1,17 +1,22 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
+import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
-import ltd.royalgreen.pacecloud.BaseViewModel
 import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 
-class LoginViewModel : BaseViewModel(){
+class LoginViewModel @Inject constructor(app: Application) : ViewModel(){
 
     @Inject
     lateinit var apiService: ApiService
+
+    val application = app
 
     val userName: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
@@ -34,35 +39,39 @@ class LoginViewModel : BaseViewModel(){
     }
 
     fun processSignIn() {
-        apiCallStatus.value = ApiCallStatus.LOADING
-        val jsonObject = JsonObject().apply {
-            addProperty("userName", userName.value)
-            addProperty("userPass", password.value)
-        }
-        val param = JsonArray().apply {
-            add(jsonObject)
-        }.toString()
+        if (isNetworkAvailable(application)) {
+            apiCallStatus.value = ApiCallStatus.LOADING
+            val jsonObject = JsonObject().apply {
+                addProperty("userName", userName.value)
+                addProperty("userPass", password.value)
+            }
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }.toString()
 
-        val handler = CoroutineExceptionHandler { _, exception ->
-            println("Caught $exception")
-        }
+            val handler = CoroutineExceptionHandler { _, exception ->
+                println("Caught $exception")
+            }
 
-        CoroutineScope(Dispatchers.IO).launch(handler) {
-            withTimeoutOrNull(5000L) {
-                val response = apiService.loginportalusers(param).execute()
-                val apiResponse = ApiResponse.create(response)
-                when (apiResponse) {
-                    is ApiSuccessResponse -> {
-                        apiResult.postValue(apiResponse.body)
-                    }
-                    is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                withTimeoutOrNull(5000L) {
+                    val response = apiService.loginportalusers(param).execute()
+                    val apiResponse = ApiResponse.create(response)
+                    when (apiResponse) {
+                        is ApiSuccessResponse -> {
+                            apiResult.postValue(apiResponse.body)
+                        }
+                        is ApiEmptyResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        }
+                        is ApiErrorResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        }
                     }
                 }
             }
+        } else {
+            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
         }
     }
 }

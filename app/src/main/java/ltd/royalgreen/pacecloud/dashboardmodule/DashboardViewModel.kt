@@ -1,18 +1,24 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
+import android.app.Application
+import android.content.SharedPreferences
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
-import ltd.royalgreen.pacecloud.BaseViewModel
+import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
-import ltd.royalgreen.pacecloud.network.ApiService
+import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 
-class DashboardViewModel : BaseViewModel() {
+class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
     @Inject
     lateinit var apiService: ApiService
 
-//    @Inject
-//    lateinit var loggedUser: LoggedUser
+    val application = app
 
     val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
@@ -30,23 +36,118 @@ class DashboardViewModel : BaseViewModel() {
         MutableLiveData<DashOsSummary>()
     }
 
-    init {
-        //Get LoggedUser data from shared preference
-//        val sharedPref = getSharedPreferences(SHARED_PREFS_KEY, Context.MODE_PRIVATE)
-//        val loggedUser = sharedPreferences.getString(USER_PROFILE, null)
-//        return gson.fromJson(serializedUser, UserProfile::class.java)
+    fun getUserBalance(user: LoggedUser) {
+        if (isNetworkAvailable(application)) {
+            apiCallStatus.value = ApiCallStatus.LOADING
+            val jsonObject = JsonObject().apply {
+                addProperty("UserID", user.resdata?.loggeduser?.userID)
+            }
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }.toString()
 
+            val handler = CoroutineExceptionHandler { _, exception ->
+                println("Caught $exception")
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                withTimeoutOrNull(5000L) {
+                    val response = apiService.billclouduserbalance(param).execute()
+                    val apiResponse = ApiResponse.create(response)
+                    when (apiResponse) {
+                        is ApiSuccessResponse -> {
+                            userBalance.postValue(apiResponse.body)
+                            apiCallStatus.value = ApiCallStatus.SUCCESS
+                        }
+                        is ApiEmptyResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        }
+                        is ApiErrorResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        }
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+        }
     }
 
-    private fun getUserBalance() {
+    fun getOsStatus(user: LoggedUser) {
+        if (isNetworkAvailable(application)) {
+            apiCallStatus.value = ApiCallStatus.LOADING
+            val jsonObject = JsonObject().apply {
+                addProperty("CompanyID", user.resdata?.loggeduser?.companyID)
+                addProperty("values", "cloudvmstatus")
+                addProperty("UserID", user.resdata?.loggeduser?.userID)
+            }
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }.toString()
 
+            val handler = CoroutineExceptionHandler { _, exception ->
+                println("Caught $exception")
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                withTimeoutOrNull(5000L) {
+                    val response = apiService.GetDashboardChartPortal(param).execute()
+                    val apiResponse = ApiResponse.create(response)
+                    when (apiResponse) {
+                        is ApiSuccessResponse -> {
+                            osStatus.postValue(apiResponse.body)
+                            apiCallStatus.value = ApiCallStatus.SUCCESS
+                        }
+                        is ApiEmptyResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        }
+                        is ApiErrorResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        }
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+        }
     }
 
-    private fun getOsStatus() {
+    fun getOsSummary(user: LoggedUser) {
+        if (isNetworkAvailable(application)) {
+            apiCallStatus.value = ApiCallStatus.LOADING
+            val jsonObject = JsonObject().apply {
+                addProperty("CompanyID", user.resdata?.loggeduser?.companyID)
+                addProperty("values", "cloudvm")
+                addProperty("UserID", user.resdata?.loggeduser?.userID)
+            }
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }.toString()
 
-    }
+            val handler = CoroutineExceptionHandler { _, exception ->
+                println("Caught $exception")
+            }
 
-    private fun getOsSummary() {
-
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                withTimeoutOrNull(5000L) {
+                    val response = apiService.GetDashboardChartPortalSummery(param).execute()
+                    val apiResponse = ApiResponse.create(response)
+                    when (apiResponse) {
+                        is ApiSuccessResponse -> {
+                            osSummary.postValue(apiResponse.body)
+                            apiCallStatus.value = ApiCallStatus.SUCCESS
+                        }
+                        is ApiEmptyResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        }
+                        is ApiErrorResponse -> {
+                            apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        }
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+        }
     }
 }

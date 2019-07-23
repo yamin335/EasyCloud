@@ -13,9 +13,10 @@ import ltd.royalgreen.pacecloud.network.ApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import javax.inject.Inject
 import javax.inject.Singleton
 
-@Module
+@Module(includes = [ViewModelModule::class])
 @Suppress("unused")
 object AppModule {
     @Singleton
@@ -38,11 +39,11 @@ object AppModule {
         return app.getSharedPreferences(SHARED_PREFS_KEY, Context.MODE_PRIVATE)
     }
 
-    @Singleton
-    @JvmStatic
-    @Provides
-    fun provideLoggedUser(preference: SharedPreferences): LoggedUser {
-        val loggedUser = preference.getString("LoggedUser", null)
-        return Gson().fromJson(loggedUser, LoggedUser::class.java)
-    }
+//    @Singleton
+//    @JvmStatic
+//    @Provides
+//    fun provideLoggedUser(preference: SharedPreferences): LoggedUser {
+//        val loggedUser = preference.getString("LoggedUser", "{}")
+//        return Gson().fromJson(loggedUser, LoggedUser::class.java)
+//    }
 }

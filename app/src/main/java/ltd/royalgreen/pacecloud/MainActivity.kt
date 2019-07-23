@@ -27,6 +27,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
+import ltd.royalgreen.pacecloud.util.ExpandableMenuAdapter
+import ltd.royalgreen.pacecloud.util.ExpandableMenuModel
 import javax.inject.Inject
 
 /**
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        prepareSideNavMenu()
         if (savedInstanceState == null) {
             setupBottomNavigationBar()
         } // Else, need to wait for onRestoreInstanceState
@@ -136,6 +139,29 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 dialog.cancel()
             }
         exitDialog.show()
+    }
+
+    private fun prepareSideNavMenu() {
+        val menuHeaderList = ArrayList<ExpandableMenuModel>()
+        val menuChildMap = HashMap<ExpandableMenuModel, List<String>>()
+
+        val demoMenuHeader = ExpandableMenuModel("Menu Header", R.drawable.ic_star_white_24dp)
+        menuHeaderList.add(demoMenuHeader)
+
+        val aboutHeader = ExpandableMenuModel("About Us", R.drawable.ic_info_white_24dp)
+        menuHeaderList.add(aboutHeader)
+
+        val demoMenuChild = ArrayList<String>()
+        demoMenuChild.add("First Demo Child")
+        demoMenuChild.add("Second Demo Child")
+
+        val aboutChild = ArrayList<String>()
+
+        menuChildMap[menuHeaderList[0]] = demoMenuChild
+        menuChildMap[menuHeaderList[1]] = aboutChild
+
+        val sideMenuAdapter = ExpandableMenuAdapter(this, menuHeaderList, menuChildMap)
+        expandableMenu.setAdapter(sideMenuAdapter)
     }
 
     override fun onBackPressed() {

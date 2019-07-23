@@ -3,6 +3,7 @@
     <color name="colorPrimary">#24272c</color>
     <color name="colorPrimaryDark">#0F1013</color>
     <color name="colorAccent">#50C503</color>
+    <color name="colorWhite">#ffffff</color>
 
     <!-- Custom colors -->
     <color name="colorPrimaryLight">#5E5E5E</color>
@@ -15,4 +16,14 @@
     <color name="colorDarkGreen">#46AC06</color>
     <color name="colorGreen">#50C503</color>
     <color name="colorRed">#D50000</color>
+
+    <!-- Colors for pie chart -->
+    <color name="pieColor1">#FEBF00</color>
+    <color name="pieColor2">#29990B</color>
+
+    <!-- Colors for bar chart -->
+    <color name="barColor1">#29990B</color>
+    <color name="barColor2">#FEBF00</color>
+    <color name="barColor3">#c4ea7c</color>
+    <color name="barColor4">#fd973c</color>
 </resources>

@@ -9,6 +9,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
@@ -28,9 +29,12 @@ class LoginActivity : AppCompatActivity(){
     @Inject
     lateinit var preferences: SharedPreferences
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
     private val viewModel: LoginViewModel by lazy {
         // Get the ViewModel.
-        ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
     }
 
     public override fun onResume() {
