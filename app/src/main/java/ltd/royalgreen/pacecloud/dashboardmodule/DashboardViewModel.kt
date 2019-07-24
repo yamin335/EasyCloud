@@ -20,12 +20,8 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
     val application = app
 
-    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
+    private val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
-    }
-
-    val userBalance: MutableLiveData<BalanceModel> by lazy {
-        MutableLiveData<BalanceModel>()
     }
 
     val osStatus: MutableLiveData<DashOsStatus> by lazy {
@@ -34,43 +30,6 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
     val osSummary: MutableLiveData<DashOsSummary> by lazy {
         MutableLiveData<DashOsSummary>()
-    }
-
-    fun getUserBalance(user: LoggedUser) {
-        if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
-            val jsonObject = JsonObject().apply {
-                addProperty("UserID", user.resdata?.loggeduser?.userID)
-            }
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }.toString()
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                println("Caught $exception")
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
-                    val response = apiService.billclouduserbalance(param).execute()
-                    val apiResponse = ApiResponse.create(response)
-                    when (apiResponse) {
-                        is ApiSuccessResponse -> {
-                            userBalance.postValue(apiResponse.body)
-                            apiCallStatus.value = ApiCallStatus.SUCCESS
-                        }
-                        is ApiEmptyResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
-                    }
-                }
-            }
-        } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
-        }
     }
 
     fun getOsStatus(user: LoggedUser) {

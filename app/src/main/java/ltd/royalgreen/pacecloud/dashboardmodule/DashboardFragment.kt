@@ -20,9 +20,11 @@ import ltd.royalgreen.pacecloud.databinding.DashboardFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.util.autoCleared
-import java.math.BigDecimal
-import java.math.RoundingMode
 import javax.inject.Inject
+import com.github.mikephil.charting.utils.ViewPortHandler
+import com.github.mikephil.charting.formatter.ValueFormatter
+import java.text.DecimalFormat
+import kotlin.math.roundToInt
 
 
 class DashboardFragment : Fragment(), Injectable {
@@ -71,6 +73,7 @@ class DashboardFragment : Fragment(), Injectable {
         view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
         view.osStatusPieChart.description.isEnabled = false
         view.osStatusPieChart.isRotationEnabled = false
+//        view.osStatusPieChart.setUsePercentValues(true)
         view.osStatusPieChart.animateXY(900, 900)
 
         //Bar Chart Configuration
@@ -79,24 +82,17 @@ class DashboardFragment : Fragment(), Injectable {
         view.osSummaryBarChart.setFitBars(true)
         view.osSummaryBarChart.setNoDataText("No Chart Data Found")
         view.osSummaryBarChart.description.isEnabled = false
+        view.osSummaryBarChart.setScaleEnabled(false)
         view.osSummaryBarChart.xAxis.setDrawGridLines(false)
         view.osSummaryBarChart.animateY(900)
 
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
         if (user != null) {
-            viewModel.getUserBalance(user)
             viewModel.getOsStatus(user)
             viewModel.getOsSummary(user)
             binding.name = user.resdata?.loggeduser?.fullName
-            binding.email = user.resdata?.loggeduser?.email
-            binding.createDate = user.resdata?.loggeduser?.created
-            binding.updateDate = user.resdata?.loggeduser?.lastUpdated
             binding.versionNo = "Beta Version:1.0.1"
         }
-
-        viewModel.userBalance.observe(this, Observer { userBalance ->
-            binding.balance = BigDecimal(userBalance.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
-        })
 
         viewModel.osStatus.observe(this, Observer { status ->
             val dataSet = status?.resdata?.dashboardchartdata
@@ -110,7 +106,9 @@ class DashboardFragment : Fragment(), Injectable {
                 pieDataSet.valueTextColor = resources.getColor(R.color.colorWhite)
                 pieDataSet.valueTextSize = 13f
                 pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2), resources.getColor(R.color.pieColor1))
-                view.osStatusPieChart.data = PieData(pieDataSet)
+                val pieData = PieData(pieDataSet)
+                pieData.setValueFormatter(CustomValueFormatter())
+                view.osStatusPieChart.data = pieData
                 view.osStatusPieChart.invalidate()
             }
         })
@@ -132,6 +130,8 @@ class DashboardFragment : Fragment(), Injectable {
                     }
                 }
                 val barDataSet = BarDataSet(entries, "VM OS Summary")
+                barDataSet.valueFormatter = CustomValueFormatter()
+                barDataSet.valueTextSize = 11f
                 val barData = BarData(barDataSet)
                 barDataSet.colors = arrayListOf(resources.getColor(R.color.barColor1),
                     resources.getColor(R.color.barColor2), resources.getColor(R.color.barColor3),
@@ -143,4 +143,17 @@ class DashboardFragment : Fragment(), Injectable {
             }
         })
     }
+
+    inner class CustomValueFormatter : ValueFormatter() {
+
+        // override this for BarChart
+        override fun getBarLabel(barEntry: BarEntry?): String {
+            return barEntry?.y?.roundToInt().toString()
+        }
+
+        override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
+            return pieEntry?.y?.roundToInt().toString()
+        }
+    }
+
 }

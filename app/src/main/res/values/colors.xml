@@ -6,8 +6,8 @@
     <color name="colorWhite">#ffffff</color>
 
     <!-- Custom colors -->
-    <color name="colorPrimaryLight">#5E5E5E</color>
-    <color name="colorPrimaryLightDark">#3D3D3D</color>
+    <color name="colorPrimaryLight">#3d3d3d</color>
+    <color name="colorPrimaryLightDark">#313131</color>
     <color name="colorYellow">#F1CB00</color>
     <color name="colorGray">#FF808080</color>
     <color name="colorGrayLight">#FFafafaf</color>
