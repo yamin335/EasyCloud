@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
+import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import retrofit2.Call
 import retrofit2.http.GET
@@ -50,4 +51,8 @@ interface ApiService {
     //API FOR USER VM SUMMERY
     @GET("/api/portal/GetDashboardChartPortal")
     fun GetDashboardChartPortalSummery(@Query("param") param: String): Call<DashOsSummary>
+
+    //API FOR USER VM SUMMERY
+    @GET("/api/portal/cloudactivitylog")
+    fun cloudactivitylog(@Query("param") param: String): Call<UserActivityLog>
 }

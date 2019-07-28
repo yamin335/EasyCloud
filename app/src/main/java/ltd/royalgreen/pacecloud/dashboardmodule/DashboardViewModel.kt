@@ -3,9 +3,12 @@ package ltd.royalgreen.pacecloud.dashboardmodule
 import android.app.Application
 import android.content.SharedPreferences
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.gson.Gson
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
@@ -15,6 +18,9 @@ import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 
 class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
+    @Inject
+    lateinit var preferences: SharedPreferences
+
     @Inject
     lateinit var apiService: ApiService
 
@@ -30,6 +36,22 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
     val osSummary: MutableLiveData<DashOsSummary> by lazy {
         MutableLiveData<DashOsSummary>()
+    }
+
+    val userLogResponse: MutableLiveData<UserActivityLog> by lazy {
+        MutableLiveData<UserActivityLog>()
+    }
+
+    lateinit var userLogs: LiveData<PagedList<CloudActivityLog>>
+
+    fun initializedPagedListBuilder(config: PagedList.Config):
+            LivePagedListBuilder<Long, CloudActivityLog> {
+        val dataSourceFactory = object : DataSource.Factory<Long, CloudActivityLog>() {
+            override fun create(): DataSource<Long, CloudActivityLog> {
+                return ActivityLogDataSource(application, apiService, preferences)
+            }
+        }
+        return LivePagedListBuilder<Long, CloudActivityLog>(dataSourceFactory, config)
     }
 
     fun getOsStatus(user: LoggedUser) {

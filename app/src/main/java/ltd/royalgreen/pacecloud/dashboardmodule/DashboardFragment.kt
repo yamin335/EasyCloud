@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.paging.PagedList
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
@@ -21,9 +23,10 @@ import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
-import com.github.mikephil.charting.utils.ViewPortHandler
 import com.github.mikephil.charting.formatter.ValueFormatter
-import java.text.DecimalFormat
+import kotlinx.android.synthetic.main.dashboard_fragment.*
+import kotlinx.android.synthetic.main.dashboard_fragment.view.userActivityLogList
+import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import kotlin.math.roundToInt
 
 
@@ -43,6 +46,9 @@ class DashboardFragment : Fragment(), Injectable {
     private var binding by autoCleared<DashboardFragmentBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
+    //For Cloud User Activity Log
+    private val adapter = ActivityLogAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -61,14 +67,33 @@ class DashboardFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
+        userActivityLogList.layoutManager = LinearLayoutManager(activity)
+        userActivityLogList.addItemDecoration(RecyclerItemDivider(activity!!.applicationContext, LinearLayoutManager.VERTICAL, 8))
+        userActivityLogList.adapter = adapter
+
+        //1
+        val config = PagedList.Config.Builder()
+            .setPageSize(30)
+            .setEnablePlaceholders(false)
+            .build()
+
+        //2
+        viewModel.userLogs = viewModel.initializedPagedListBuilder(config).build()
+
+        //3
+        viewModel.userLogs.observe(this, Observer<PagedList<CloudActivityLog>> { pagedList ->
+            adapter.submitList(pagedList)
+        })
+
         //Pie Chart Configuration
         view.osStatusPieChart.isLogEnabled = false
-        view.osStatusPieChart.holeRadius = 40F
-        view.osStatusPieChart.transparentCircleRadius = 48F
-        view.osStatusPieChart.centerText = "VM OS Status"
+        view.osStatusPieChart.holeRadius = 35F
+        view.osStatusPieChart.transparentCircleRadius = 43F
+        view.osStatusPieChart.centerText = "VM Status"
         view.osStatusPieChart.setNoDataText("No Chart Data Found")
 //        view.osStatusPieChart.setDrawMarkers(false)
-        view.osStatusPieChart.setDrawEntryLabels(false)
+        view.osStatusPieChart.setDrawEntryLabels(true)
+        view.osStatusPieChart.setEntryLabelTextSize(11f)
         view.osStatusPieChart.setNoDataTextColor(resources.getColor(R.color.pieColor1))
         view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
         view.osStatusPieChart.description.isEnabled = false
@@ -104,7 +129,7 @@ class DashboardFragment : Fragment(), Injectable {
                 }
                 val pieDataSet = PieDataSet(entries, "Cloud VM OS Status")
                 pieDataSet.valueTextColor = resources.getColor(R.color.colorWhite)
-                pieDataSet.valueTextSize = 13f
+                pieDataSet.valueTextSize = 11f
                 pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2), resources.getColor(R.color.pieColor1))
                 val pieData = PieData(pieDataSet)
                 pieData.setValueFormatter(CustomValueFormatter())
@@ -129,7 +154,7 @@ class DashboardFragment : Fragment(), Injectable {
                         titles.add(index, value.dataName?: "")
                     }
                 }
-                val barDataSet = BarDataSet(entries, "VM OS Summary")
+                val barDataSet = BarDataSet(entries, "OS Summary")
                 barDataSet.valueFormatter = CustomValueFormatter()
                 barDataSet.valueTextSize = 11f
                 val barData = BarData(barDataSet)

@@ -16,6 +16,7 @@
     <color name="colorDarkGreen">#46AC06</color>
     <color name="colorGreen">#50C503</color>
     <color name="colorRed">#D50000</color>
+    <color name="textColor1">#27a4b0</color>
 
     <!-- Colors for pie chart -->
     <color name="pieColor1">#FEBF00</color>
