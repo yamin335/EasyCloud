@@ -9,5 +9,5 @@ import androidx.fragment.app.Fragment
 class FragmentDataBindingComponent(fragment: Fragment) : DataBindingComponent {
     private val adapter = FragmentBindingAdapters(fragment)
 
-    fun getFragmentBindingAdapters() = adapter
+    override fun getFragmentBindingAdapters() = adapter
 }

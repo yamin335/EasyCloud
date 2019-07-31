@@ -95,7 +95,7 @@ class DashboardFragment : Fragment(), Injectable {
         view.osStatusPieChart.setDrawEntryLabels(true)
         view.osStatusPieChart.setEntryLabelTextSize(11f)
         view.osStatusPieChart.setNoDataTextColor(resources.getColor(R.color.pieColor1))
-        view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
+//        view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
         view.osStatusPieChart.description.isEnabled = false
         view.osStatusPieChart.isRotationEnabled = false
 //        view.osStatusPieChart.setUsePercentValues(true)
@@ -127,10 +127,10 @@ class DashboardFragment : Fragment(), Injectable {
                 dataSet.forEach {
                     entries.add(PieEntry(it.dataValue?.toFloat()?: 0.00F, it.dataName))
                 }
-                val pieDataSet = PieDataSet(entries, "Cloud VM OS Status")
+                val pieDataSet = PieDataSet(entries, "")
                 pieDataSet.valueTextColor = resources.getColor(R.color.colorWhite)
                 pieDataSet.valueTextSize = 11f
-                pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2), resources.getColor(R.color.pieColor1))
+                pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2), resources.getColor(R.color.pieColor1), resources.getColor(R.color.colorRed))
                 val pieData = PieData(pieDataSet)
                 pieData.setValueFormatter(CustomValueFormatter())
                 view.osStatusPieChart.data = pieData

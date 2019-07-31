@@ -6,6 +6,7 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
 import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.servicemodule.VMListResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -52,7 +53,11 @@ interface ApiService {
     @GET("/api/portal/GetDashboardChartPortal")
     fun GetDashboardChartPortalSummery(@Query("param") param: String): Call<DashOsSummary>
 
-    //API FOR USER VM SUMMERY
+    //API FOR USER ACTIVITY LOG
     @GET("/api/portal/cloudactivitylog")
     fun cloudactivitylog(@Query("param") param: String): Call<UserActivityLog>
+
+    //API FOR USER VM LIST
+    @GET("/api/portal/cloudvmbyuserid")
+    fun cloudvmbyuserid(@Query("param") param: String): Call<VMListResponse>
 }

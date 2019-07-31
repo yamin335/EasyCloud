@@ -1,14 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".Hello">
+<layout xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="tVM" type="String"/>
+        <variable name="rVM" type="String"/>
+        <variable name="tNodeHour" type="String"/>
+        <variable name="tCloudCost" type="String"/>
+        <variable name="viewModel" type="ltd.royalgreen.pacecloud.servicemodule.ServiceFragmentViewModel"/>
+    </data>
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:id="@+id/loader"
+                android:layout_width="match_parent"
+                android:layout_marginBottom="-13dp"
+                android:layout_marginTop="-13dp"
+                android:layout_height="30dp"
+                android:indeterminate="true"
+                android:layout_alignParentTop="true"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorGreen"
+                android:layout_below="@id/loader">
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/vmListRecycler"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@color/colorWhite"
+                    app:layout_constraintTop_toBottomOf="@+id/label4"
+                    android:layout_marginTop="8dp" app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="0dp" app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="0dp" android:layout_marginBottom="0dp"
+                    app:layout_constraintBottom_toBottomOf="parent">
 
-</FrameLayout>
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <TextView
+                    android:id="@+id/label11"
+                    android:text="Total VM:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="8dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintVertical_bias="0.0" app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"/>
+            <TextView
+                    android:id="@+id/totalVM"
+                    android:text="@{tVM}"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="@+id/label11"
+                    app:layout_constraintBottom_toBottomOf="@+id/label11"
+                    app:layout_constraintStart_toEndOf="@+id/label11" android:layout_marginStart="4dp"
+                    app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+                    app:layout_constraintHorizontal_bias="0.0"/>
+
+            <TextView
+                    android:id="@+id/label2"
+                    android:text="Running VM:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toEndOf="@+id/totalVM" android:layout_marginStart="16dp"
+                    app:layout_constraintTop_toTopOf="@+id/totalVM"
+                    app:layout_constraintBottom_toBottomOf="@+id/totalVM"
+                    app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+                    app:layout_constraintHorizontal_bias="0.0"/>
+            <TextView
+                    android:id="@+id/runningVM"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorWhite"
+                    android:text="@{rVM}"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toEndOf="@+id/label2" android:layout_marginStart="4dp"
+                    app:layout_constraintTop_toTopOf="@+id/label2" app:layout_constraintBottom_toBottomOf="@+id/label2"
+                    app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+                    app:layout_constraintHorizontal_bias="0.0"/>
+
+            <TextView
+                    android:id="@+id/label3"
+                    android:text="Total Hour:"
+                    android:textStyle="bold"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@+id/label11"
+                    app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:layout_constraintTop_toBottomOf="@+id/label11" app:layout_constraintBottom_toBottomOf="parent"/>
+            <TextView
+                    android:id="@+id/totalNodeHour"
+                    android:text="@{tNodeHour}"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="15sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="@+id/label3"
+                    app:layout_constraintBottom_toBottomOf="@+id/label3"
+                    app:layout_constraintStart_toEndOf="@+id/label3" app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0" android:layout_marginStart="4dp"/>
+            <View
+                    android:id="@+id/divider"
+                    android:layout_width="1dp"
+                    android:layout_height="0dp"
+                    android:background="@color/colorWhite"
+                    app:layout_constraintTop_toTopOf="@+id/label3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/totalNodeHour" android:layout_marginStart="10dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/label3"/>
+            <TextView
+                    android:id="@+id/label4"
+                    android:text="Total Cost:"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/label3"
+                    app:layout_constraintStart_toEndOf="@+id/divider"
+                    app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintVertical_bias="0.0" app:layout_constraintTop_toTopOf="@+id/label3"
+                    android:layout_marginStart="10dp"/>
+            <TextView
+                    android:id="@+id/totalCloudCost"
+                    android:text="@{tCloudCost}"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toEndOf="@+id/label4" android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/label4"
+                    app:layout_constraintTop_toTopOf="@+id/label4" app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginEnd="8dp" app:layout_constraintHorizontal_bias="0.0"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </RelativeLayout>
+</layout>

@@ -1,4 +1,4 @@
-package ltd.royalgreen.pacecloud.loginmodule
+package ltd.royalgreen.pacecloud
 
 import android.content.Context
 import android.view.View
@@ -9,8 +9,10 @@ import android.widget.TextView
 import androidx.databinding.BindingAdapter
 import ltd.royalgreen.pacecloud.network.ApiCallStatus
 
-object LoginBindingAdapters {
-
+/**
+ * Data Binding adapters specific to the app.
+ */
+object BindingAdapters {
     /**
      * Hides keyboard when the [EditText] is focused.
      *
@@ -40,7 +42,14 @@ object LoginBindingAdapters {
         view.visibility = if (apiCallStatus?.equals(ApiCallStatus.LOADING) == true) View.VISIBLE else View.GONE
     }
 
-    // Shows and hides errorText
+    // Shows and hides progressbar
+    @JvmStatic
+    @BindingAdapter("showLoader")
+    fun showLoader(view: View, apiCallStatus: ApiCallStatus?) {
+        view.visibility = if (apiCallStatus?.equals(ApiCallStatus.LOADING) == true) View.VISIBLE else View.GONE
+    }
+
+    // Shows and hides errorText showLoader
     @JvmStatic
     @BindingAdapter("showIfInvalid")
     fun showIfInvalid(view: View, errorMessage: Boolean?) {

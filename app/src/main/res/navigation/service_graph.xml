@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/hello2"
-        android:name="ltd.royalgreen.pacecloud.Hello"
+        android:name="ltd.royalgreen.pacecloud.servicemodule.ServiceFragment"
         android:label="@string/services"
         tools:layout="@layout/service_fragment" />
 </navigation>

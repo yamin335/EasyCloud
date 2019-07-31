@@ -38,10 +38,6 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
         MutableLiveData<DashOsSummary>()
     }
 
-    val userLogResponse: MutableLiveData<UserActivityLog> by lazy {
-        MutableLiveData<UserActivityLog>()
-    }
-
     lateinit var userLogs: LiveData<PagedList<CloudActivityLog>>
 
     fun initializedPagedListBuilder(config: PagedList.Config):
