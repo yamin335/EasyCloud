@@ -5,13 +5,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/payment_graph"
-    app:startDestination="@+id/leaderboard">
+    app:startDestination="@+id/payment">
 
     <fragment
-            android:id="@+id/leaderboard"
-            android:name="ltd.royalgreen.pacecloud.paymentmodule.Leaderboard"
+            android:id="@+id/payment"
+            android:name="ltd.royalgreen.pacecloud.paymentmodule.PaymentFragment"
             android:label="@string/payment"
-            tools:layout="@layout/payment_fragment">
+    >
         <action
                 android:id="@+id/action_leaderboard_to_userProfile"
                 app:destination="@id/userProfile"/>

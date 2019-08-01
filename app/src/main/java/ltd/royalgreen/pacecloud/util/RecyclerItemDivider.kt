@@ -47,7 +47,7 @@ class RecyclerItemDivider(context: Context, orientation: Int = 0, margin: Int = 
         val left = parent.paddingLeft
         val right = parent.width - parent.paddingRight
 
-        val childCount = parent.childCount-1
+        val childCount = parent.childCount
         for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
             val params = child
@@ -63,7 +63,7 @@ class RecyclerItemDivider(context: Context, orientation: Int = 0, margin: Int = 
         val top = parent.paddingTop
         val bottom = parent.height - parent.paddingBottom
 
-        val childCount = parent.childCount-1
+        val childCount = parent.childCount
         for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
             val params = child

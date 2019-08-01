@@ -8,6 +8,7 @@ import dagger.multibindings.IntoMap
 import ltd.royalgreen.pacecloud.MainActivityViewModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardViewModel
 import ltd.royalgreen.pacecloud.loginmodule.LoginViewModel
+import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragmentViewModel
 import ltd.royalgreen.pacecloud.util.PaceCloudViewModelFactory
 
@@ -33,6 +34,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(ServiceFragmentViewModel::class)
     abstract fun bindServiceFragmentViewModel(serviceFragmentViewModel: ServiceFragmentViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(PaymentFragmentViewModel::class)
+    abstract fun bindPaymentFragmentViewModel(paymentFragmentViewModel: PaymentFragmentViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: PaceCloudViewModelFactory): ViewModelProvider.Factory
