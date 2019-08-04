@@ -2,28 +2,31 @@
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     <TextView
-            android:text="Payment History Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/textColor1"
             android:textStyle="bold"
             android:textSize="15sp"
-            android:id="@+id/textView5" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
+            android:id="@+id/paymentTitle"
+            android:ellipsize="end"
+            android:maxLines="2"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.0" app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintHorizontal_bias="0.0" app:layout_constraintVertical_bias="0.0"
+            app:layout_constraintEnd_toStartOf="@+id/date" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/textView5"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/paymentTitle"
+            app:layout_constraintTop_toBottomOf="@+id/paymentTitle" app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.0" android:id="@+id/linearLayout6" android:layout_marginTop="4dp">
         <TextView
                 android:text="Balance"
@@ -31,7 +34,6 @@
                 android:layout_height="wrap_content"/>
         <TextView
                 android:id="@+id/balance"
-                android:text="1234567890.1234"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -51,7 +53,6 @@
                 android:layout_height="wrap_content"/>
         <TextView
                 android:id="@+id/debit"
-                android:text="1234567890.1234"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -70,7 +71,6 @@
                 android:layout_height="wrap_content"/>
         <TextView
                 android:id="@+id/credit"
-                android:text="1234567890.1234"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -96,13 +96,12 @@
             android:layout_marginEnd="8dp"/>
     <TextView
             android:id="@+id/date"
-            android:text="23/07/2019 06:38:14 PM"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent" android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintVertical_bias="0.0" android:layout_marginTop="2dp"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

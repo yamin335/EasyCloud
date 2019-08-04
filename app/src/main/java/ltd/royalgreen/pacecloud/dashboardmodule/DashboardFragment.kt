@@ -112,7 +112,8 @@ class DashboardFragment : Fragment(), Injectable {
         view.osSummaryBarChart.animateY(900)
 
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-        if (user != null) {
+
+        user?.let {
             viewModel.getOsStatus(user)
             viewModel.getOsSummary(user)
             binding.name = user.resdata?.loggeduser?.fullName

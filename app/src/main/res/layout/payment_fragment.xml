@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-    <data>
-
-    </data>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_height="match_parent"
             android:layout_width="match_parent"
             xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <include layout="@layout/payment_content_main" />
-        <include layout="@layout/payment_bottom_sheet" />
+        <include
+                android:id="@+id/includedContentMain"
+                layout="@layout/payment_content_main" />
+        <include
+                android:id="@+id/includedBottomSheet"
+                layout="@layout/payment_bottom_sheet" />
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/searchFab"
                 app:srcCompat="@drawable/ic_search_black_24dp"
@@ -19,7 +20,7 @@
                 app:maxImageSize="32dp"
                 android:layout_marginBottom="8dp"
                 android:layout_marginEnd="8dp"
-                app:layout_anchor="@+id/bottomSheet"
+                app:layout_anchor="@+id/includedBottomSheet"
                 app:layout_anchorGravity="top|end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

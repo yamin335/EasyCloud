@@ -6,6 +6,7 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
 import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
 import ltd.royalgreen.pacecloud.servicemodule.VMListResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -60,4 +61,8 @@ interface ApiService {
     //API FOR USER VM LIST
     @GET("/api/portal/cloudvmbyuserid")
     fun cloudvmbyuserid(@Query("param") param: String): Call<VMListResponse>
+
+    //API FOR USER VM LIST
+    @GET("/api/portal/billhistory")
+    fun billhistory(@Query("param") param: String): Call<PaymentHistory>
 }
