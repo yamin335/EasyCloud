@@ -41,11 +41,11 @@ class PaymentListDataSource(private val application: Application, private val ap
             }
 
             val handler = CoroutineExceptionHandler { _, exception ->
-                println("Caught $exception")
+                tempApiCallStatus.postValue(ApiCallStatus.ERROR)
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
+                withTimeoutOrNull(3000L) {
                     val response = api.billhistory(param).execute()
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {
@@ -87,11 +87,11 @@ class PaymentListDataSource(private val application: Application, private val ap
             }
 
             val handler = CoroutineExceptionHandler { _, exception ->
-                println("Caught $exception")
+                tempApiCallStatus.postValue(ApiCallStatus.ERROR)
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
+                withTimeoutOrNull(3000L) {
                     val response = api.billhistory(param).execute()
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {

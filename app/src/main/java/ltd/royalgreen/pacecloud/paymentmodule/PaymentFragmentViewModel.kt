@@ -67,10 +67,6 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         searchValue.value = ""
     }
 
-    fun rechargeAccount() {
-        Toast.makeText(application, "Recharge clicked!", Toast.LENGTH_LONG).show()
-    }
-
     fun initializedPagedListBuilder(config: PagedList.Config):
             LivePagedListBuilder<Long, BilCloudUserLedger> {
         val dataSourceFactory = object : DataSource.Factory<Long, BilCloudUserLedger>() {

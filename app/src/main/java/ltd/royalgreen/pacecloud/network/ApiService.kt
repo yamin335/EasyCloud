@@ -1,17 +1,18 @@
 package ltd.royalgreen.pacecloud.network
 
 import androidx.lifecycle.LiveData
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
 import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
+import ltd.royalgreen.pacecloud.paymentmodule.RechargeResponse
 import ltd.royalgreen.pacecloud.servicemodule.VMListResponse
 import retrofit2.Call
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 /**
  * REST API access points
@@ -65,4 +66,8 @@ interface ApiService {
     //API FOR USER VM LIST
     @GET("/api/portal/billhistory")
     fun billhistory(@Query("param") param: String): Call<PaymentHistory>
+
+    //API FOR RECHARGE
+    @POST("/api/portal/newrechargesave")
+    fun newrechargesave(@Body jsonArray: JsonArray): Call<RechargeResponse>
 }
