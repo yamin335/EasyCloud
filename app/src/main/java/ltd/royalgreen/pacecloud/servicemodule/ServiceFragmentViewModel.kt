@@ -25,19 +25,19 @@ class ServiceFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<ApiCallStatus>()
     }
 
-    val vmResponse: MutableLiveData<VMListResponse> by lazy {
-        MutableLiveData<VMListResponse>()
+    val deploymentResponse: MutableLiveData<Deployment> by lazy {
+        MutableLiveData<Deployment>()
     }
 
-    lateinit var vmList: LiveData<PagedList<VM>>
+    lateinit var deploymentList: LiveData<PagedList<Deployment>>
 
     fun initializedPagedListBuilder(config: PagedList.Config):
-            LivePagedListBuilder<Long, VM> {
-        val dataSourceFactory = object : DataSource.Factory<Long, VM>() {
-            override fun create(): DataSource<Long, VM> {
-                return VMListDataSource(application, apiService, preferences, vmResponse, apiCallStatus)
+            LivePagedListBuilder<Long, Deployment> {
+        val dataSourceFactory = object : DataSource.Factory<Long, Deployment>() {
+            override fun create(): DataSource<Long, Deployment> {
+                return DeploymentListDataSource(application, apiService, preferences, deploymentResponse, apiCallStatus)
             }
         }
-        return LivePagedListBuilder<Long, VM>(dataSourceFactory, config)
+        return LivePagedListBuilder<Long, Deployment>(dataSourceFactory, config)
     }
 }

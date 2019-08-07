@@ -49,7 +49,7 @@
                         android:id="@+id/note"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:imeOptions="actionNext"
+                        android:imeOptions="actionDone"
                         android:inputType="textMultiLine"
                         android:maxLines="10"
                         android:lines="6"

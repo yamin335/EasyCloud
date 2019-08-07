@@ -43,7 +43,7 @@ class PaymentRechargeDialog internal constructor(parentActivity: Activity, priva
                         amountInputLayout.error = "Empty Amount!"
                     }
 
-                    "^(?=\\d)(?=.*[1-9])\\d+\\.?\\d+".toRegex().matches(value) -> {
+                    "^(?=\\d)(?=.*[1-9])(\\d*)\\.?\\d+".toRegex().matches(value) -> {
                         save.isEnabled = true
                         amountInputLayout.isErrorEnabled = false
                         rechargeAmount = value.toString()

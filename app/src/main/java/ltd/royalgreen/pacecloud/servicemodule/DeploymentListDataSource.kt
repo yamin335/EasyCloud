@@ -8,18 +8,19 @@ import androidx.paging.PageKeyedDataSource
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 
-class VMListDataSource(private val application: Application, private val api: ApiService,
-                       private val preferences: SharedPreferences, vmResponse: MutableLiveData<VMListResponse>, apiCallStatus: MutableLiveData<ApiCallStatus>) : PageKeyedDataSource<Long, VM>() {
+class DeploymentListDataSource(private val application: Application, private val api: ApiService,
+                               private val preferences: SharedPreferences, deployment: MutableLiveData<Deployment>, apiCallStatus: MutableLiveData<ApiCallStatus>) : PageKeyedDataSource<Long, Deployment>() {
 
-    val tempVMResponse = vmResponse
+    val tempDeployment = deployment
     val tempApiCallStatus = apiCallStatus
 
-    override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, VM>) {
+    override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, Deployment>) {
         if (isNetworkAvailable(application)) {
             tempApiCallStatus.postValue(ApiCallStatus.LOADING)
             var param = "[]"
@@ -45,8 +46,16 @@ class VMListDataSource(private val application: Application, private val api: Ap
                     val response = api.cloudvmbyuserid(param).execute()
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {
-                            callback.onResult(apiResponse.body.resdata?.listCloudvm as MutableList<VM>, null, 1)
-                            tempVMResponse.postValue(apiResponse.body)
+                            val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
+                            val jsonArray = JsonParser().parse(stringResponse).asJsonArray
+                            val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
+                            for ((index, jsonObject) in jsonArray.withIndex()) {
+                                val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
+                                mutableDeploymentList.add(deployment)
+                                if (index == 0)
+                                    tempDeployment.postValue(deployment)
+                            }
+                            callback.onResult(mutableDeploymentList, null, 1)
                             tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         }
                         is ApiEmptyResponse -> {
@@ -63,7 +72,7 @@ class VMListDataSource(private val application: Application, private val api: Ap
         }
     }
 
-    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, VM>) {
+    override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, Deployment>) {
         if (isNetworkAvailable(application)) {
             tempApiCallStatus.postValue(ApiCallStatus.LOADING)
             var param = "[]"
@@ -89,7 +98,14 @@ class VMListDataSource(private val application: Application, private val api: Ap
                     val response = api.cloudvmbyuserid(param).execute()
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {
-                            callback.onResult(apiResponse.body.resdata?.listCloudvm as MutableList<VM>, params.key + 1)
+                            val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
+                            val jsonArray = JsonParser().parse(stringResponse).asJsonArray
+                            val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
+                            for (jsonObject in jsonArray) {
+                                val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
+                                mutableDeploymentList.add(deployment)
+                            }
+                            callback.onResult(mutableDeploymentList, params.key + 1)
                             tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         }
                         is ApiEmptyResponse -> {
@@ -106,7 +122,7 @@ class VMListDataSource(private val application: Application, private val api: Ap
         }
     }
 
-    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, VM>) {
+    override fun loadBefore(params: LoadParams<Long>, callback: LoadCallback<Long, Deployment>) {
 
     }
 }

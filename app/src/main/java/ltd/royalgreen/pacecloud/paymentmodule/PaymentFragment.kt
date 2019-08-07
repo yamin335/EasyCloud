@@ -1,5 +1,6 @@
 package ltd.royalgreen.pacecloud.paymentmodule
 
+import android.app.DatePickerDialog
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -8,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -20,30 +22,24 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.payment_bottom_sheet.*
-import kotlinx.android.synthetic.main.payment_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.payment_content_main.*
 import kotlinx.android.synthetic.main.payment_fragment.*
-import kotlinx.android.synthetic.main.service_fragment.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.PaymentFragmentBinding
-import ltd.royalgreen.pacecloud.databinding.ServiceFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.servicemodule.VM
-import ltd.royalgreen.pacecloud.servicemodule.VMListAdapter
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
-import java.math.BigDecimal
-import java.math.RoundingMode
+import java.util.*
 import javax.inject.Inject
 
 class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCallback {
+
+    @Inject
+    lateinit var apiService: ApiService
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -98,6 +94,16 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             applySearch()
         }
 
+        binding.includedBottomSheet.reset.setOnClickListener {
+            viewModel.paymentList.value?.dataSource?.invalidate()
+            viewModel.fromDate.value = "dd/mm/yyyy"
+            viewModel.toDate.value = "dd/mm/yyyy"
+            viewModel.searchValue.value = ""
+            if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
         binding.lifecycleOwner = viewLifecycleOwner
         binding.includedBottomSheet.viewModel = viewModel
         binding.includedContentMain.viewModel = viewModel
@@ -146,46 +152,54 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     override fun onSavePressed(date: String, amount: String, note: String) {
-        val result = date+"~~~~~~"+amount+"~~~~~~"+note
-//        if (isNetworkAvailable(activity!!)) {
-//            viewModel.apiCallStatus.value = ApiCallStatus.LOADING
-//            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-//            user?.let {
-//                viewModel.getUserBalance(it)
-//            }
-//            val jsonObject = JsonObject().apply {
-//                addProperty("UserID", user?.resdata?.loggeduser?.userID)
-//            }
-//            val param = JsonArray().apply {
-//                add(jsonObject)
-//            }.toString()
-//
-//            val handler = CoroutineExceptionHandler { _, exception ->
-//                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-//            }
-//
-//            CoroutineScope(Dispatchers.IO).launch(handler) {
-//                withTimeoutOrNull(3000L) {
-//                    val response = apiService.billclouduserbalance(param).execute()
-//                    val apiResponse = ApiResponse.create(response)
-//                    when (apiResponse) {
-//                        is ApiSuccessResponse -> {
-//                            val balanceModel = apiResponse.body
-//                            userBalance.postValue(BigDecimal(balanceModel.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString())
-//                            apiCallStatus.value = ApiCallStatus.SUCCESS
-//                        }
-//                        is ApiEmptyResponse -> {
-//                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
-//                        }
-//                        is ApiErrorResponse -> {
-//                            apiCallStatus.postValue(ApiCallStatus.ERROR)
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
-//        }
+        if (isNetworkAvailable(activity!!)) {
+            viewModel.apiCallStatus.value = ApiCallStatus.LOADING
+            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+            val jsonObject = JsonObject()
+            user?.let {
+                jsonObject.addProperty("CloudUserID", user.resdata?.loggeduser?.userID)
+                jsonObject.addProperty("UserName", user.resdata?.loggeduser?.fullName)
+                jsonObject.addProperty("Running", false)
+                jsonObject.addProperty("vmName", "")
+                jsonObject.addProperty("vmID", 0)
+                jsonObject.addProperty("TransactionDate", date)
+                jsonObject.addProperty("BalanceAmount", amount)
+                jsonObject.addProperty("Particulars", note)
+                jsonObject.addProperty("IsActive", true)
+            }
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }
+
+            val handler = CoroutineExceptionHandler { _, exception ->
+                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                withTimeoutOrNull(3000L) {
+                    val response = apiService.newrechargesave(param).execute()
+                    val apiResponse = ApiResponse.create(response)
+                    when (apiResponse) {
+                        is ApiSuccessResponse -> {
+                            val balanceModel = apiResponse.body
+                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                            if (balanceModel.resdata?.resstate == true) {
+                                viewModel.paymentList.value?.dataSource?.invalidate()
+                                Toast.makeText(requireActivity(), "Recharge Successful", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                        is ApiEmptyResponse -> {
+                            viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        }
+                        is ApiErrorResponse -> {
+                            viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        }
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(requireActivity(), "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun showRechargeDialog() {

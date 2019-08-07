@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -18,7 +19,7 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.ServiceFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
+import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import java.math.BigDecimal
@@ -26,6 +27,9 @@ import java.math.RoundingMode
 import javax.inject.Inject
 
 class ServiceFragment : Fragment(), Injectable {
+
+    @Inject
+    lateinit var api: ApiService
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -42,7 +46,7 @@ class ServiceFragment : Fragment(), Injectable {
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
     //For Cloud User Activity Log
-    private lateinit var adapter: VMListAdapter
+    private lateinit var adapter: DeploymentListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -62,10 +66,25 @@ class ServiceFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        adapter = VMListAdapter(this.context!!)
+        adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
+            override fun onStartStop() {
+                Toast.makeText(requireContext(), "stop clicked from interface!", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onAttachDetach() {
+                Toast.makeText(requireContext(), "Attach clicked from interface!", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onReboot() {
+                Toast.makeText(requireContext(), "Reboot clicked from interface!", Toast.LENGTH_LONG).show()
+            }
+
+            override fun onTerminate() {
+                Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
+            }
+        })
 
         vmListRecycler.layoutManager = LinearLayoutManager(activity)
-        vmListRecycler.addItemDecoration(RecyclerItemDivider(activity!!.applicationContext, LinearLayoutManager.VERTICAL, 8))
         vmListRecycler.adapter = adapter
 
         //1
@@ -75,18 +94,18 @@ class ServiceFragment : Fragment(), Injectable {
             .build()
 
         //2
-        viewModel.vmList = viewModel.initializedPagedListBuilder(config).build()
+        viewModel.deploymentList = viewModel.initializedPagedListBuilder(config).build()
 
         //3
-        viewModel.vmList.observe(this, Observer<PagedList<VM>> { pagedList ->
+        viewModel.deploymentList.observe(this, Observer<PagedList<Deployment>> { pagedList ->
             adapter.submitList(pagedList)
         })
 
-        viewModel.vmResponse.observe(this, Observer<VMListResponse> { value ->
-            binding.tvm = value.resdata?.totalNumberOfVMs.toString()
-            binding.rvm = value.resdata?.totalNumberOfRunningVMs.toString()
-            binding.tNodeHour = BigDecimal(value.resdata?.totalNodeHours?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString()
-            binding.tCloudCost = BigDecimal(value.resdata?.totalCloudCost?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString()
+        viewModel.deploymentResponse.observe(this, Observer<Deployment> { value ->
+            binding.tvm = value.totalNumberOfVMs.toString()
+            binding.rvm = value.totalNumberOfRunningVMs.toString()
+            binding.tNodeHour = BigDecimal(value.totalNodeHours?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString()
+            binding.tCloudCost = BigDecimal(value.totalCloudCost?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString()
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->

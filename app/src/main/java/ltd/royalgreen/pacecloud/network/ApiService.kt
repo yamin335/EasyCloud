@@ -1,8 +1,6 @@
 package ltd.royalgreen.pacecloud.network
 
-import androidx.lifecycle.LiveData
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
@@ -10,7 +8,6 @@ import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
 import ltd.royalgreen.pacecloud.paymentmodule.RechargeResponse
-import ltd.royalgreen.pacecloud.servicemodule.VMListResponse
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -61,7 +58,7 @@ interface ApiService {
 
     //API FOR USER VM LIST
     @GET("/api/portal/cloudvmbyuserid")
-    fun cloudvmbyuserid(@Query("param") param: String): Call<VMListResponse>
+    fun cloudvmbyuserid(@Query("param") param: String): Call<String>
 
     //API FOR USER VM LIST
     @GET("/api/portal/billhistory")
