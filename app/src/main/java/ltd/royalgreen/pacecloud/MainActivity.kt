@@ -119,25 +119,25 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         currentNavController = controller
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-
-        currentNavController?.observe(this, Observer { navController ->
-            when(navController.graph.id) {
-                R.id.dashboard_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-                R.id.service_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-                R.id.payment_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-                R.id.support_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-            }
-        })
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.signOut -> doSignOut()
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//
+//        currentNavController?.observe(this, Observer { navController ->
+//            when(navController.graph.id) {
+//                R.id.dashboard_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//                R.id.service_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//                R.id.payment_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//                R.id.support_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//            }
+//        })
+//        return true
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when(item.itemId) {
+//            R.id.signOut -> doSignOut()
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onSupportNavigateUp(): Boolean {
         return currentNavController?.value?.navigateUp(appBarConfiguration) ?: false || super.onSupportNavigateUp()

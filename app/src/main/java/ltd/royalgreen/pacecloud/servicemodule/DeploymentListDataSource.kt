@@ -38,7 +38,6 @@ class DeploymentListDataSource(private val application: Application, private val
 
             val handler = CoroutineExceptionHandler { _, exception ->
                 tempApiCallStatus.postValue(ApiCallStatus.ERROR)
-                Toast.makeText(application, "SERVER Not Responding!", Toast.LENGTH_LONG).show()
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
@@ -90,7 +89,6 @@ class DeploymentListDataSource(private val application: Application, private val
 
             val handler = CoroutineExceptionHandler { _, exception ->
                 tempApiCallStatus.postValue(ApiCallStatus.ERROR)
-                Toast.makeText(application, "SERVER Not Responding!", Toast.LENGTH_LONG).show()
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {

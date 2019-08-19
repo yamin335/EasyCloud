@@ -9,12 +9,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.service_fragment.*
+import kotlinx.android.synthetic.main.service_vm_row.view.*
+import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.ServiceFragmentBinding
@@ -22,6 +27,7 @@ import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
+import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -67,8 +73,20 @@ class ServiceFragment : Fragment(), Injectable {
         binding.viewModel = viewModel
 
         adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
-            override fun onStartStop() {
-                Toast.makeText(requireContext(), "stop clicked from interface!", Toast.LENGTH_LONG).show()
+            override fun onStop(success: Boolean) {
+                if (success) {
+//                    viewModel.deploymentList.value?.dataSource?.invalidate()
+                } else {
+
+                }
+            }
+
+            override fun onStart(success: Boolean) {
+                if (success) {
+//                    viewModel.deploymentList.value?.dataSource?.invalidate()
+                } else {
+
+                }
             }
 
             override fun onAttachDetach() {
@@ -82,7 +100,7 @@ class ServiceFragment : Fragment(), Injectable {
             override fun onTerminate() {
                 Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
             }
-        })
+        }, requireActivity())
 
         vmListRecycler.layoutManager = LinearLayoutManager(activity)
         vmListRecycler.adapter = adapter

@@ -82,7 +82,7 @@ class LoginActivity : AppCompatActivity(){
         viewModel.apiCallStatus.observe(this, Observer {
             when(it) {
                 ApiCallStatus.SUCCESS -> {
-                    Toast.makeText(this, "Signed in successfully", Toast.LENGTH_LONG).show()
+//                    Toast.makeText(this, "Signed in successfully", Toast.LENGTH_LONG).show()
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 }
@@ -111,7 +111,7 @@ class LoginActivity : AppCompatActivity(){
                     CoroutineScope(Dispatchers.IO).launch(handler) {
                         val loggedUserSerialized = Gson().toJson(loggedUser)
                         preferences.edit().apply {
-                            putBoolean("LoginState", true)
+//                            putBoolean("LoginState", true)
                             putString("LoggedUser", loggedUserSerialized)
                             apply()
                         }

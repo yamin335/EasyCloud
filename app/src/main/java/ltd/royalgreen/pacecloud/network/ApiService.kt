@@ -60,9 +60,19 @@ interface ApiService {
     @GET("/api/portal/cloudvmbyuserid")
     fun cloudvmbyuserid(@Query("param") param: String): Call<String>
 
-    //API FOR USER VM LIST
+    //API FOR USER PAYMENT HISTORY
     @GET("/api/portal/billhistory")
     fun billhistory(@Query("param") param: String): Call<PaymentHistory>
+
+    //API FOR VM START_STOP
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/cloudvmstartstop")
+    fun cloudvmstartstop(@Body jsonArray: JsonArray): Call<String>
+
+    //API FOR VM REBOOT
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/cloudvmreboot")
+    fun cloudvmreboot(@Body jsonArray: JsonArray): Call<String>
 
     //API FOR RECHARGE
     @POST("/api/portal/newrechargesave")

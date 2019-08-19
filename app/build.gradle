@@ -88,6 +88,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'
+    //OkHttpClient3 for network call with retrofit
+    implementation "com.squareup.okhttp3:okhttp:4.1.0"
     //MPAndroidChartView for chartView
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 

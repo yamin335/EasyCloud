@@ -41,29 +41,33 @@ class SplashActivity : AppCompatActivity() {
                     launch {
                         delay(1500L)
                     }
-                    val handler = CoroutineExceptionHandler { _, exception ->
-                        Toast.makeText(this@SplashActivity, "$exception", Toast.LENGTH_LONG).show()
-                        finish()
-                    }
 
-                    CoroutineScope(Dispatchers.IO).launch(handler) {
-                        //This code run only one time after the first time launch of this application
-                        if (!preferences.getBoolean("FirstTime", false)) {
-                            preferences.edit().apply {
-                                putBoolean("FirstTime", true)
-                                putBoolean("LoginState", false)
-                                apply()
-                            }
-                        }
+                    startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                    finish()
 
-                        if (preferences.getBoolean("LoginState", false)) {
-                            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
-                            finish()
-                        } else {
-                            startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
-                            finish()
-                        }
-                    }
+//                    val handler = CoroutineExceptionHandler { _, exception ->
+//                        Toast.makeText(this@SplashActivity, "$exception", Toast.LENGTH_LONG).show()
+//                        finish()
+//                    }
+//
+//                    CoroutineScope(Dispatchers.IO).launch(handler) {
+//                        //This code run only one time after the first time launch of this application
+//                        if (!preferences.getBoolean("FirstTime", false)) {
+//                            preferences.edit().apply {
+//                                putBoolean("FirstTime", true)
+//                                putBoolean("LoginState", false)
+//                                apply()
+//                            }
+//                        }
+//
+//                        if (preferences.getBoolean("LoginState", false)) {
+//                            startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+//                            finish()
+//                        } else {
+//                            startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+//                            finish()
+//                        }
+//                    }
                 }
             }
 

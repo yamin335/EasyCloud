@@ -101,6 +101,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             viewModel.searchValue.value = ""
             if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
                 bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+                searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, activity!!.theme))
             }
         }
 

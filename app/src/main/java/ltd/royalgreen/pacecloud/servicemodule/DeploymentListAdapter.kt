@@ -1,5 +1,6 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
+import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,7 +12,7 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 
 
-class DeploymentListAdapter(val context: Context, private val callBack: VMListAdapter.ActionCallback) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
+class DeploymentListAdapter(val context: Context, private val callBack: VMListAdapter.ActionCallback, private val activity: Activity) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeploymentListViewHolder {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.service_deployment_row, parent, false)
@@ -28,7 +29,7 @@ class DeploymentListAdapter(val context: Context, private val callBack: VMListAd
       holder.itemView.deploymentName.text = item?.deploymentName.toString()
 
       item?.vmLists?.let {
-          val vmAdapter = VMListAdapter(it, callBack)
+          val vmAdapter = VMListAdapter(it, callBack, activity)
           holder.itemView.vmRecycler.layoutManager = LinearLayoutManager(context)
           holder.itemView.vmRecycler.addItemDecoration(RecyclerItemDivider(context, LinearLayoutManager.VERTICAL, 8))
           holder.itemView.vmRecycler.adapter = vmAdapter
