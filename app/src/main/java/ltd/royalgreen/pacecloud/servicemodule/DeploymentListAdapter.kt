@@ -2,17 +2,45 @@ package ltd.royalgreen.pacecloud.servicemodule
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_deployment_row.view.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ltd.royalgreen.pacecloud.R
+import ltd.royalgreen.pacecloud.loginmodule.LoggedUserData
+import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
+import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 
-class DeploymentListAdapter(val context: Context, private val callBack: VMListAdapter.ActionCallback, private val activity: Activity) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
+class DeploymentListAdapter(val context: Context,
+                            private val callBack: VMListAdapter.ActionCallback,
+                            private val renameSuccessCallback: RenameSuccessCallback,
+                            private val activity: Activity,
+                            private val loggedUser: LoggedUserData?) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
+
+    val apiService: ApiService = Retrofit.Builder()
+        .baseUrl("http://123.136.26.98:8081")
+        .addConverterFactory(ScalarsConverterFactory.create())
+        .addConverterFactory(GsonConverterFactory.create())
+        .addCallAdapterFactory(LiveDataCallAdapterFactory())
+        .build()
+        .create(ApiService::class.java)
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeploymentListViewHolder {
     val view = LayoutInflater.from(parent.context).inflate(R.layout.service_deployment_row, parent, false)
@@ -23,7 +51,47 @@ class DeploymentListAdapter(val context: Context, private val callBack: VMListAd
       val item = getItem(position)
       val context = holder.itemView.context
       holder.itemView.edit.setOnClickListener {
-          Toast.makeText(holder.itemView.context, "Edit clicked!", Toast.LENGTH_LONG).show()
+          val renameDialog = DeploymentRenameDialog(activity, object : DeploymentRenameDialog.RenameCallback {
+              override fun onSavePressed(renamedValue: String) {
+                  if (isNetworkAvailable(context)) {
+                      val jsonObject = JsonObject().apply {
+                          addProperty("UserID", loggedUser?.userID)
+                          addProperty("id", item?.deploymentId)
+                          addProperty("name", renamedValue)
+                      }
+
+                      val param = JsonArray().apply {
+                          add(jsonObject)
+                      }
+
+                      val handler = CoroutineExceptionHandler { _, exception ->
+                          exception.printStackTrace()
+                      }
+
+                      CoroutineScope(Dispatchers.IO).launch(handler) {
+                          val response = apiService.updatedeploymentname(param).execute()
+                          when (val apiResponse = ApiResponse.create(response)) {
+                              is ApiSuccessResponse -> {
+                                  if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                                      renameSuccessCallback.onRenamed()
+                                  }
+                              }
+                              is ApiEmptyResponse -> {
+
+                              }
+                              is ApiErrorResponse -> {
+
+                              }
+                          }
+                      }
+                  } else {
+                      Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+                  }
+              }
+          }, loggedUser?.fullName, item?.deploymentName)
+          renameDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+          renameDialog.setCancelable(true)
+          renameDialog.show()
       }
 
       holder.itemView.deploymentName.text = item?.deploymentName.toString()
@@ -103,7 +171,9 @@ class DeploymentListAdapter(val context: Context, private val callBack: VMListAd
 //      }
 //      popup.setForceShowIcon(true)
 //      popup.show()
-
-
   }
+
+    interface RenameSuccessCallback{
+        fun onRenamed()
+    }
 }

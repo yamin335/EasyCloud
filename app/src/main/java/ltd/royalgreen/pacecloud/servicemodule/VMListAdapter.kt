@@ -84,6 +84,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+
         val item = vmList[position]
         val context = holder.itemView.context
         val resources = holder.itemView.context.resources
@@ -102,6 +103,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             callBack.onAttachDetach()
             actionMenuPopupWindow.dismiss()
         }
+
         popupMenu.menuStartStop.labelStartStop.text = if (item.status.equals("Running", true)) {
             "Stop"
         } else {
@@ -130,6 +132,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 Toast.makeText(context, "VM Can Not Be Started!", Toast.LENGTH_LONG).show()
             }
         })
+
         var vmStopStatus: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
         vmStopStatus.observe(holder, androidx.lifecycle.Observer {
             if (it) {
@@ -163,6 +166,22 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 popupMenu.menuReboot.isEnabled = true
                 popupMenu.labelReboot.setTextColor(context.resources.getColor(R.color.colorPrimaryLight))
                 Toast.makeText(context, "VM Can Not Be Rebooted!", Toast.LENGTH_LONG).show()
+            }
+        })
+
+        var vmNoteStatus: MutableLiveData<String> = MutableLiveData<String>()
+        vmNoteStatus.observe(holder, androidx.lifecycle.Observer {
+            if (it != "^^^^^") {
+                item.vmNote = it
+                holder.itemView.loader.visibility = View.GONE
+                popupMenu.menuNote.isEnabled = true
+                popupMenu.labelNote.setTextColor(context.resources.getColor(R.color.colorPrimaryLight))
+                Toast.makeText(context, "Saved Successfully", Toast.LENGTH_LONG).show()
+            } else {
+                holder.itemView.loader.visibility = View.GONE
+                popupMenu.menuNote.isEnabled = true
+                popupMenu.labelNote.setTextColor(context.resources.getColor(R.color.colorPrimaryLight))
+                Toast.makeText(context, "Note Can Not Be Saved!", Toast.LENGTH_LONG).show()
             }
         })
 
@@ -382,6 +401,55 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             callBack.onTerminate()
             actionMenuPopupWindow.dismiss()
         }
+
+        popupMenu.menuNote.setOnClickListener {
+            val vmNoteDialog = VMNoteDialog(activity, object : VMNoteDialog.NoteCallback{
+                override fun onNoteSaved(noteValue: String) {
+                    if (isNetworkAvailable(context)) {
+                        holder.itemView.loader.visibility = View.VISIBLE
+                        popupMenu.menuNote.isEnabled = false
+                        popupMenu.labelNote.setTextColor(context.resources.getColor(R.color.colorGrayLight))
+                        val jsonObject = JsonObject().apply {
+                            addProperty("vmNote", noteValue)
+                            addProperty("id", item.id)
+                        }
+                        val param = JsonArray().apply {
+                            add(jsonObject)
+                        }
+
+                        val handler = CoroutineExceptionHandler { _, exception ->
+                            vmNoteStatus.postValue("^^^^^")
+                        }
+
+                        CoroutineScope(Dispatchers.Default).launch(handler) {
+                            val response = apiService.updatevmnote(param).execute()
+                            when (val apiResponse = ApiResponse.create(response)) {
+                                is ApiSuccessResponse -> {
+                                    if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                                        vmNoteStatus.postValue(noteValue)
+                                        callBack.onNote()
+                                    } else {
+                                        vmNoteStatus.postValue("^^^^^")
+                                    }
+                                }
+                                is ApiEmptyResponse -> {
+                                    vmNoteStatus.postValue("^^^^^")
+                                }
+                                is ApiErrorResponse -> {
+                                    vmNoteStatus.postValue("^^^^^")
+                                }
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }, item.vmNote)
+            vmNoteDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            vmNoteDialog.setCancelable(false)
+            vmNoteDialog.show()
+            actionMenuPopupWindow.dismiss()
+        }
         actionMenuPopupWindow.elevation = 16F
 
         holder.itemView.vmName.text = item.vmName
@@ -412,6 +480,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         fun onAttachDetach()
         fun onReboot()
         fun onTerminate()
+        fun onNote()
     }
 
     override fun onViewAttachedToWindow(holder: MyViewHolder) {

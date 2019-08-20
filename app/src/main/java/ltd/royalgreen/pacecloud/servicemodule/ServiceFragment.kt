@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.service_fragment.*
@@ -24,6 +25,7 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.ServiceFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
+import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
@@ -72,7 +74,13 @@ class ServiceFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
+        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+
         adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
+            override fun onNote() {
+
+            }
+
             override fun onStop(success: Boolean) {
                 if (success) {
 //                    viewModel.deploymentList.value?.dataSource?.invalidate()
@@ -100,7 +108,11 @@ class ServiceFragment : Fragment(), Injectable {
             override fun onTerminate() {
                 Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
             }
-        }, requireActivity())
+        }, object : DeploymentListAdapter.RenameSuccessCallback {
+            override fun onRenamed() {
+                viewModel.deploymentList.value?.dataSource?.invalidate()
+            }
+        },requireActivity(), user?.resdata?.loggeduser)
 
         vmListRecycler.layoutManager = LinearLayoutManager(activity)
         vmListRecycler.adapter = adapter

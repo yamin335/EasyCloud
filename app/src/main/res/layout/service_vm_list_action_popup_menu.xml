@@ -7,17 +7,107 @@
         app:cardBackgroundColor="#FFFFFFFF"
         app:cardCornerRadius="5dp"
         app:cardElevation="16dp">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
             android:orientation="vertical"
-            android:layout_width="wrap_content"
+            android:layout_width="150dp"
             android:layout_height="wrap_content">
         <LinearLayout
+                android:id="@+id/menuStartStop"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+            <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="1dp"
+                    android:paddingEnd="1dp"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_gravity="center_vertical"
+                    android:id="@+id/switchStartStop"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:id="@+id/labelStartStop"/>
+
+        </LinearLayout>
+        <LinearLayout
+                android:id="@+id/menuReboot"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+            <ImageView
+                    android:id="@+id/iconReboot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/rounded_bg_lightgray"
+                    android:padding="3dp"
+                    android:tint="@color/colorGray"
+                    app:srcCompat="@drawable/ic_repeat_black_24dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"/>
+            <TextView
+                    android:text="Reboot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:id="@+id/labelReboot"/>
+        </LinearLayout>
+        <LinearLayout
+                android:id="@+id/menuNote"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+            <ImageView
+                    android:id="@+id/iconNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:padding="3dp"
+                    android:tint="@color/colorGray"
+                    android:background="@drawable/rounded_bg_lightgray"
+                    app:srcCompat="@drawable/ic_edit_black_24dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginBottom="0dp"/>
+            <TextView
+                    android:text="Note"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:id="@+id/labelNote"/>
+        </LinearLayout>
+        <LinearLayout
                 android:id="@+id/menuAttachVolume"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@+id/menuStartStop" app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0"
@@ -49,79 +139,13 @@
         </LinearLayout>
 
         <LinearLayout
-                android:id="@+id/menuStartStop"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0">
-            <Switch
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="1dp"
-                    android:paddingEnd="1dp"
-                    android:layout_marginStart="0dp"
-                    android:layout_marginEnd="6dp"
-                    android:layout_gravity="center_vertical"
-                    android:id="@+id/switchStartStop"/>
-            <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/colorPrimaryLight"
-                    android:id="@+id/labelStartStop"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-                android:id="@+id/menuReboot"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@+id/menuAttachVolume"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0">
-            <ImageView
-                    android:id="@+id/iconReboot"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/rounded_bg_lightgray"
-                    android:padding="3dp"
-                    android:tint="@color/colorGray"
-                    app:srcCompat="@drawable/ic_repeat_black_24dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginTop="0dp"
-                    android:layout_marginBottom="0dp"/>
-            <TextView
-                    android:text="Reboot"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/colorPrimaryLight"
-                    android:id="@+id/labelReboot"/>
-        </LinearLayout>
-
-        <LinearLayout
                 android:id="@+id/menuTerminate"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@+id/menuReboot"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -152,5 +176,5 @@
 
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

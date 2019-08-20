@@ -74,6 +74,16 @@ interface ApiService {
     @POST("/api/portal/cloudvmreboot")
     fun cloudvmreboot(@Body jsonArray: JsonArray): Call<String>
 
+    //API FOR RENAME DEPLOYMENT
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/updatedeploymentname")
+    fun updatedeploymentname(@Body jsonArray: JsonArray): Call<String>
+
+    //API FOR DEPLOYMENT NOTE
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/updatevmnote")
+    fun updatevmnote(@Body jsonArray: JsonArray): Call<String>
+
     //API FOR RECHARGE
     @POST("/api/portal/newrechargesave")
     fun newrechargesave(@Body jsonArray: JsonArray): Call<RechargeResponse>

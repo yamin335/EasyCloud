@@ -52,4 +52,6 @@
     <string name="user_payment">User payment history and processing</string>
     <string name="user_support">Support section for user</string>
     <string name="only_a_space"> </string>
+    <string name="refresh_the_existing_ui">Refresh the existing UI</string>
+    <string name="refresh">Refresh</string>
 </resources>

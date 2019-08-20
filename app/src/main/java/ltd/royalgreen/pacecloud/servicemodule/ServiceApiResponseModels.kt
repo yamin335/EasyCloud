@@ -27,5 +27,5 @@ data class VM(val tenantId: Number?, val userId: Number?, val id: String?, val r
               val privateIpAddresses: String?, val cloudCost: Number?, val nodeHours: Number?, val userFavorite: Boolean?,
               val recordTimestamp: Number?, val dtRecordTimestamp: String?, val imageId: String?,
               val terminateProtection: Boolean?, val importedTime: Number?, val dtImportedTime: String?,
-              val running: Boolean?, val runTime: Number?, val dtRunTime: String?, val vmNote: String?,
+              val running: Boolean?, val runTime: Number?, val dtRunTime: String?, var vmNote: String?,
               val serviceTierId: String?, val noOfNic: Number?, val isProcessing: Boolean?)
