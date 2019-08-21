@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
@@ -89,7 +90,7 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
 
     fun getUserBalance(user: LoggedUser?) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
+            apiCallStatus.postValue(ApiCallStatus.LOADING)
             val jsonObject = JsonObject().apply {
                 addProperty("UserID", user?.resdata?.loggeduser?.userID)
             }
@@ -108,8 +109,13 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                     when (apiResponse) {
                         is ApiSuccessResponse -> {
                             val balanceModel = apiResponse.body
-                            userBalance.postValue(BigDecimal(balanceModel.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString())
-                            apiCallStatus.value = ApiCallStatus.SUCCESS
+                            userBalance.postValue(BigDecimal(balanceModel.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
+                            val userBalanceSerialized = Gson().toJson(apiResponse.body)
+                            preferences.edit().apply {
+                                putString("UserBalance", userBalanceSerialized)
+                                apply()
+                            }
+                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         }
                         is ApiEmptyResponse -> {
                             apiCallStatus.postValue(ApiCallStatus.EMPTY)

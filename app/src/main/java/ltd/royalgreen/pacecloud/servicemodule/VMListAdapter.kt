@@ -454,8 +454,8 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
         holder.itemView.vmName.text = item.vmName
 //      holder.itemView.config.text = item?.numberOfCpus.toString()+" CPU, "+item?.memorySize?.toDouble()?.div(1024.0).toString().split(".")[0]+" GB Memory"
-        holder.itemView.nodeHour.text = BigDecimal(item?.nodeHours?.toDouble()?:0.00).setScale(4, RoundingMode.HALF_UP).toString()
-        holder.itemView.cloudCost.text = BigDecimal(item?.costPerHour?.toDouble()?:0.00).setScale(3, RoundingMode.HALF_UP).toString()
+        holder.itemView.nodeHour.text = BigDecimal(item?.nodeHours?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+        holder.itemView.cloudCost.text = BigDecimal(item?.costPerHour?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
 //      holder.itemView.status.text = item?.status
         if (item.status.equals("Running", true)) {
 //          holder.itemView.status.setTextColor(context.resources.getColor(R.color.textColor1))

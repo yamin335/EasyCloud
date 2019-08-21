@@ -14,7 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <androidx.constraintlayout.widget.ConstraintLayout
-                xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/rootLinear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -25,17 +24,18 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="15"
-                    android:textSize="16sp"
+                    android:textSize="13sp"
                     android:maxLines="2"
                     android:ellipsize="end"
+                    android:textStyle="bold"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@id/version"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:text="@{`Welcome! `+name}"
                     android:textColor="@color/colorPrimary"
-                    android:textStyle="bold" app:layout_constraintVertical_bias="0.0"
-                    app:layout_constraintHorizontal_bias="0.0" android:layout_marginTop="8dp"
+                    app:layout_constraintVertical_bias="0.0"
+                    app:layout_constraintHorizontal_bias="0.0"
                     android:layout_marginLeft="8dp" android:layout_marginRight="8dp"/>
             <TextView
                     android:id="@+id/version"
@@ -46,13 +46,11 @@
                     android:gravity="end|center_vertical"
                     android:text="@{versionNo}"
                     android:textColor="#5e6a74"
-                    app:layout_constraintVertical_bias="0.0"
-                    app:layout_constraintHorizontal_bias="1.0" android:layout_marginTop="2dp"
-                    android:layout_marginLeft="8dp" android:layout_marginRight="5dp"
+                    app:layout_constraintHorizontal_bias="1.0"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
+                    app:layout_constraintTop_toTopOf="@+id/userDashName"
+                    app:layout_constraintBottom_toBottomOf="@+id/userDashName" android:layout_marginRight="8dp"/>
 
             <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/osStatusPieChart"

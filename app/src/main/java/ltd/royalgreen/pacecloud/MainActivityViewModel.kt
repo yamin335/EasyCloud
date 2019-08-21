@@ -20,6 +20,9 @@ class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() 
     val application = app
 
     @Inject
+    lateinit var preferences: SharedPreferences
+
+    @Inject
     lateinit var apiService: ApiService
 
     val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
@@ -32,7 +35,7 @@ class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() 
 
     fun getUserBalance(user: LoggedUser?) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
+            apiCallStatus.postValue(ApiCallStatus.LOADING)
             val jsonObject = JsonObject().apply {
                 addProperty("UserID", user?.resdata?.loggeduser?.userID)
             }
@@ -51,7 +54,12 @@ class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() 
                     when (apiResponse) {
                         is ApiSuccessResponse -> {
                             userBalance.postValue(apiResponse.body)
-                            apiCallStatus.value = ApiCallStatus.SUCCESS
+                            val userBalanceSerialized = Gson().toJson(apiResponse.body)
+                            preferences.edit().apply {
+                                putString("UserBalance", userBalanceSerialized)
+                                apply()
+                            }
+                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         }
                         is ApiEmptyResponse -> {
                             apiCallStatus.postValue(ApiCallStatus.EMPTY)

@@ -33,6 +33,8 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.*
 import javax.inject.Inject
 
@@ -129,6 +131,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             adapter.submitList(pagedList)
         })
 
+        viewModel.paymentResponse.observe(this, Observer {
+            binding.includedContentMain.lastPaymentAmount = BigDecimal(it.resdata?.listBilCloudUserLedger?.get(0)?.creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+        })
+
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
             when(status) {
                 ApiCallStatus.LOADING -> {
@@ -154,7 +160,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
     override fun onSavePressed(date: String, amount: String, note: String) {
         if (isNetworkAvailable(activity!!)) {
-            viewModel.apiCallStatus.value = ApiCallStatus.LOADING
+            viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
             val jsonObject = JsonObject()
             user?.let {
@@ -185,6 +191,9 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                             val balanceModel = apiResponse.body
                             viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                             if (balanceModel.resdata?.resstate == true) {
+                                user?.let {
+                                    viewModel.getUserBalance(it)
+                                }
                                 viewModel.paymentList.value?.dataSource?.invalidate()
                                 Toast.makeText(requireActivity(), "Recharge Successful", Toast.LENGTH_LONG).show()
                             }

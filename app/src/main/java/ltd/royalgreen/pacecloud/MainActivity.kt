@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.nav_drawer.*
 import kotlinx.android.synthetic.main.nav_header.view.*
 import kotlinx.coroutines.*
+import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.databinding.MainActivityBinding
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
@@ -58,11 +59,33 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     private var currentNavController: LiveData<NavController>? = null
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    var listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
+            when (key) {
+                "UserBalance" -> {
+                    val userBalance = Gson().fromJson(prefs.getString("UserBalance", null), BalanceModel::class.java)
+                    userBalance?.let {
+                        viewModel.userBalance.value = it
+                    }
+                }
+            }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        preferences.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        preferences.unregisterOnSharedPreferenceChangeListener(listener)
+    }
+
     override fun supportFragmentInjector() = dispatchingAndroidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        preferences.registerOnSharedPreferenceChangeListener(listener)
         val binding: MainActivityBinding = DataBindingUtil.setContentView(
             this, R.layout.main_activity)
         binding.lifecycleOwner = this

@@ -2,6 +2,7 @@
 <layout>
     <data>
         <variable name="viewModel" type="ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel"/>
+        <variable name="lastPaymentAmount" type="String"/>
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -30,9 +31,17 @@
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:layout_width="wrap_content"
-                    android:layout_weight="1"
                     android:layout_height="wrap_content"/>
-
+            <TextView
+                    android:id="@+id/lastPayment"
+                    android:text="@{`Last Recharge: `+lastPaymentAmount}"
+                    android:layout_marginStart="8dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/rechargeButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
