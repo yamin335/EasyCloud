@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import ltd.royalgreen.pacecloud.AboutFragmentViewModel
 import ltd.royalgreen.pacecloud.MainActivityViewModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardViewModel
 import ltd.royalgreen.pacecloud.loginmodule.LoginViewModel
@@ -39,6 +40,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(PaymentFragmentViewModel::class)
     abstract fun bindPaymentFragmentViewModel(paymentFragmentViewModel: PaymentFragmentViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(AboutFragmentViewModel::class)
+    abstract fun bindAboutFragmentViewModel(aboutFragmentViewModel: AboutFragmentViewModel): ViewModel
 
     @Binds
     abstract fun bindViewModelFactory(factory: PaceCloudViewModelFactory): ViewModelProvider.Factory

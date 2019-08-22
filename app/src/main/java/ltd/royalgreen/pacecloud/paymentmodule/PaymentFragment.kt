@@ -133,6 +133,39 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
         viewModel.paymentResponse.observe(this, Observer {
             binding.includedContentMain.lastPaymentAmount = BigDecimal(it.resdata?.listBilCloudUserLedger?.get(0)?.creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+            val date = it.resdata?.listBilCloudUserLedger?.get(0)?.transactionDate
+            if (date != null && date.contains("T")) {
+                val tempStringArray = date.split("T")
+                var tempString1 = tempStringArray[1]
+                if (tempString1.contains(".")){
+                    tempString1 = tempString1.split(".")[0]
+                    tempString1 = when {
+                        tempString1.split(":")[0].toInt()>12 -> {
+                            val hour = tempString1.split(":")[0].toInt()
+                            val minute = tempString1.split(":")[1].toInt()
+                            val seconds = tempString1.split(":")[2].toInt()
+                            "${hour-12}:$minute:$seconds PM"
+                        }
+                        tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
+                        else -> "$tempString1 AM"
+                    }
+                } else {
+                    tempString1 = when {
+                        tempString1.split(":")[0].toInt()>12 -> {
+                            val hour = tempString1.split(":")[0].toInt()
+                            val minute = tempString1.split(":")[1].toInt()
+                            val seconds = tempString1.split(":")[2].toInt()
+                            "${hour-12}:$minute:$seconds PM"
+                        }
+                        tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
+                        else -> "$tempString1 AM"
+                    }
+                }
+                val year = tempStringArray[0].split("-")[0]
+                val month = tempStringArray[0].split("-")[1]
+                val day = tempStringArray[0].split("-")[2]
+                binding.includedContentMain.lastPaymentDate = "$day-$month-$year  |  $tempString1"
+            }
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->

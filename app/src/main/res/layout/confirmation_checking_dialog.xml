@@ -35,11 +35,12 @@
 
             <com.google.android.material.button.MaterialButton
                     android:id="@+id/no"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:backgroundTint="@color/colorRed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorGray"
+                    android:textColor="@color/colorWhite"
                     android:text="No"
                     app:cornerRadius="5dp"
                     android:layout_marginEnd="16dp"

@@ -17,7 +17,7 @@
         android:title="@string/payment" />
     <item
         android:id="@+id/support_graph"
-        android:icon="@drawable/ic_mood_gray_24dp"
+        android:icon="@drawable/ic_live_help_black_24dp"
         android:contentDescription="@string/user_support"
         android:title="@string/support" />
 </menu>

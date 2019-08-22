@@ -1,5 +1,6 @@
 package ltd.royalgreen.pacecloud
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -7,14 +8,16 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.view.menu.MenuItemImpl
+import androidx.core.util.forEach
 import androidx.core.view.GravityCompat
+import androidx.core.view.size
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -58,6 +61,8 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     private var currentNavController: LiveData<NavController>? = null
     private lateinit var appBarConfiguration: AppBarConfiguration
+
+    private val totalFragments = arrayOf("bottomNavigation#0","bottomNavigation#1", "bottomNavigation#2", "bottomNavigation#3")
 
     var listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             when (key) {
@@ -104,6 +109,12 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
             viewModel.getUserBalance(user)
             setupBottomNavigationBar()
         } // Else, need to wait for onRestoreInstanceState
+
+//        bottom_nav.setOnNavigationItemSelectedListener {
+//            it.isCheckable = true
+//            it.isChecked = true
+//            false
+//        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -118,7 +129,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
      * Called on first creation and when restoring state.
      */
     private fun setupBottomNavigationBar() {
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
 
         val navGraphIds = listOf(R.navigation.dashboard_graph, R.navigation.service_graph, R.navigation.payment_graph, R.navigation.support_graph)
 
@@ -195,23 +205,77 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         val menuHeaderList = ArrayList<ExpandableMenuModel>()
         val menuChildMap = HashMap<ExpandableMenuModel, List<String>>()
 
-        val demoMenuHeader = ExpandableMenuModel("Menu Header", R.drawable.ic_star_white_24dp)
-        menuHeaderList.add(demoMenuHeader)
+//        val demoMenuHeader = ExpandableMenuModel("Menu Header", R.drawable.ic_star_white_24dp)
+//        menuHeaderList.add(demoMenuHeader)
 
         val aboutHeader = ExpandableMenuModel("About Us", R.drawable.ic_info_white_24dp)
         menuHeaderList.add(aboutHeader)
 
-        val demoMenuChild = ArrayList<String>()
-        demoMenuChild.add("First Demo Child")
-        demoMenuChild.add("Second Demo Child")
+//        val demoMenuChild = ArrayList<String>()
+//        demoMenuChild.add("First Demo Child")
+//        demoMenuChild.add("Second Demo Child")
 
         val aboutChild = ArrayList<String>()
-
-        menuChildMap[menuHeaderList[0]] = demoMenuChild
-        menuChildMap[menuHeaderList[1]] = aboutChild
+//
+//        menuChildMap[menuHeaderList[0]] = demoMenuChild
+        menuChildMap[menuHeaderList[0]] = aboutChild
 
         val sideMenuAdapter = ExpandableMenuAdapter(this, menuHeaderList, menuChildMap)
         expandableMenu.setAdapter(sideMenuAdapter)
+
+        expandableMenu.setOnGroupClickListener { expandableListView, view, i, l ->
+            if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            if (i == 0 && l == 0L) {
+                supportFragmentManager.popBackStack("bottomNavigation#0", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                val navHost = obtainNavHostFragment(
+                    fragmentManager = supportFragmentManager,
+                    fragmentTag = "aboutFragment",
+                    navGraphId = R.navigation.about_graph,
+                    containerId = R.id.nav_host_container)
+                attachNavHostFragment(
+                    fragmentManager = supportFragmentManager,
+                    navHostFragment = navHost,
+                    isPrimaryNavFragment = true)
+                supportFragmentManager.beginTransaction()
+                    .attach(navHost)
+                    .setPrimaryNavigationFragment(navHost)
+                    .apply {
+                        // Detach all other Fragments
+                        totalFragments.forEach {
+                            if (it != "aboutFragment") {
+                                detach(supportFragmentManager.findFragmentByTag(it)!!)
+                            }
+                        }
+                    }
+                    .addToBackStack("aboutFragment")
+                    .setCustomAnimations(
+                        R.anim.nav_default_enter_anim,
+                        R.anim.nav_default_exit_anim,
+                        R.anim.nav_default_pop_enter_anim,
+                        R.anim.nav_default_pop_exit_anim)
+                    .setReorderingAllowed(true)
+                    .commit()
+                bottom_nav.deselectAllItems()
+
+//                for (k in bottom_nav.menu.size downTo  0) {
+//                    bottom_nav.menu.getItem(i).isCheckable = false
+//                }
+
+//                bottom_nav.menu.setGroupCheckable(0, false, true)
+//                bottom_nav.menu.setGroupCheckable(0, true, true)
+//                val navController = MutableLiveData<NavController>()
+//                navController.value = navHost.navController
+//                currentNavController = navController
+//                Toast.makeText(this, "About Clicked", Toast.LENGTH_LONG).show()
+            }
+            return@setOnGroupClickListener false
+        }
+
+        expandableMenu.setOnChildClickListener { expandableListView, view, headerID, i, l ->
+            return@setOnChildClickListener false
+        }
     }
 
     override fun onBackPressed() {
@@ -233,6 +297,54 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                     dialog.cancel()
                 }
             exitDialog.show()
+        }
+    }
+
+    private fun obtainNavHostFragment(
+        fragmentManager: FragmentManager,
+        fragmentTag: String,
+        navGraphId: Int,
+        containerId: Int
+    ): NavHostFragment {
+        // If the Nav Host fragment exists, return it
+        val existingFragment = fragmentManager.findFragmentByTag(fragmentTag) as NavHostFragment?
+        existingFragment?.let { return it }
+
+        // Otherwise, create it and return it.
+        val navHostFragment = NavHostFragment.create(navGraphId)
+        fragmentManager.beginTransaction()
+            .add(containerId, navHostFragment, fragmentTag)
+            .commitNow()
+        return navHostFragment
+    }
+
+    private fun attachNavHostFragment(
+        fragmentManager: FragmentManager,
+        navHostFragment: NavHostFragment,
+        isPrimaryNavFragment: Boolean
+    ) {
+        fragmentManager.beginTransaction()
+            .attach(navHostFragment)
+            .apply {
+                if (isPrimaryNavFragment) {
+                    setPrimaryNavigationFragment(navHostFragment)
+                }
+
+            }
+            .commitNow()
+
+    }
+
+    @SuppressLint("RestrictedApi")
+    fun BottomNavigationView.deselectAllItems() {
+        val menu = this.menu
+
+        for(i in 0 until menu.size()) {
+            (menu.getItem(i) as? MenuItemImpl)?.let {
+                it.isExclusiveCheckable = false
+                it.isChecked = false
+                it.isExclusiveCheckable = true
+            }
         }
     }
 }
