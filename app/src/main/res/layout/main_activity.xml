@@ -33,8 +33,8 @@
                     android:id="@+id/expandableMenu"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginTop="87dp"
-                    android:background="#F5F5F5"
+                    android:layout_marginTop="190dp"
+                    android:background="#FFFFFF"
                     android:divider="@null"
                     android:childDivider="@null"
                     android:groupIndicator="@null">

@@ -63,9 +63,9 @@ class ExpandableMenuAdapter(
         }
 
         if (isExpanded) {
-            convertedView.indicator.setImageDrawable(mContext.resources.getDrawable(R.drawable.ic_remove_white_24dp))
+            convertedView.indicator.setImageDrawable(mContext.resources.getDrawable(R.drawable.ic_arrow_drop_up_gray_24dp))
         } else {
-            convertedView.indicator.setImageDrawable(mContext.resources.getDrawable(R.drawable.ic_add_white_24dp))
+            convertedView.indicator.setImageDrawable(mContext.resources.getDrawable(R.drawable.ic_arrow_drop_down_gray_24dp))
         }
         convertedView.headerTitle.text = headerTitle.iconName
         convertedView.headerIcon.setImageResource(headerTitle.iconImg)

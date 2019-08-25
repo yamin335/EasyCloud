@@ -3,11 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/service_graph"
-    app:startDestination="@id/hello2">
+    app:startDestination="@id/serviceScreen">
 
     <fragment
-        android:id="@+id/hello2"
+        android:id="@+id/serviceScreen"
         android:name="ltd.royalgreen.pacecloud.servicemodule.ServiceFragment"
         android:label="@string/services"
-        tools:layout="@layout/service_fragment" />
+        tools:layout="@layout/service_fragment" >
+        <action android:id="@+id/action_serviceScreen_to_about_graph" app:destination="@id/about_graph"/>
+    </fragment>
+    <include app:graph="@navigation/about_graph"/>
 </navigation>

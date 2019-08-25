@@ -17,7 +17,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.*
 import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -32,6 +35,7 @@ import kotlinx.android.synthetic.main.nav_drawer.*
 import kotlinx.android.synthetic.main.nav_header.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
+import ltd.royalgreen.pacecloud.dashboardmodule.DashboardFragment
 import ltd.royalgreen.pacecloud.databinding.MainActivityBinding
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
@@ -227,37 +231,59 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
             if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
-            if (i == 0 && l == 0L) {
-                supportFragmentManager.popBackStack("bottomNavigation#0", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                val navHost = obtainNavHostFragment(
-                    fragmentManager = supportFragmentManager,
-                    fragmentTag = "aboutFragment",
-                    navGraphId = R.navigation.about_graph,
-                    containerId = R.id.nav_host_container)
-                attachNavHostFragment(
-                    fragmentManager = supportFragmentManager,
-                    navHostFragment = navHost,
-                    isPrimaryNavFragment = true)
-                supportFragmentManager.beginTransaction()
-                    .attach(navHost)
-                    .setPrimaryNavigationFragment(navHost)
-                    .apply {
-                        // Detach all other Fragments
-                        totalFragments.forEach {
-                            if (it != "aboutFragment") {
-                                detach(supportFragmentManager.findFragmentByTag(it)!!)
-                            }
-                        }
+            when(currentNavController?.value?.graph?.id) {
+                R.id.dashboard_graph -> {
+                    if (i == 0 && l == 0L) {
+                        currentNavController?.value?.navigate(R.id.action_dashboardScreen_to_about_graph)
                     }
-                    .addToBackStack("aboutFragment")
-                    .setCustomAnimations(
-                        R.anim.nav_default_enter_anim,
-                        R.anim.nav_default_exit_anim,
-                        R.anim.nav_default_pop_enter_anim,
-                        R.anim.nav_default_pop_exit_anim)
-                    .setReorderingAllowed(true)
-                    .commit()
-                bottom_nav.deselectAllItems()
+                }
+                R.id.service_graph -> {
+                    if (i == 0 && l == 0L) {
+                        currentNavController?.value?.navigate(R.id.action_serviceScreen_to_about_graph)
+                    }
+                }
+                R.id.payment_graph -> {
+                    if (i == 0 && l == 0L) {
+                        currentNavController?.value?.navigate(R.id.action_paymentScreen_to_about_graph)
+                    }
+                }
+                R.id.support_graph -> {
+                    if (i == 0 && l == 0L) {
+                        currentNavController?.value?.navigate(R.id.action_supportScreen_to_about_graph)
+                    }
+                }
+            }
+//            if (i == 0 && l == 0L) {
+//                supportFragmentManager.popBackStack("bottomNavigation#0", FragmentManager.POP_BACK_STACK_INCLUSIVE)
+//                val navHost = obtainNavHostFragment(
+//                    fragmentManager = supportFragmentManager,
+//                    fragmentTag = "aboutFragment",
+//                    navGraphId = R.navigation.about_graph,
+//                    containerId = R.id.nav_host_container)
+//                attachNavHostFragment(
+//                    fragmentManager = supportFragmentManager,
+//                    navHostFragment = navHost,
+//                    isPrimaryNavFragment = true)
+//                supportFragmentManager.beginTransaction()
+//                    .attach(navHost)
+//                    .setPrimaryNavigationFragment(navHost)
+//                    .apply {
+//                        // Detach all other Fragments
+//                        totalFragments.forEach {
+//                            if (it != "aboutFragment") {
+//                                detach(supportFragmentManager.findFragmentByTag(it)!!)
+//                            }
+//                        }
+//                    }
+//                    .addToBackStack("aboutFragment")
+//                    .setCustomAnimations(
+//                        R.anim.nav_default_enter_anim,
+//                        R.anim.nav_default_exit_anim,
+//                        R.anim.nav_default_pop_enter_anim,
+//                        R.anim.nav_default_pop_exit_anim)
+//                    .setReorderingAllowed(true)
+//                    .commit()
+//                bottom_nav.deselectAllItems()
 
 //                for (k in bottom_nav.menu.size downTo  0) {
 //                    bottom_nav.menu.getItem(i).isCheckable = false
@@ -269,8 +295,8 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 //                navController.value = navHost.navController
 //                currentNavController = navController
 //                Toast.makeText(this, "About Clicked", Toast.LENGTH_LONG).show()
-            }
-            return@setOnGroupClickListener false
+//            }
+            return@setOnGroupClickListener true
         }
 
         expandableMenu.setOnChildClickListener { expandableListView, view, headerID, i, l ->

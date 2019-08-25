@@ -4,21 +4,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/support_graph"
-    app:startDestination="@id/register"
+    app:startDestination="@id/supportScreen"
     tools:ignore="UnusedNavigation">
 
     <fragment
-            android:id="@+id/register"
+            android:id="@+id/supportScreen"
             android:name="ltd.royalgreen.pacecloud.supportmodule.SupportFragment"
             android:label="@string/support"
             tools:layout="@layout/support_fragment">
-        <action
-            android:id="@+id/action_register_to_registered"
-            app:destination="@id/registered"/>
+        <action android:id="@+id/action_supportScreen_to_about_graph" app:destination="@id/about_graph"/>
     </fragment>
-    <fragment
-        android:id="@+id/registered"
-        android:name="ltd.royalgreen.pacecloud.supportmodule.Registered"
-        android:label="Registered"
-        tools:layout="@layout/fragment_registered"/>
+    <include app:graph="@navigation/about_graph"/>
 </navigation>

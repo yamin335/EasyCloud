@@ -41,7 +41,7 @@
     <string name="support">Support</string>
     <string name="username">Username</string>
     <string name="signin">Sign In</string>
-    <string name="sign_up_now">Sign Up ?</string>
+    <string name="sign_up_now">Sign Up !</string>
     <string name="forgot_password">Forgot Password ?</string>
     <string name="sign_out">Sign Out</string>
     <string name="get_sign_out">Get sign out from application</string>
@@ -54,4 +54,5 @@
     <string name="only_a_space"></string>
     <string name="refresh_the_existing_ui">Refresh the existing UI</string>
     <string name="refresh">Refresh</string>
+    <string name="home">Home</string>
 </resources>

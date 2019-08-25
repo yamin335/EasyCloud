@@ -1,8 +1,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_checked="true"
-        android:color="@color/colorGreen" />
+        android:color="@color/colorDarkGreen" />
     <item
         android:state_checked="false"
-        android:color="@color/colorPrimary" />
+        android:color="@color/colorGray" />
 </selector>

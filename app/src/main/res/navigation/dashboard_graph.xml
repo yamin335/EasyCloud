@@ -4,20 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dashboard_graph"
-    app:startDestination="@+id/titleScreen">
+    app:startDestination="@+id/dashboardScreen">
 
     <fragment
-            android:id="@+id/titleScreen"
+            android:id="@+id/dashboardScreen"
             android:name="ltd.royalgreen.pacecloud.dashboardmodule.DashboardFragment"
-            android:label="@string/dashboard"
+            android:label="@string/home"
             tools:layout="@layout/dashboard_fragment">
-        <action
-                android:id="@+id/action_title_to_about"
-                app:destination="@id/aboutScreen"/>
+        <action android:id="@+id/action_dashboardScreen_to_about_graph" app:destination="@id/about_graph"/>
     </fragment>
-    <fragment
-        android:id="@+id/aboutScreen"
-        android:name="ltd.royalgreen.pacecloud.dashboardmodule.About"
-        android:label="@string/title_about"
-        tools:layout="@layout/fragment_about"/>
+    <include app:graph="@navigation/about_graph"/>
 </navigation>

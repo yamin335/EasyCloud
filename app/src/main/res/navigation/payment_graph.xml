@@ -5,28 +5,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/payment_graph"
-    app:startDestination="@+id/payment">
+    app:startDestination="@+id/paymentScreen">
 
     <fragment
-            android:id="@+id/payment"
+            android:id="@+id/paymentScreen"
             android:name="ltd.royalgreen.pacecloud.paymentmodule.PaymentFragment"
             android:label="@string/payment"
     >
-        <action
-                android:id="@+id/action_leaderboard_to_userProfile"
-                app:destination="@id/userProfile"/>
+        <action android:id="@+id/action_paymentScreen_to_about_graph" app:destination="@id/about_graph"/>
     </fragment>
-    <fragment
-        android:id="@+id/userProfile"
-        android:name="ltd.royalgreen.pacecloud.paymentmodule.UserProfile"
-        android:label="@string/title_detail"
-        tools:layout="@layout/fragment_user_profile">
-        <deepLink
-            android:id="@+id/deepLink"
-            app:uri="www.example.com/user/{userName}"
-            android:autoVerify="true"/>
-        <argument
-            android:name="userName"
-            app:argType="string"/>
-    </fragment>
+    <include app:graph="@navigation/about_graph"/>
 </navigation>
