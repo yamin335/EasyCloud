@@ -39,7 +39,7 @@ class ActivityLogDataSource(private val application: Application, private val ap
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
+                withTimeoutOrNull(7000L) {
                     val response = api.cloudactivitylog(param).execute()
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {
@@ -82,7 +82,7 @@ class ActivityLogDataSource(private val application: Application, private val ap
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
+                withTimeoutOrNull(7000L) {
                     val response = api.cloudactivitylog(param).execute()
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {

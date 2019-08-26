@@ -25,7 +25,12 @@ object AppModule {
     @Provides
     @JvmStatic
     fun provideApiService(): ApiService {
+        val client = OkHttpClient().newBuilder()
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .callTimeout(5, TimeUnit.SECONDS)
+            .build()
         return Retrofit.Builder()
+            .client(client)
             .baseUrl("http://123.136.26.98:8081")
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())

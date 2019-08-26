@@ -22,19 +22,19 @@
 
         <com.google.android.material.navigation.NavigationView
                 android:id="@+id/nav_view"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="start"
                 android:fitsSystemWindows="true"
-                android:background="#FFFFFF"
+                android:background="#F8F8F8"
                 app:headerLayout="@layout/nav_header">
 
             <ExpandableListView
                     android:id="@+id/expandableMenu"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginTop="190dp"
-                    android:background="#FFFFFF"
+                    android:background="#F8F8F8"
                     android:divider="@null"
                     android:childDivider="@null"
                     android:groupIndicator="@null">

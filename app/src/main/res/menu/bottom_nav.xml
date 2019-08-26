@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/dashboard_graph"
-        android:icon="@drawable/ic_home_black_24dp"
+        android:icon="@drawable/ic_cloud_circle_black_24dp"
         android:contentDescription="@string/dashboard_activity"
-        android:title="@string/home" />
+        android:title="@string/dashboard" />
     <item
         android:id="@+id/service_graph"
-        android:icon="@drawable/ic_cloud_done_gray_24dp"
+        android:icon="@drawable/ic_storage_black_24dp"
         android:contentDescription="@string/list_of_services"
-        android:title="@string/services" />
+        android:title="@string/virtual_machine" />
     <item
         android:id="@+id/payment_graph"
-        android:icon="@drawable/ic_monetization_on_gray_24dp"
+        android:icon="@drawable/ic_equalizer_black_24dp"
         android:contentDescription="@string/user_payment"
         android:title="@string/payment" />
     <item

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuItemImpl
@@ -65,8 +66,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     private var currentNavController: LiveData<NavController>? = null
     private lateinit var appBarConfiguration: AppBarConfiguration
-
-    private val totalFragments = arrayOf("bottomNavigation#0","bottomNavigation#1", "bottomNavigation#2", "bottomNavigation#3")
 
     var listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             when (key) {
@@ -151,6 +150,25 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
             setSupportActionBar(toolbar)
             setupActionBarWithNavController(navController, appBarConfiguration)
             nav_view.setupWithNavController(navController)
+
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                when(destination.id) {
+                    R.id.dashboardScreen -> {
+                        bottom_nav.visibility = View.VISIBLE
+                    }
+                    R.id.serviceScreen -> {
+                        bottom_nav.visibility = View.VISIBLE
+                    }
+                    R.id.paymentScreen -> {
+                        bottom_nav.visibility = View.VISIBLE
+                    }
+                    R.id.supportScreen -> {
+                        bottom_nav.visibility = View.VISIBLE
+                    }
+                    else -> bottom_nav.visibility = View.GONE
+                }
+            }
+
 //            setupActionBarWithNavController(navController)
         })
         currentNavController = controller
@@ -191,7 +209,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 }
                 CoroutineScope(Dispatchers.IO).launch(handler) {
                     preferences.edit().apply {
-                        putBoolean("LoginState", false)
                         putString("LoggedUser", "")
                         apply()
                     }
@@ -215,14 +232,19 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         val aboutHeader = ExpandableMenuModel("About Us", R.drawable.ic_info_white_24dp)
         menuHeaderList.add(aboutHeader)
 
+        val signoutHeader = ExpandableMenuModel("Sign Out", R.drawable.ic_exit_to_app_white_24dp)
+        menuHeaderList.add(signoutHeader)
+
 //        val demoMenuChild = ArrayList<String>()
 //        demoMenuChild.add("First Demo Child")
 //        demoMenuChild.add("Second Demo Child")
 
         val aboutChild = ArrayList<String>()
+        val signoutChild = ArrayList<String>()
 //
 //        menuChildMap[menuHeaderList[0]] = demoMenuChild
         menuChildMap[menuHeaderList[0]] = aboutChild
+        menuChildMap[menuHeaderList[1]] = signoutChild
 
         val sideMenuAdapter = ExpandableMenuAdapter(this, menuHeaderList, menuChildMap)
         expandableMenu.setAdapter(sideMenuAdapter)
@@ -252,6 +274,10 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                         currentNavController?.value?.navigate(R.id.action_supportScreen_to_about_graph)
                     }
                 }
+            }
+
+            if (i == 1 && l == 1L) {
+                doSignOut()
             }
 //            if (i == 0 && l == 0L) {
 //                supportFragmentManager.popBackStack("bottomNavigation#0", FragmentManager.POP_BACK_STACK_INCLUSIVE)

@@ -29,6 +29,7 @@
                     android:id="@+id/mainContainer"
                     android:layout_width="match_parent"
                     android:layout_below="@id/loader"
+                    android:layout_marginTop="80dp"
                     android:layout_height="wrap_content">
                 <ImageView
                         android:id="@+id/logo"
@@ -143,6 +144,7 @@
                         android:layout_width="match_parent"
                         android:layout_marginStart="24dp"
                         android:layout_marginEnd="24dp"
+                        android:visibility="gone"
                         android:layout_height="match_parent"
                         android:layout_below="@id/loginButton"
                         android:orientation="horizontal"

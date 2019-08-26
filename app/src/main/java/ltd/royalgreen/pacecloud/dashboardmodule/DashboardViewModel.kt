@@ -67,7 +67,7 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
+                withTimeoutOrNull(7000L) {
                     val response = apiService.GetDashboardChartPortal(param).execute()
                     val apiResponse = ApiResponse.create(response)
                     when (apiResponse) {
@@ -106,7 +106,7 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(5000L) {
+                withTimeoutOrNull(7000L) {
                     val response = apiService.GetDashboardChartPortalSummery(param).execute()
                     val apiResponse = ApiResponse.create(response)
                     when (apiResponse) {

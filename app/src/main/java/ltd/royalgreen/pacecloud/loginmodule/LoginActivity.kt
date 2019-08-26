@@ -86,7 +86,7 @@ class LoginActivity : AppCompatActivity(){
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 }
-                ApiCallStatus.ERROR -> Toast.makeText(this, "Unexpected ERROR occured!!!", Toast.LENGTH_LONG).show()
+                ApiCallStatus.ERROR -> Toast.makeText(this, "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
                 ApiCallStatus.TIMEOUT -> Toast.makeText(this, "SERVER is not responding...", Toast.LENGTH_LONG).show()
                 ApiCallStatus.EMPTY -> Toast.makeText(this, "Empty return value!!!", Toast.LENGTH_LONG).show()
                 ApiCallStatus.INVALIDUSERNAME -> {

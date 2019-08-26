@@ -1,6 +1,7 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingComponent
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.components.LegendEntry
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import kotlinx.android.synthetic.main.dashboard_fragment.view.*
@@ -25,9 +27,11 @@ import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
 import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlinx.android.synthetic.main.dashboard_fragment.*
-import kotlinx.android.synthetic.main.dashboard_fragment.view.userActivityLogList
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import kotlin.math.roundToInt
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.utils.ColorTemplate
 
 
 class DashboardFragment : Fragment(), Injectable {
@@ -67,8 +71,8 @@ class DashboardFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        userActivityLogList.layoutManager = LinearLayoutManager(activity)
-        userActivityLogList.addItemDecoration(RecyclerItemDivider(activity!!.applicationContext, LinearLayoutManager.VERTICAL, 8))
+        userActivityLogList.layoutManager = LinearLayoutManager(requireContext())
+        userActivityLogList.addItemDecoration(RecyclerItemDivider(requireContext(), LinearLayoutManager.VERTICAL, 8))
         userActivityLogList.adapter = adapter
 
         //1
@@ -87,8 +91,8 @@ class DashboardFragment : Fragment(), Injectable {
 
         //Pie Chart Configuration
         view.osStatusPieChart.isLogEnabled = false
-        view.osStatusPieChart.holeRadius = 35F
-        view.osStatusPieChart.transparentCircleRadius = 43F
+        view.osStatusPieChart.holeRadius = 30F
+        view.osStatusPieChart.transparentCircleRadius = 38F
         view.osStatusPieChart.centerText = "VM Status"
         view.osStatusPieChart.setNoDataText("No Chart Data Found")
 //        view.osStatusPieChart.setDrawMarkers(false)
@@ -98,6 +102,7 @@ class DashboardFragment : Fragment(), Injectable {
 //        view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
         view.osStatusPieChart.description.isEnabled = false
         view.osStatusPieChart.isRotationEnabled = false
+        view.osStatusPieChart.setEntryLabelColor(resources.getColor(R.color.colorWhite))
 //        view.osStatusPieChart.setUsePercentValues(true)
         view.osStatusPieChart.animateXY(900, 900)
 
@@ -125,16 +130,59 @@ class DashboardFragment : Fragment(), Injectable {
             val entries: List<PieEntry>
             entries = ArrayList<PieEntry>()
             if (dataSet != null) {
-                dataSet.forEach {
-                    entries.add(PieEntry(it.dataValue?.toFloat()?: 0.00F, it.dataName))
+                val legendLabel = ArrayList<String>()
+                val legends = ArrayList<LegendEntry>()
+                dataSet.forEach { dashOsStatusChart ->
+                    val data = dashOsStatusChart.dataValue?.toFloat()
+                    if ( data != null && data > 0.0F && data <= 5.0) {
+                        entries.add(PieEntry(data*5, dashOsStatusChart.dataName))
+                    } else if (data != null && data > 0.0F){
+                        entries.add(PieEntry(data, dashOsStatusChart.dataName))
+                    }
+                    if (!legendLabel.contains(dashOsStatusChart.dataName)) {
+                        dashOsStatusChart.dataName?.let {
+                            val legend = LegendEntry()
+                            when(it) {
+                                "Running" -> {
+                                    legend.formColor = resources.getColor(R.color.pieColor2)
+                                }
+                                "Stopped" -> {
+                                    legend.formColor = resources.getColor(R.color.pieColor1)
+                                }
+                                "Terminated" -> {
+                                    legend.formColor = resources.getColor(R.color.colorRed)
+                                }
+                                "Error" -> {
+                                    legend.formColor = resources.getColor(R.color.barColor4)
+                                }
+                                else -> {
+                                    legend.formColor = resources.getColor(R.color.barColor3)
+                                }
+                            }
+                            legend.label = it
+                            legends.add(legend)
+                            legendLabel.add(it)
+                        }
+                    }
                 }
-                val pieDataSet = PieDataSet(entries, "")
+                val pieDataSet = MyPieDataSet(entries, "")
+                pieDataSet.sliceSpace = 3f
+//                pieDataSet.xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+//                pieDataSet.yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+//                pieDataSet.valueLinePart1OffsetPercentage = 90.0f
+//                pieDataSet.valueLinePart1Length = 0.65f
+//                pieDataSet.valueLinePart2Length = 0.4f
                 pieDataSet.valueTextColor = resources.getColor(R.color.colorWhite)
                 pieDataSet.valueTextSize = 11f
-                pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2), resources.getColor(R.color.pieColor1), resources.getColor(R.color.colorRed))
+                pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2),
+                    resources.getColor(R.color.pieColor1),
+                    resources.getColor(R.color.colorRed),
+                    resources.getColor(R.color.barColor4),
+                    resources.getColor(R.color.barColor3))
                 val pieData = PieData(pieDataSet)
                 pieData.setValueFormatter(CustomValueFormatter())
                 view.osStatusPieChart.data = pieData
+                view.osStatusPieChart.legend.setCustom(legends)
                 view.osStatusPieChart.invalidate()
             }
         })
@@ -178,8 +226,34 @@ class DashboardFragment : Fragment(), Injectable {
         }
 
         override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
-            return pieEntry?.y?.roundToInt().toString()
+            var modifiedValue = 0
+            pieEntry?.y?.let {
+                modifiedValue = if (it.roundToInt()>0 && it<=25) {
+                    it.roundToInt().div(5)
+                } else {
+                    it.roundToInt()
+                }
+            }
+            return modifiedValue.toString()
         }
+    }
+
+    inner class MyPieDataSet(yVals: List<PieEntry>, label: String) : PieDataSet(yVals, label){
+        override fun getEntryIndex(e: PieEntry?): Int {
+         return super.getEntryIndex(e)
+        }
+
+        override fun getColor(index: Int): Int {
+            return when(getEntryForIndex(index).label) {
+                "Running" -> colors[0]
+                "Stopped" -> colors[1]
+                "Terminated" -> colors[2]
+                "Error" -> colors[3]
+                else -> colors[4]
+            }
+        }
+
+
     }
 
 }

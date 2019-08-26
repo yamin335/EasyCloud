@@ -58,7 +58,7 @@ class ExpandableMenuAdapter(
         }
 
         when (groupPosition) {
-            1 -> convertedView.indicator.visibility = View.VISIBLE
+            5 -> convertedView.indicator.visibility = View.VISIBLE
             else -> convertedView.indicator.visibility = View.INVISIBLE
         }
 

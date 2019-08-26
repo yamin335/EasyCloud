@@ -65,8 +65,8 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
     }
 
     private val client = OkHttpClient().newBuilder()
-        .connectTimeout(1, TimeUnit.MINUTES)
-        .callTimeout(1, TimeUnit.MINUTES)
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .callTimeout(5, TimeUnit.SECONDS)
         .build()
 
     val apiService: ApiService = Retrofit.Builder()
