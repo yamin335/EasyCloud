@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/serviceScreen"
         android:name="ltd.royalgreen.pacecloud.servicemodule.ServiceFragment"
-        android:label="@string/services"
+        android:label="@string/virtual_machine"
         tools:layout="@layout/service_fragment" >
         <action android:id="@+id/action_serviceScreen_to_about_graph" app:destination="@id/about_graph"/>
     </fragment>

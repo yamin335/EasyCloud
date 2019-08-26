@@ -134,11 +134,10 @@ class DashboardFragment : Fragment(), Injectable {
                 val legends = ArrayList<LegendEntry>()
                 dataSet.forEach { dashOsStatusChart ->
                     val data = dashOsStatusChart.dataValue?.toFloat()
-                    if ( data != null && data > 0.0F && data <= 5.0) {
-                        entries.add(PieEntry(data*5, dashOsStatusChart.dataName))
-                    } else if (data != null && data > 0.0F){
-                        entries.add(PieEntry(data, dashOsStatusChart.dataName))
+                    if ( data != null && data > 0.0F) {
+                        entries.add(PieEntry(data+5, dashOsStatusChart.dataName))
                     }
+
                     if (!legendLabel.contains(dashOsStatusChart.dataName)) {
                         dashOsStatusChart.dataName?.let {
                             val legend = LegendEntry()
@@ -228,8 +227,8 @@ class DashboardFragment : Fragment(), Injectable {
         override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
             var modifiedValue = 0
             pieEntry?.y?.let {
-                modifiedValue = if (it.roundToInt()>0 && it<=25) {
-                    it.roundToInt().div(5)
+                modifiedValue = if (it.roundToInt()>0) {
+                    it.roundToInt().minus(5)
                 } else {
                     it.roundToInt()
                 }
