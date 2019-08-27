@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#24272c</color>
     <color name="colorPrimaryDark">#F8F8F8</color>
-    <color name="colorAccent">#50C503</color>
+    <color name="colorAccent">#19af2c</color>
     <color name="colorWhite">#ffffff</color>
 
     <!-- Custom colors -->
@@ -23,6 +23,8 @@
     <color name="textColor2">#2763cb</color>
     <color name="colorCustom1">#24272c</color>
     <color name="customColor1">#F5FFEC</color>
+    <color name="customColor2">#F5F9FA</color>
+    <color name="customColor3">#FDFDFD</color>
 
     <!-- Colors for pie chart -->
     <color name="pieColor1">#FEBF00</color>

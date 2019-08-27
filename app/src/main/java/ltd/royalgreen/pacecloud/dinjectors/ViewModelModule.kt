@@ -11,6 +11,7 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashboardViewModel
 import ltd.royalgreen.pacecloud.loginmodule.LoginViewModel
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragmentViewModel
+import ltd.royalgreen.pacecloud.supportmodule.SupportFragmentViewModel
 import ltd.royalgreen.pacecloud.util.PaceCloudViewModelFactory
 
 @Suppress("unused")
@@ -40,6 +41,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(PaymentFragmentViewModel::class)
     abstract fun bindPaymentFragmentViewModel(paymentFragmentViewModel: PaymentFragmentViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SupportFragmentViewModel::class)
+    abstract fun bindSupportFragmentViewModel(supportFragmentViewModel: SupportFragmentViewModel): ViewModel
 
     @Binds
     @IntoMap

@@ -87,7 +87,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
         val item = vmList[position]
         val context = holder.itemView.context
-        val resources = holder.itemView.context.resources
+//        val resources = holder.itemView.context.resources
 
         //Custom popup menu for action button
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -116,7 +116,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         vmStartStatus.observe(holder, androidx.lifecycle.Observer {
             if (it) {
                 item.status = "Running"
-                holder.itemView.statusIcon.setColorFilter(context.resources.getColor(R.color.textColor1))
+                holder.itemView.statusIcon.setColorFilter(context.resources.getColor(R.color.colorGreenTheme))
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuStartStop.isEnabled = true
                 popupMenu.switchStartStop.isEnabled = true
@@ -230,7 +230,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                                 when (val apiResponse = ApiResponse.create(response)) {
                                     is ApiSuccessResponse -> {
                                         if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                                            delay(50000L)
+                                            delay(45000L)
                                             vmStopStatus.postValue(true)
                                             callBack.onStop(true)
                                         } else {
@@ -454,12 +454,12 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
         holder.itemView.vmName.text = item.vmName
 //      holder.itemView.config.text = item?.numberOfCpus.toString()+" CPU, "+item?.memorySize?.toDouble()?.div(1024.0).toString().split(".")[0]+" GB Memory"
-        holder.itemView.nodeHour.text = BigDecimal(item?.nodeHours?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
-        holder.itemView.cloudCost.text = BigDecimal(item?.costPerHour?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+        holder.itemView.nodeHour.text = BigDecimal(item.nodeHours?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+        holder.itemView.cloudCost.text = BigDecimal(item.costPerHour?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
 //      holder.itemView.status.text = item?.status
         if (item.status.equals("Running", true)) {
 //          holder.itemView.status.setTextColor(context.resources.getColor(R.color.textColor1))
-            holder.itemView.statusIcon.setColorFilter(context.resources.getColor(R.color.textColor1))
+            holder.itemView.statusIcon.setColorFilter(context.resources.getColor(R.color.colorGreenTheme))
         } else {
 //          holder.itemView.status.setTextColor(context.resources.getColor(R.color.colorRed))
             holder.itemView.statusIcon.setColorFilter(context.resources.getColor(R.color.colorRed))

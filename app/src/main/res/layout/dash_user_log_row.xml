@@ -7,7 +7,7 @@
             android:id="@+id/logTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/textColor1"
+            android:textColor="@color/colorGreenTheme"
             android:textSize="13sp"
             android:textStyle="bold"
             android:ellipsize="end"

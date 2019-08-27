@@ -1,6 +1,7 @@
 package ltd.royalgreen.pacecloud
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedDispatcher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuItemImpl
 import androidx.core.util.forEach
@@ -29,6 +31,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.main_activity.*
@@ -40,8 +45,10 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashboardFragment
 import ltd.royalgreen.pacecloud.databinding.MainActivityBinding
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
+import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.ExpandableMenuAdapter
 import ltd.royalgreen.pacecloud.util.ExpandableMenuModel
+import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -50,6 +57,10 @@ import javax.inject.Inject
  * An activity that inflates a layout that has a [BottomNavigationView].
  */
 class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
+
+    @Inject
+    lateinit var apiService: ApiService
+
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -99,13 +110,17 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-        if (user != null) {
-            nav_view.getHeaderView(0).loggedUserName.text = user.resdata?.loggeduser?.fullName
-            nav_view.getHeaderView(0).loggedUserEmail.text = user.resdata?.loggeduser?.email
+        user?.let {
+            nav_view.getHeaderView(0).loggedUserName.text = it.resdata?.loggeduser?.fullName
+            nav_view.getHeaderView(0).loggedUserEmail.text = it.resdata?.loggeduser?.email
         }
         prepareSideNavMenu()
         viewModel.userBalance.observe(this, Observer { balance ->
             nav_view.getHeaderView(0).loggedUserBalance.text = BigDecimal(balance.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+        })
+
+        viewModel.recreateActivity.observe(this, Observer { reCreate ->
+//           if (reCreate) this@MainActivity.recreate()
         })
 
         if (savedInstanceState == null) {
@@ -179,7 +194,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         currentNavController?.observe(this, Observer { navController ->
             when(navController.graph.id) {
                 R.id.dashboard_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-                R.id.service_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+                R.id.service_graph -> menuInflater.inflate(R.menu.virtual_machine_menu, menu)
                 R.id.payment_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
                 R.id.support_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
             }
@@ -190,6 +205,8 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.refresh -> recreate()
+            R.id.sync_and_refresh -> recreate()
+//            R.id.sync_and_refresh -> syncDatabaseAndRefresh(this)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -279,49 +296,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
             if (i == 1 && l == 1L) {
                 doSignOut()
             }
-//            if (i == 0 && l == 0L) {
-//                supportFragmentManager.popBackStack("bottomNavigation#0", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-//                val navHost = obtainNavHostFragment(
-//                    fragmentManager = supportFragmentManager,
-//                    fragmentTag = "aboutFragment",
-//                    navGraphId = R.navigation.about_graph,
-//                    containerId = R.id.nav_host_container)
-//                attachNavHostFragment(
-//                    fragmentManager = supportFragmentManager,
-//                    navHostFragment = navHost,
-//                    isPrimaryNavFragment = true)
-//                supportFragmentManager.beginTransaction()
-//                    .attach(navHost)
-//                    .setPrimaryNavigationFragment(navHost)
-//                    .apply {
-//                        // Detach all other Fragments
-//                        totalFragments.forEach {
-//                            if (it != "aboutFragment") {
-//                                detach(supportFragmentManager.findFragmentByTag(it)!!)
-//                            }
-//                        }
-//                    }
-//                    .addToBackStack("aboutFragment")
-//                    .setCustomAnimations(
-//                        R.anim.nav_default_enter_anim,
-//                        R.anim.nav_default_exit_anim,
-//                        R.anim.nav_default_pop_enter_anim,
-//                        R.anim.nav_default_pop_exit_anim)
-//                    .setReorderingAllowed(true)
-//                    .commit()
-//                bottom_nav.deselectAllItems()
-
-//                for (k in bottom_nav.menu.size downTo  0) {
-//                    bottom_nav.menu.getItem(i).isCheckable = false
-//                }
-
-//                bottom_nav.menu.setGroupCheckable(0, false, true)
-//                bottom_nav.menu.setGroupCheckable(0, true, true)
-//                val navController = MutableLiveData<NavController>()
-//                navController.value = navHost.navController
-//                currentNavController = navController
-//                Toast.makeText(this, "About Clicked", Toast.LENGTH_LONG).show()
-//            }
             return@setOnGroupClickListener true
         }
 
@@ -334,69 +308,48 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
-                .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.ic_launcher)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
-                    preferences.edit().apply {
-                        putString("LoggedUser", "")
-                        apply()
-                    }
-                    finish()
-                }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.cancel()
-                }
-            exitDialog.show()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 
-    private fun obtainNavHostFragment(
-        fragmentManager: FragmentManager,
-        fragmentTag: String,
-        navGraphId: Int,
-        containerId: Int
-    ): NavHostFragment {
-        // If the Nav Host fragment exists, return it
-        val existingFragment = fragmentManager.findFragmentByTag(fragmentTag) as NavHostFragment?
-        existingFragment?.let { return it }
-
-        // Otherwise, create it and return it.
-        val navHostFragment = NavHostFragment.create(navGraphId)
-        fragmentManager.beginTransaction()
-            .add(containerId, navHostFragment, fragmentTag)
-            .commitNow()
-        return navHostFragment
-    }
-
-    private fun attachNavHostFragment(
-        fragmentManager: FragmentManager,
-        navHostFragment: NavHostFragment,
-        isPrimaryNavFragment: Boolean
-    ) {
-        fragmentManager.beginTransaction()
-            .attach(navHostFragment)
-            .apply {
-                if (isPrimaryNavFragment) {
-                    setPrimaryNavigationFragment(navHostFragment)
+    private fun syncDatabaseAndRefresh(activity: Activity) {
+        if (isNetworkAvailable(activity)) {
+            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+            val jsonObject = JsonObject()
+            user?.let {
+                jsonObject.apply {
+                    addProperty("pageNumber", "1")
+                    addProperty("pageSize", "20")
+                    addProperty("id", it.resdata?.loggeduser?.userID?.toInt() ?: 0)
                 }
-
             }
-            .commitNow()
 
-    }
-
-    @SuppressLint("RestrictedApi")
-    fun BottomNavigationView.deselectAllItems() {
-        val menu = this.menu
-
-        for(i in 0 until menu.size()) {
-            (menu.getItem(i) as? MenuItemImpl)?.let {
-                it.isExclusiveCheckable = false
-                it.isChecked = false
-                it.isExclusiveCheckable = true
+            val handler = CoroutineExceptionHandler { _, exception ->
+                exception.printStackTrace()
             }
+
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                val response = apiService.clouduservmsyncwithlocaldb(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                            viewModel.recreateActivity.postValue(true)
+                        }
+                    }
+                    is ApiEmptyResponse -> {
+
+                    }
+                    is ApiErrorResponse -> {
+
+                    }
+                }
+            }
+        } else {
+            Toast.makeText(activity, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
         }
     }
 }

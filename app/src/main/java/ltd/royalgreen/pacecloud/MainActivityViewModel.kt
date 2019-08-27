@@ -33,6 +33,10 @@ class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() 
         MutableLiveData<BalanceModel>()
     }
 
+    val recreateActivity: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
     fun getUserBalance(user: LoggedUser?) {
         if (isNetworkAvailable(application)) {
             apiCallStatus.postValue(ApiCallStatus.LOADING)

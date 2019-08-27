@@ -64,7 +64,7 @@
                 app:layout_constraintTop_toTopOf="@+id/textView4" app:layout_constraintBottom_toBottomOf="@+id/textView4"
                 app:layout_constraintStart_toEndOf="@+id/textView4" android:layout_marginStart="4dp"/>
         <TextView
-                android:text="Cost:"
+                android:text="Cost/Hour:"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textView7"
@@ -91,7 +91,7 @@
                 android:layout_height="40dp"
                 android:text="Action"
                 android:textAllCaps="false"
-                app:cornerRadius="5dp"
+                app:cornerRadius="2dp"
                 app:iconGravity="textEnd"
                 app:iconPadding="0dp"
                 android:textSize="13sp"

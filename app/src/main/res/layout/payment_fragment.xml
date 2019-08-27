@@ -15,7 +15,7 @@
         <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/searchFab"
                 app:srcCompat="@drawable/ic_search_black_24dp"
-                android:backgroundTint="#448AFF"
+                android:backgroundTint="@color/colorGreenTheme"
                 app:tint="#ffffff"
                 app:elevation="8dp"
                 app:maxImageSize="32dp"

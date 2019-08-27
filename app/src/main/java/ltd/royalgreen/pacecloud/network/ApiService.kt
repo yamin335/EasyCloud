@@ -1,6 +1,7 @@
 package ltd.royalgreen.pacecloud.network
 
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
@@ -87,4 +88,9 @@ interface ApiService {
     //API FOR RECHARGE
     @POST("/api/portal/newrechargesave")
     fun newrechargesave(@Body jsonArray: JsonArray): Call<RechargeResponse>
+
+    //API FOR SYNC DATABASE
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/clouduservmsyncwithlocaldb")
+    fun clouduservmsyncwithlocaldb(@Body jsonArray: JsonArray): Call<String>
 }
