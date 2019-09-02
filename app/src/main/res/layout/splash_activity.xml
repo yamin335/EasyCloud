@@ -4,12 +4,14 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="#FFFFFFFF"
-             tools:context=".SplashActivity">
+             tools:context=".mainactivitymodule.SplashActivity">
     <ImageView
             android:id="@+id/logo"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:src="@drawable/login_logo"
-            android:layout_gravity="center"/>
+            android:layout_marginBottom="7dp"
+            android:src="@drawable/pace_cloud_logo"
+            android:layout_gravity="center_vertical|center_horizontal"
+            tools:ignore="ContentDescription"/>
 
 </FrameLayout>

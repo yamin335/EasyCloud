@@ -4,31 +4,25 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.opengl.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.Toast
-import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.MutableLiveData
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_vm_list_action_popup_menu.view.*
 import kotlinx.android.synthetic.main.service_vm_row.view.*
 import kotlinx.coroutines.*
-import ltd.royalgreen.pacecloud.ConfirmationCheckingDialog
+import ltd.royalgreen.pacecloud.mainactivitymodule.ConfirmationCheckingDialog
 import ltd.royalgreen.pacecloud.R
-import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.paymentmodule.BilCloudUserLedger
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import okhttp3.OkHttpClient
@@ -37,9 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 class VMListAdapter internal constructor(private val vmList: List<VM>, private val callBack: ActionCallback, private val activity: Activity) : RecyclerView.Adapter<VMListAdapter.MyViewHolder>() {
 
@@ -187,142 +179,160 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
         popupMenu.menuStartStop.setOnClickListener {
             if (item.status.equals("Running", true)) {
-                val confirmationDialog = ConfirmationCheckingDialog(activity, object : ConfirmationCheckingDialog.ConfirmationCallback{
-                    override fun onYesPressed() {
-                        if (isNetworkAvailable(context)) {
-                            holder.itemView.loader.visibility = View.VISIBLE
-                            popupMenu.menuStartStop.isEnabled = false
-                            popupMenu.switchStartStop.isEnabled = false
-                            popupMenu.labelStartStop.setTextColor(context.resources.getColor(R.color.colorGrayLight))
-                            val firstObject = JsonObject().apply {
-                                addProperty("UserID", item.userId)
-                                addProperty("id", item.id)
-                                addProperty("IsTrue", true)
-                                addProperty("CostPerHour", item.costPerHour)
-                            }
-                            val secondObject = JsonObject().apply {
-                                addProperty("resourceType", "VIRTUAL_MACHINE")
-                                add("executionSpecs", JsonArray())
-                                val jsonArray = JsonArray().apply {
-                                    val jsonObject = JsonObject().apply {
-                                        addProperty("id", item.id)
-                                    }
-                                    add(jsonObject)
+                val confirmationDialog = ConfirmationCheckingDialog(
+                    activity,
+                    object :
+                        ConfirmationCheckingDialog.ConfirmationCallback {
+                        override fun onYesPressed() {
+                            if (isNetworkAvailable(context)) {
+                                holder.itemView.loader.visibility = View.VISIBLE
+                                popupMenu.menuStartStop.isEnabled = false
+                                popupMenu.switchStartStop.isEnabled = false
+                                popupMenu.labelStartStop.setTextColor(context.resources.getColor(R.color.colorGrayLight))
+                                val firstObject = JsonObject().apply {
+                                    addProperty("UserID", item.userId)
+                                    addProperty("id", item.id)
+                                    addProperty("IsTrue", true)
+                                    addProperty("CostPerHour", item.costPerHour)
                                 }
-                                add("executionResources", jsonArray)
-                            }
-                            val thirdObject = JsonObject().apply {
-                                addProperty("acknowledgedByUser", true)
-                            }
-                            val param = JsonArray().apply {
-                                add(firstObject)
-                                add(secondObject)
-                                add(thirdObject)
-                            }
+                                val secondObject = JsonObject().apply {
+                                    addProperty("resourceType", "VIRTUAL_MACHINE")
+                                    add("executionSpecs", JsonArray())
+                                    val jsonArray = JsonArray().apply {
+                                        val jsonObject = JsonObject().apply {
+                                            addProperty("id", item.id)
+                                        }
+                                        add(jsonObject)
+                                    }
+                                    add("executionResources", jsonArray)
+                                }
+                                val thirdObject = JsonObject().apply {
+                                    addProperty("acknowledgedByUser", true)
+                                }
+                                val param = JsonArray().apply {
+                                    add(firstObject)
+                                    add(secondObject)
+                                    add(thirdObject)
+                                }
 
-                            val handler = CoroutineExceptionHandler { _, exception ->
-                                vmStopStatus.postValue(false)
-                                callBack.onStop(false)
-                            }
+                                val handler = CoroutineExceptionHandler { _, exception ->
+                                    vmStopStatus.postValue(false)
+                                    callBack.onStop(false)
+                                }
 
-                            CoroutineScope(Dispatchers.Default).launch(handler) {
-                                val response = apiService.cloudvmstartstop(param).execute()
-                                when (val apiResponse = ApiResponse.create(response)) {
-                                    is ApiSuccessResponse -> {
-                                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                                            delay(45000L)
-                                            vmStopStatus.postValue(true)
-                                            callBack.onStop(true)
-                                        } else {
+                                CoroutineScope(Dispatchers.Default).launch(handler) {
+                                    val response = apiService.cloudvmstartstop(param).execute()
+                                    when (val apiResponse = ApiResponse.create(response)) {
+                                        is ApiSuccessResponse -> {
+                                            if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
+                                                    "resstate"
+                                                ).asBoolean
+                                            ) {
+                                                delay(45000L)
+                                                vmStopStatus.postValue(true)
+                                                callBack.onStop(true)
+                                            } else {
+                                                callBack.onStop(false)
+                                                vmStopStatus.postValue(false)
+                                            }
+                                        }
+                                        is ApiEmptyResponse -> {
+                                            callBack.onStop(false)
+                                            vmStopStatus.postValue(false)
+                                        }
+                                        is ApiErrorResponse -> {
                                             callBack.onStop(false)
                                             vmStopStatus.postValue(false)
                                         }
                                     }
-                                    is ApiEmptyResponse -> {
-                                        callBack.onStop(false)
-                                        vmStopStatus.postValue(false)
-                                    }
-                                    is ApiErrorResponse -> {
-                                        callBack.onStop(false)
-                                        vmStopStatus.postValue(false)
-                                    }
                                 }
+                            } else {
+                                Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG)
+                                    .show()
                             }
-                        } else {
-                            Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
                         }
-                    }
-                }, "Are You Sure to Stop This VM ?")
+                    },
+                    "Are You Sure to Stop This VM ?"
+                )
                 confirmationDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 confirmationDialog.setCancelable(false)
                 confirmationDialog.show()
             } else {
-                val confirmationDialog = ConfirmationCheckingDialog(activity, object : ConfirmationCheckingDialog.ConfirmationCallback{
-                    override fun onYesPressed() {
-                        if (isNetworkAvailable(context)) {
-                            holder.itemView.loader.visibility = View.VISIBLE
-                            popupMenu.menuStartStop.isEnabled = false
-                            popupMenu.switchStartStop.isEnabled = false
-                            popupMenu.labelStartStop.setTextColor(context.resources.getColor(R.color.colorGrayLight))
-                            val firstObject = JsonObject().apply {
-                                addProperty("UserID", item.userId)
-                                addProperty("id", item.id)
-                                addProperty("IsTrue", false)
-                                addProperty("CostPerHour", item.costPerHour)
-                            }
-                            val secondObject = JsonObject().apply {
-                                addProperty("resourceType", "VIRTUAL_MACHINE")
-                                add("executionSpecs", JsonArray())
-                                val jsonArray = JsonArray().apply {
-                                    val jsonObject = JsonObject().apply {
-                                        addProperty("id", item.id)
-                                    }
-                                    add(jsonObject)
+                val confirmationDialog = ConfirmationCheckingDialog(
+                    activity,
+                    object :
+                        ConfirmationCheckingDialog.ConfirmationCallback {
+                        override fun onYesPressed() {
+                            if (isNetworkAvailable(context)) {
+                                holder.itemView.loader.visibility = View.VISIBLE
+                                popupMenu.menuStartStop.isEnabled = false
+                                popupMenu.switchStartStop.isEnabled = false
+                                popupMenu.labelStartStop.setTextColor(context.resources.getColor(R.color.colorGrayLight))
+                                val firstObject = JsonObject().apply {
+                                    addProperty("UserID", item.userId)
+                                    addProperty("id", item.id)
+                                    addProperty("IsTrue", false)
+                                    addProperty("CostPerHour", item.costPerHour)
                                 }
-                                add("executionResources", jsonArray)
-                            }
-                            val thirdObject = JsonObject().apply {
-                                addProperty("acknowledgedByUser", true)
-                            }
-                            val param = JsonArray().apply {
-                                add(firstObject)
-                                add(secondObject)
-                                add(thirdObject)
-                            }
+                                val secondObject = JsonObject().apply {
+                                    addProperty("resourceType", "VIRTUAL_MACHINE")
+                                    add("executionSpecs", JsonArray())
+                                    val jsonArray = JsonArray().apply {
+                                        val jsonObject = JsonObject().apply {
+                                            addProperty("id", item.id)
+                                        }
+                                        add(jsonObject)
+                                    }
+                                    add("executionResources", jsonArray)
+                                }
+                                val thirdObject = JsonObject().apply {
+                                    addProperty("acknowledgedByUser", true)
+                                }
+                                val param = JsonArray().apply {
+                                    add(firstObject)
+                                    add(secondObject)
+                                    add(thirdObject)
+                                }
 
-                            val handler = CoroutineExceptionHandler { _, exception ->
-                                vmStartStatus.postValue(false)
-                                callBack.onStart(false)
-                            }
+                                val handler = CoroutineExceptionHandler { _, exception ->
+                                    vmStartStatus.postValue(false)
+                                    callBack.onStart(false)
+                                }
 
-                            CoroutineScope(Dispatchers.Default).launch(handler) {
-                                val response = apiService.cloudvmstartstop(param).execute()
-                                when (val apiResponse = ApiResponse.create(response)) {
-                                    is ApiSuccessResponse -> {
-                                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                                            delay(70000L)
-                                            vmStartStatus.postValue(true)
-                                            callBack.onStart(true)
-                                        } else {
+                                CoroutineScope(Dispatchers.Default).launch(handler) {
+                                    val response = apiService.cloudvmstartstop(param).execute()
+                                    when (val apiResponse = ApiResponse.create(response)) {
+                                        is ApiSuccessResponse -> {
+                                            if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
+                                                    "resstate"
+                                                ).asBoolean
+                                            ) {
+                                                delay(70000L)
+                                                vmStartStatus.postValue(true)
+                                                callBack.onStart(true)
+                                            } else {
+                                                vmStartStatus.postValue(false)
+                                                callBack.onStart(false)
+                                            }
+                                        }
+                                        is ApiEmptyResponse -> {
+                                            vmStartStatus.postValue(false)
+                                            callBack.onStart(false)
+                                        }
+                                        is ApiErrorResponse -> {
                                             vmStartStatus.postValue(false)
                                             callBack.onStart(false)
                                         }
                                     }
-                                    is ApiEmptyResponse -> {
-                                        vmStartStatus.postValue(false)
-                                        callBack.onStart(false)
-                                    }
-                                    is ApiErrorResponse -> {
-                                        vmStartStatus.postValue(false)
-                                        callBack.onStart(false)
-                                    }
                                 }
+                            } else {
+                                Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG)
+                                    .show()
                             }
-                        } else {
-                            Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
                         }
-                    }
-                }, "Are You Sure to Start This VM ?")
+                    },
+                    "Are You Sure to Start This VM ?"
+                )
                 confirmationDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                 confirmationDialog.setCancelable(false)
                 confirmationDialog.show()
@@ -331,66 +341,73 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         }
 
         popupMenu.menuReboot.setOnClickListener {
-            val confirmationDialog = ConfirmationCheckingDialog(activity, object : ConfirmationCheckingDialog.ConfirmationCallback{
-                override fun onYesPressed() {
-                    if (isNetworkAvailable(context)) {
-                        holder.itemView.loader.visibility = View.VISIBLE
-                        popupMenu.menuReboot.isEnabled = false
-                        popupMenu.labelReboot.setTextColor(context.resources.getColor(R.color.colorGrayLight))
-                        val firstObject = JsonObject().apply {
-                            addProperty("UserID", item.userId)
-                            addProperty("id", item.id)
-                            addProperty("IsTrue", true)
-                        }
-                        val secondObject = JsonObject().apply {
-                            addProperty("resourceType", "VIRTUAL_MACHINE")
-                            add("executionSpecs", JsonArray())
-                            val jsonArray = JsonArray().apply {
-                                val jsonObject = JsonObject().apply {
-                                    addProperty("id", item.id)
-                                }
-                                add(jsonObject)
+            val confirmationDialog = ConfirmationCheckingDialog(
+                activity,
+                object : ConfirmationCheckingDialog.ConfirmationCallback {
+                    override fun onYesPressed() {
+                        if (isNetworkAvailable(context)) {
+                            holder.itemView.loader.visibility = View.VISIBLE
+                            popupMenu.menuReboot.isEnabled = false
+                            popupMenu.labelReboot.setTextColor(context.resources.getColor(R.color.colorGrayLight))
+                            val firstObject = JsonObject().apply {
+                                addProperty("UserID", item.userId)
+                                addProperty("id", item.id)
+                                addProperty("IsTrue", true)
                             }
-                            add("executionResources", jsonArray)
-                        }
-                        val param = JsonArray().apply {
-                            add(firstObject)
-                            add(secondObject)
-                        }
+                            val secondObject = JsonObject().apply {
+                                addProperty("resourceType", "VIRTUAL_MACHINE")
+                                add("executionSpecs", JsonArray())
+                                val jsonArray = JsonArray().apply {
+                                    val jsonObject = JsonObject().apply {
+                                        addProperty("id", item.id)
+                                    }
+                                    add(jsonObject)
+                                }
+                                add("executionResources", jsonArray)
+                            }
+                            val param = JsonArray().apply {
+                                add(firstObject)
+                                add(secondObject)
+                            }
 
-                        val handler = CoroutineExceptionHandler { _, exception ->
-                            vmRebootStatus.postValue(false)
-                            callBack.onReboot()
-                        }
+                            val handler = CoroutineExceptionHandler { _, exception ->
+                                vmRebootStatus.postValue(false)
+                                callBack.onReboot()
+                            }
 
-                        CoroutineScope(Dispatchers.Default).launch(handler) {
-                            val response = apiService.cloudvmreboot(param).execute()
-                            when (val apiResponse = ApiResponse.create(response)) {
-                                is ApiSuccessResponse -> {
-                                    if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                            CoroutineScope(Dispatchers.Default).launch(handler) {
+                                val response = apiService.cloudvmreboot(param).execute()
+                                when (val apiResponse = ApiResponse.create(response)) {
+                                    is ApiSuccessResponse -> {
+                                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
+                                                "resstate"
+                                            ).asBoolean
+                                        ) {
 //                                        delay(50000L)
-                                        vmRebootStatus.postValue(true)
+                                            vmRebootStatus.postValue(true)
+                                            callBack.onReboot()
+                                        } else {
+                                            callBack.onReboot()
+                                            vmRebootStatus.postValue(false)
+                                        }
+                                    }
+                                    is ApiEmptyResponse -> {
                                         callBack.onReboot()
-                                    } else {
+                                        vmRebootStatus.postValue(false)
+                                    }
+                                    is ApiErrorResponse -> {
                                         callBack.onReboot()
                                         vmRebootStatus.postValue(false)
                                     }
                                 }
-                                is ApiEmptyResponse -> {
-                                    callBack.onReboot()
-                                    vmRebootStatus.postValue(false)
-                                }
-                                is ApiErrorResponse -> {
-                                    callBack.onReboot()
-                                    vmRebootStatus.postValue(false)
-                                }
                             }
+                        } else {
+                            Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
                         }
-                    } else {
-                        Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
                     }
-                }
-            }, "Are You Sure to Reboot This VM ?")
+                },
+                "Are You Sure to Reboot This VM ?"
+            )
             confirmationDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             confirmationDialog.setCancelable(false)
             confirmationDialog.show()

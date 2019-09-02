@@ -2,7 +2,7 @@ package ltd.royalgreen.pacecloud.dinjectors
 
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import ltd.royalgreen.pacecloud.AboutFragment
+import ltd.royalgreen.pacecloud.aboutmodule.AboutFragment
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardFragment
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragment
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragment

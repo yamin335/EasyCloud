@@ -3,12 +3,8 @@ package ltd.royalgreen.pacecloud.dashboardmodule
 import android.app.Application
 import android.content.SharedPreferences
 import android.widget.Toast
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.paging.DataSource
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
@@ -26,7 +22,7 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
     val application = app
 
-    private val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
+    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
     }
 
@@ -38,17 +34,17 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
         MutableLiveData<DashOsSummary>()
     }
 
-    lateinit var userLogs: LiveData<PagedList<CloudActivityLog>>
+//    lateinit var userLogs: LiveData<PagedList<CloudActivityLog>>
 
-    fun initializedPagedListBuilder(config: PagedList.Config):
-            LivePagedListBuilder<Long, CloudActivityLog> {
-        val dataSourceFactory = object : DataSource.Factory<Long, CloudActivityLog>() {
-            override fun create(): DataSource<Long, CloudActivityLog> {
-                return ActivityLogDataSource(application, apiService, preferences)
-            }
-        }
-        return LivePagedListBuilder<Long, CloudActivityLog>(dataSourceFactory, config)
-    }
+//    fun initializedPagedListBuilder(config: PagedList.Config):
+//            LivePagedListBuilder<Long, CloudActivityLog> {
+//        val dataSourceFactory = object : DataSource.Factory<Long, CloudActivityLog>() {
+//            override fun create(): DataSource<Long, CloudActivityLog> {
+//                return ActivityLogDataSource(application, apiService, preferences)
+//            }
+//        }
+//        return LivePagedListBuilder<Long, CloudActivityLog>(dataSourceFactory, config)
+//    }
 
     fun getOsStatus(user: LoggedUser) {
         if (isNetworkAvailable(application)) {
@@ -63,24 +59,22 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
             }.toString()
 
             val handler = CoroutineExceptionHandler { _, exception ->
+                apiCallStatus.postValue(ApiCallStatus.ERROR)
                 println("Caught $exception")
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(7000L) {
-                    val response = apiService.GetDashboardChartPortal(param).execute()
-                    val apiResponse = ApiResponse.create(response)
-                    when (apiResponse) {
-                        is ApiSuccessResponse -> {
-                            osStatus.postValue(apiResponse.body)
-                            apiCallStatus.value = ApiCallStatus.SUCCESS
-                        }
-                        is ApiEmptyResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
+                val response = apiService.GetDashboardChartPortal(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        osStatus.postValue(apiResponse.body)
+                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }
@@ -102,24 +96,22 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
             }.toString()
 
             val handler = CoroutineExceptionHandler { _, exception ->
+                apiCallStatus.postValue(ApiCallStatus.ERROR)
                 println("Caught $exception")
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(7000L) {
-                    val response = apiService.GetDashboardChartPortalSummery(param).execute()
-                    val apiResponse = ApiResponse.create(response)
-                    when (apiResponse) {
-                        is ApiSuccessResponse -> {
-                            osSummary.postValue(apiResponse.body)
-                            apiCallStatus.value = ApiCallStatus.SUCCESS
-                        }
-                        is ApiEmptyResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
+                val response = apiService.GetDashboardChartPortalSummery(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        osSummary.postValue(apiResponse.body)
+                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }

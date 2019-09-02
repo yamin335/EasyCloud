@@ -16,7 +16,7 @@ import com.google.gson.Gson
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.login_activity.*
 import kotlinx.coroutines.*
-import ltd.royalgreen.pacecloud.MainActivity
+import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivity
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.databinding.LoginActivityBinding
 import ltd.royalgreen.pacecloud.network.*
@@ -58,36 +58,33 @@ class LoginActivity : AppCompatActivity(){
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
 
+        binding.passwordInputLayout.isEndIconVisible = false
+
         loginButton.setOnClickListener {
             viewModel.errorMessage.value = false
-            usernametInputLayout.isErrorEnabled = false
-            passwordInputLayout.isErrorEnabled = false
-            when {
-                viewModel.userName.value.isNullOrEmpty() -> {
-                    passwordInputLayout.isErrorEnabled = false
-                    usernametInputLayout.isErrorEnabled = true
-                    usernametInputLayout.error = "Username required!"
-                    usernametInputLayout.requestFocus()
-                }
-                viewModel.password.value.isNullOrEmpty() -> {
-                    usernametInputLayout.isErrorEnabled = false
-                    passwordInputLayout.isErrorEnabled = true
-                    passwordInputLayout.error = "Password required!"
-                    passwordInputLayout.requestFocus()
-                }
-                else -> viewModel.processSignIn()
-            }
+            viewModel.processSignIn()
         }
+
+        viewModel.userName.observe(this, Observer {
+            viewModel.errorMessage.value = false
+            binding.loginButton.isEnabled = !it.isNullOrEmpty() && !viewModel.password.value.isNullOrEmpty()
+
+        })
+
+        viewModel.password.observe(this, Observer {
+            viewModel.errorMessage.value = false
+            binding.loginButton.isEnabled = !it.isNullOrEmpty() && !viewModel.userName.value.isNullOrEmpty()
+            binding.passwordInputLayout.isEndIconVisible = !it.isNullOrEmpty()
+        })
 
         viewModel.apiCallStatus.observe(this, Observer {
             when(it) {
                 ApiCallStatus.SUCCESS -> {
-//                    Toast.makeText(this, "Signed in successfully", Toast.LENGTH_LONG).show()
                     startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                     finish()
                 }
                 ApiCallStatus.ERROR -> Toast.makeText(this, "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.TIMEOUT -> Toast.makeText(this, "SERVER is not responding...", Toast.LENGTH_LONG).show()
+                ApiCallStatus.TIMEOUT -> Toast.makeText(this, "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
                 ApiCallStatus.EMPTY -> Toast.makeText(this, "Empty return value!!!", Toast.LENGTH_LONG).show()
                 ApiCallStatus.INVALIDUSERNAME -> {
                     viewModel.errorMessage.value = true
@@ -106,7 +103,7 @@ class LoginActivity : AppCompatActivity(){
                 else -> {
                     viewModel.apiCallStatus.value = ApiCallStatus.SUCCESS
                     val handler = CoroutineExceptionHandler { _, exception ->
-                        Toast.makeText(this, "$exception", Toast.LENGTH_LONG).show()
+                        exception.printStackTrace()
                     }
                     CoroutineScope(Dispatchers.IO).launch(handler) {
                         val loggedUserSerialized = Gson().toJson(loggedUser)
@@ -124,7 +121,7 @@ class LoginActivity : AppCompatActivity(){
     override fun onBackPressed() {
         val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
             .setTitle("Do you want to exit?")
-            .setIcon(R.mipmap.ic_launcher)
+            .setIcon(R.mipmap.app_logo_new)
             .setCancelable(false)
             .setPositiveButton("Yes") { _, _ ->
                 finish()

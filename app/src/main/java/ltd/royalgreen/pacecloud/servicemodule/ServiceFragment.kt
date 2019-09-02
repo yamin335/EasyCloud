@@ -64,7 +64,7 @@ class ServiceFragment : Fragment(), Injectable {
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
             val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
                 .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.ic_launcher)
+                .setIcon(R.mipmap.app_logo_new)
                 .setCancelable(false)
                 .setPositiveButton("Yes") { _, _ ->
                     preferences.edit().apply {

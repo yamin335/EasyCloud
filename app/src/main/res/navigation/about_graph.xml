@@ -4,6 +4,6 @@
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/about_graph"
             app:startDestination="@id/aboutScreen">
 
-    <fragment android:id="@+id/aboutScreen" android:name="ltd.royalgreen.pacecloud.AboutFragment"
+    <fragment android:id="@+id/aboutScreen" android:name="ltd.royalgreen.pacecloud.aboutmodule.AboutFragment"
               android:label="About" tools:layout="@layout/about_fragment"/>
 </navigation>

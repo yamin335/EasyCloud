@@ -1,64 +1,63 @@
-package ltd.royalgreen.pacecloud.loginmodule
+package ltd.royalgreen.pacecloud.mainactivitymodule
 
 import android.app.Application
+import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
+import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
+import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 
-class LoginViewModel @Inject constructor(app: Application) : ViewModel(){
-
-    @Inject
-    lateinit var apiService: ApiService
+class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() {
 
     val application = app
 
-    val userName: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
+    @Inject
+    lateinit var preferences: SharedPreferences
 
-    val password: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
+    @Inject
+    lateinit var apiService: ApiService
 
     val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
     }
 
-    val apiResult: MutableLiveData<LoggedUser> by lazy {
-        MutableLiveData<LoggedUser>()
+    val userBalance: MutableLiveData<BalanceModel> by lazy {
+        MutableLiveData<BalanceModel>()
     }
 
-    val errorMessage: MutableLiveData<Boolean> by lazy {
-        MutableLiveData<Boolean>()
-    }
-
-    fun processSignIn() {
+    fun getUserBalance(user: LoggedUser?) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
+            apiCallStatus.postValue(ApiCallStatus.LOADING)
             val jsonObject = JsonObject().apply {
-                addProperty("userName", userName.value)
-                addProperty("userPass", password.value)
+                addProperty("UserID", user?.resdata?.loggeduser?.userID)
             }
             val param = JsonArray().apply {
                 add(jsonObject)
             }.toString()
 
             val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
+                println("Caught $exception")
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                val response = apiService.loginportalusers(param).execute()
+                val response = apiService.billclouduserbalance(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
-                        apiResult.postValue(apiResponse.body)
+                        userBalance.postValue(apiResponse.body)
+                        val userBalanceSerialized = Gson().toJson(apiResponse.body)
+                        preferences.edit().apply {
+                            putString("UserBalance", userBalanceSerialized)
+                            apply()
+                        }
+                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                     }
                     is ApiEmptyResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.EMPTY)
@@ -72,4 +71,5 @@ class LoginViewModel @Inject constructor(app: Application) : ViewModel(){
             Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
         }
     }
+
 }

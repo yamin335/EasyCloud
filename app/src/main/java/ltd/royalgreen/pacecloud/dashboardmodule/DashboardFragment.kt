@@ -3,7 +3,9 @@ package ltd.royalgreen.pacecloud.dashboardmodule
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
@@ -35,6 +37,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import ltd.royalgreen.pacecloud.network.ApiCallStatus
 
 
 class DashboardFragment : Fragment(), Injectable {
@@ -54,15 +57,15 @@ class DashboardFragment : Fragment(), Injectable {
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
     //For Cloud User Activity Log
-    private val adapter = ActivityLogAdapter()
+//    private val adapter = ActivityLogAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // This callback will only be called when MyFragment is at least Started.
+        // This callback will only be called when DashboardFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
             val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
                 .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.ic_launcher)
+                .setIcon(R.mipmap.app_logo_new)
                 .setCancelable(false)
                 .setPositiveButton("Yes") { _, _ ->
                     preferences.edit().apply {
@@ -96,28 +99,38 @@ class DashboardFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        userActivityLogList.layoutManager = LinearLayoutManager(requireContext())
-        userActivityLogList.addItemDecoration(RecyclerItemDivider(requireContext(), LinearLayoutManager.VERTICAL, 8))
-        userActivityLogList.adapter = adapter
+        viewModel.apiCallStatus.observe(this, Observer {
+            when(it) {
+                ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
+                ApiCallStatus.ERROR -> Toast.makeText(requireContext(), "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
+                ApiCallStatus.TIMEOUT -> Toast.makeText(requireContext(), "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
+                ApiCallStatus.EMPTY -> Toast.makeText(requireContext(), "Empty return value!!!", Toast.LENGTH_LONG).show()
+                else -> Log.d("NOTHING", "Nothing to do")
+            }
+        })
+
+//        userActivityLogList.layoutManager = LinearLayoutManager(requireContext())
+//        userActivityLogList.addItemDecoration(RecyclerItemDivider(requireContext(), LinearLayoutManager.VERTICAL, 8))
+//        userActivityLogList.adapter = adapter
 
         //1
-        val config = PagedList.Config.Builder()
-            .setPageSize(30)
-            .setEnablePlaceholders(false)
-            .build()
+//        val config = PagedList.Config.Builder()
+//            .setPageSize(30)
+//            .setEnablePlaceholders(false)
+//            .build()
 
         //2
-        viewModel.userLogs = viewModel.initializedPagedListBuilder(config).build()
+//        viewModel.userLogs = viewModel.initializedPagedListBuilder(config).build()
 
         //3
-        viewModel.userLogs.observe(this, Observer<PagedList<CloudActivityLog>> { pagedList ->
-            adapter.submitList(pagedList)
-        })
+//        viewModel.userLogs.observe(this, Observer<PagedList<CloudActivityLog>> { pagedList ->
+//            adapter.submitList(pagedList)
+//        })
 
         //Pie Chart Configuration
         view.osStatusPieChart.isLogEnabled = false
-        view.osStatusPieChart.holeRadius = 30F
-        view.osStatusPieChart.transparentCircleRadius = 38F
+        view.osStatusPieChart.holeRadius = 35F
+        view.osStatusPieChart.transparentCircleRadius = 43F
         view.osStatusPieChart.centerText = "VM Status"
         view.osStatusPieChart.setNoDataText("No Chart Data Found")
 //        view.osStatusPieChart.setDrawMarkers(false)
@@ -146,8 +159,8 @@ class DashboardFragment : Fragment(), Injectable {
         user?.let {
             viewModel.getOsStatus(user)
             viewModel.getOsSummary(user)
-            binding.name = user.resdata?.loggeduser?.fullName
-            binding.versionNo = "Beta Version:1.0.1"
+//            binding.name = user.resdata?.loggeduser?.fullName
+            binding.versionNo = "Version:1.0.0"
         }
 
         viewModel.osStatus.observe(this, Observer { status ->

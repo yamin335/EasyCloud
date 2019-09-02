@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -10,7 +12,6 @@
     <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbarThumbVertical="@null"
             android:fillViewport="true">
 
         <RelativeLayout
@@ -161,9 +162,6 @@
                         android:text="@string/forgot_password"
                         android:layout_gravity="center_horizontal"
                         android:textAllCaps="false"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?attr/selectableItemBackground"
                         android:textColor="@color/colorDarkGreen"
                         android:textSize="16sp"
                         android:padding="2dp"/>
@@ -188,9 +186,6 @@
                             android:layout_height="wrap_content"
                             android:text="@string/sign_up_now"
                             android:padding="2dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
                             android:layout_marginStart="6dp"
                             android:textColor="@color/colorDarkGreen"
                             android:textAllCaps="false"
@@ -214,9 +209,6 @@
                     <TextView
                             android:id="@+id/faq"
                             android:text="FAQs"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
                             android:textColor="@color/colorDarkGreen"
                             android:textAllCaps="false"
                             android:layout_width="wrap_content"
@@ -232,9 +224,6 @@
                     <TextView
                             android:id="@+id/privacy"
                             android:text="Privacy"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
                             android:textColor="@color/colorDarkGreen"
                             android:textAllCaps="false"
                             android:layout_width="wrap_content"
@@ -251,9 +240,6 @@
                     <TextView
                             android:id="@+id/contact"
                             android:text="Contact"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
                             android:textColor="@color/colorDarkGreen"
                             android:textAllCaps="false"
                             android:layout_width="wrap_content"

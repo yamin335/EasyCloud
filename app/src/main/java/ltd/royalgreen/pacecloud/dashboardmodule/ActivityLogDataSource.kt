@@ -2,9 +2,7 @@ package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.app.Application
 import android.content.SharedPreferences
-import android.util.Log
 import android.widget.Toast
-import androidx.paging.ItemKeyedDataSource
 import androidx.paging.PageKeyedDataSource
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -13,9 +11,6 @@ import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class ActivityLogDataSource(private val application: Application, private val api: ApiService, private val preferences: SharedPreferences) : PageKeyedDataSource<Long, CloudActivityLog>() {
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, CloudActivityLog>) {

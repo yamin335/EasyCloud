@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
-import ltd.royalgreen.pacecloud.AboutFragmentViewModel
-import ltd.royalgreen.pacecloud.MainActivityViewModel
+import ltd.royalgreen.pacecloud.aboutmodule.AboutFragmentViewModel
+import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivityViewModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardViewModel
 import ltd.royalgreen.pacecloud.loginmodule.LoginViewModel
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel

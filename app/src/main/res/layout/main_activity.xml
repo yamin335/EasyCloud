@@ -5,7 +5,7 @@
 
     <data>
         <variable name="viewModel"
-                  type="ltd.royalgreen.pacecloud.MainActivityViewModel"/>
+                  type="ltd.royalgreen.pacecloud.mainactivitymodule.MainActivityViewModel"/>
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout
@@ -16,7 +16,8 @@
             tools:openDrawer="start">
 
         <include
-                layout="@layout/nav_drawer"
+                android:id="@+id/container"
+                layout="@layout/main_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -27,7 +28,7 @@
                 android:layout_gravity="start"
                 android:fitsSystemWindows="true"
                 android:background="#F8F8F8"
-                app:headerLayout="@layout/nav_header">
+                app:headerLayout="@layout/main_nav_header">
 
             <ExpandableListView
                     android:id="@+id/expandableMenu"
