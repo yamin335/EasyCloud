@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="ltd.royalgreen.pacecloud.loginmodule.LoginViewModel" />
+                type="ltd.royalgreen.pacecloud.loginmodule.LoginFragmentViewModel" />
     </data>
 
     <ScrollView
@@ -21,8 +21,8 @@
                     android:id="@+id/loader"
                     android:layout_alignParentTop="true"
                     android:layout_width="match_parent"
-                    android:layout_marginTop="-12dp"
-                    android:layout_height="30dp"
+                    android:layout_marginTop="-6dp"
+                    android:layout_height="15dp"
                     android:indeterminate="true"
                     app:isVisible="@{viewModel.apiCallStatus}"/>
 
@@ -41,7 +41,7 @@
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
                         app:srcCompat="@drawable/pace_cloud_logo"
-                        android:layout_marginTop="40dp"
+                        android:layout_marginTop="50dp"
                         android:layout_marginBottom="0dp"/>
 
             </RelativeLayout>
@@ -204,82 +204,82 @@
                     android:layout_below="@id/loginFormLinear"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                <LinearLayout
-                        android:layout_above="@id/copyright"
-                        android:layout_centerHorizontal="true"
-                        android:layout_marginBottom="30dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
 
-                    <TextView
-                            android:id="@+id/faq"
-                            android:text="FAQs"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
-                            android:textColor="@color/colorDarkGreen"
-                            android:textAllCaps="false"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                    <View
-                            android:layout_width="1dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_height="13dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@color/colorDarkGreen"/>
-
-                    <TextView
-                            android:id="@+id/privacy"
-                            android:text="Privacy"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
-                            android:textColor="@color/colorDarkGreen"
-                            android:textAllCaps="false"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-
-                    <View
-                            android:layout_width="1dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_height="13dp"
-                            android:layout_gravity="center_vertical"
-                            android:background="@color/colorDarkGreen"/>
-
-                    <TextView
-                            android:id="@+id/contact"
-                            android:text="Contact"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:background="?attr/selectableItemBackground"
-                            android:textColor="@color/colorDarkGreen"
-                            android:textAllCaps="false"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-                <TextView
-                        android:id="@+id/copyright"
-                        android:layout_alignParentBottom="true"
-                        android:gravity="center"
-                        android:padding="2dp"
-                        android:textSize="10sp"
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="4dp"
-                        android:text="@string/copyright"/>
-                <TextView
-                        android:layout_alignParentBottom="true"
-                        android:gravity="center"
-                        android:padding="2dp"
-                        android:textSize="10sp"
-                        android:text=""
-                        android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:layout_marginBottom="30dp"/>
+                        android:layout_height="match_parent">
 
+                    <LinearLayout
+                            android:id="@+id/bottomMenu"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintBottom_toTopOf="@+id/copyright"
+                            app:layout_constraintTop_toTopOf="parent" app:layout_constraintVertical_bias="0.9">
+
+                        <TextView
+                                android:id="@+id/faq"
+                                android:text="FAQs"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackground"
+                                android:textColor="@color/colorDarkGreen"
+                                android:textAllCaps="false"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                        <View
+                                android:layout_width="1dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="@color/colorDarkGreen"/>
+
+                        <TextView
+                                android:id="@+id/privacy"
+                                android:text="Privacy"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackground"
+                                android:textColor="@color/colorDarkGreen"
+                                android:textAllCaps="false"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+
+                        <View
+                                android:layout_width="1dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_height="13dp"
+                                android:layout_gravity="center_vertical"
+                                android:background="@color/colorDarkGreen"/>
+
+                        <TextView
+                                android:id="@+id/contact"
+                                android:text="Contact"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:background="?attr/selectableItemBackground"
+                                android:textColor="@color/colorDarkGreen"
+                                android:textAllCaps="false"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"/>
+                    </LinearLayout>
+
+                    <TextView
+                            android:id="@+id/copyright"
+                            android:gravity="center"
+                            android:padding="2dp"
+                            android:textSize="10sp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/copyright" app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintVertical_bias="1.0"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </RelativeLayout>
         </RelativeLayout>
     </ScrollView>

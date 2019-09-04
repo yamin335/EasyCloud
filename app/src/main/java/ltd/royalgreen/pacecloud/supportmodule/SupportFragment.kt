@@ -6,18 +6,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.databinding.DataBindingComponent
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ltd.royalgreen.pacecloud.R
+import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
+import ltd.royalgreen.pacecloud.databinding.SupportFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.network.ApiService
+import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
 
-
-/**
- * Shows a register support_graph to showcase UI state persistence. It has a button that goes to [Registered]
- */
 class SupportFragment : Fragment(), Injectable {
 
     @Inject
@@ -28,6 +30,14 @@ class SupportFragment : Fragment(), Injectable {
 
     @Inject
     lateinit var preferences: SharedPreferences
+
+    private val viewModel: SupportFragmentViewModel by lazy {
+        // Get the ViewModel.
+        ViewModelProviders.of(this, viewModelFactory).get(SupportFragmentViewModel::class.java)
+    }
+
+    private var binding by autoCleared<SupportFragmentBinding>()
+    private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +63,21 @@ class SupportFragment : Fragment(), Injectable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.support_fragment, container, false)
 
-        return view
+        // Inflate the layout for this fragment
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.support_fragment,
+            container,
+            false,
+            dataBindingComponent
+        )
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
     }
 }

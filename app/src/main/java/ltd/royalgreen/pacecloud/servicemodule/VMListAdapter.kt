@@ -224,10 +224,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                                     val response = apiService.cloudvmstartstop(param).execute()
                                     when (val apiResponse = ApiResponse.create(response)) {
                                         is ApiSuccessResponse -> {
-                                            if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
-                                                    "resstate"
-                                                ).asBoolean
-                                            ) {
+                                            if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                                                 delay(45000L)
                                                 vmStopStatus.postValue(true)
                                                 callBack.onStop(true)
@@ -303,10 +300,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                                     val response = apiService.cloudvmstartstop(param).execute()
                                     when (val apiResponse = ApiResponse.create(response)) {
                                         is ApiSuccessResponse -> {
-                                            if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
-                                                    "resstate"
-                                                ).asBoolean
-                                            ) {
+                                            if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                                                 delay(70000L)
                                                 vmStartStatus.postValue(true)
                                                 callBack.onStart(true)

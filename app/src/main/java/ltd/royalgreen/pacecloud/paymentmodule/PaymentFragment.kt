@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -194,8 +195,23 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
             when(status) {
+                ApiCallStatus.SUCCESS -> {
+                    binding.includedContentMain.loader.visibility = View.GONE
+                }
                 ApiCallStatus.LOADING -> {
                     binding.includedContentMain.loader.visibility = View.VISIBLE
+                }
+                ApiCallStatus.ERROR -> {
+                    binding.includedContentMain.loader.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
+                }
+                ApiCallStatus.TIMEOUT -> {
+                    binding.includedContentMain.loader.visibility = View.GONE
+                    Toast.makeText(requireContext(), "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
+                }
+                ApiCallStatus.EMPTY -> {
+                    binding.includedContentMain.loader.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Empty return value!!!", Toast.LENGTH_LONG).show()
                 }
                 else -> binding.includedContentMain.loader.visibility = View.GONE
             }
@@ -241,27 +257,24 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(3000L) {
-                    val response = apiService.newrechargesave(param).execute()
-                    val apiResponse = ApiResponse.create(response)
-                    when (apiResponse) {
-                        is ApiSuccessResponse -> {
-                            val balanceModel = apiResponse.body
-                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                            if (balanceModel.resdata?.resstate == true) {
-                                user?.let {
-                                    viewModel.getUserBalance(it)
-                                }
-                                viewModel.paymentList.value?.dataSource?.invalidate()
-                                Toast.makeText(requireActivity(), "Recharge Successful", Toast.LENGTH_LONG).show()
+                val response = apiService.newrechargesave(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        val balanceModel = apiResponse.body
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        if (balanceModel.resdata?.resstate == true) {
+                            user?.let {
+                                viewModel.getUserBalance(it)
                             }
+                            viewModel.paymentList.value?.dataSource?.invalidate()
+                            Toast.makeText(requireActivity(), "Recharge Successful", Toast.LENGTH_LONG).show()
                         }
-                        is ApiEmptyResponse -> {
-                            viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
+                    }
+                    is ApiEmptyResponse -> {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }
@@ -277,59 +290,3 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         rechargeDialog.show()
     }
 }
-
-//class MyAdapter(private val myDataset: Array<String>) :
-//    RecyclerView.Adapter<MyAdapter.ViewHolder>() {
-//
-//    // Provide a reference to the views for each data item
-//    // Complex data items may need more than one view per item, and
-//    // you provide access to all the views for a data item in a view holder.
-//    // Each data item is just a string in this case that is shown in a TextView.
-//    class ViewHolder(val item: View) : RecyclerView.ViewHolder(item)
-//
-//
-//    // Create new views (invoked by the layout manager)
-//    override fun onCreateViewHolder(parent: ViewGroup,
-//                                    viewType: Int): ViewHolder {
-//        // create a new view
-//        val itemView = LayoutInflater.from(parent.context)
-//            .inflate(R.layout.list_view_item, parent, false)
-//
-//
-//        return ViewHolder(itemView)
-//    }
-//
-//    // Replace the contents of a view (invoked by the layout manager)
-//    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-//        // - get element from your dataset at this position
-//        // - replace the contents of the view with that element
-//        holder.item.findViewById<TextView>(R.id.user_name_text).text = myDataset[position]
-//
-//        holder.item.findViewById<ImageView>(R.id.user_avatar_image)
-//                .setImageResource(listOfAvatars[position % listOfAvatars.size])
-//
-//        holder.item.setOnClickListener {
-//            val bundle = bundleOf(USERNAME_KEY to myDataset[position])
-//
-//            holder.item.findNavController().navigate(
-//                    R.id.action_leaderboard_to_userProfile,
-//                bundle)
-//        }
-//    }
-//
-//    // Return the size of your dataset (invoked by the layout manager)
-//    override fun getItemCount() = myDataset.size
-//
-//    companion object {
-//        const val USERNAME_KEY = "userName"
-//    }
-//}
-//
-//private val listOfAvatars = listOf(
-//    R.drawable.avatar_1_raster,
-//    R.drawable.avatar_2_raster,
-//    R.drawable.avatar_3_raster,
-//    R.drawable.avatar_4_raster,
-//    R.drawable.avatar_5_raster,
-//    R.drawable.avatar_6_raster
-//)

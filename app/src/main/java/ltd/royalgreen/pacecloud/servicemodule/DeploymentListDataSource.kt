@@ -41,28 +41,26 @@ class DeploymentListDataSource(private val application: Application, private val
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(3000L) {
-                    val response = api.cloudvmbyuserid(param).execute()
-                    when (val apiResponse = ApiResponse.create(response)) {
-                        is ApiSuccessResponse -> {
-                            val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
-                            val jsonArray = JsonParser().parse(stringResponse).asJsonArray
-                            val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
-                            for ((index, jsonObject) in jsonArray.withIndex()) {
-                                val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
-                                mutableDeploymentList.add(deployment)
-                                if (index == 0)
-                                    tempDeployment.postValue(deployment)
-                            }
-                            callback.onResult(mutableDeploymentList, null, 1)
-                            tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                val response = api.cloudvmbyuserid(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
+                        val jsonArray = JsonParser().parse(stringResponse).asJsonArray
+                        val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
+                        for ((index, jsonObject) in jsonArray.withIndex()) {
+                            val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
+                            mutableDeploymentList.add(deployment)
+                            if (index == 0)
+                                tempDeployment.postValue(deployment)
                         }
-                        is ApiEmptyResponse -> {
-                            tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            tempApiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
+                        callback.onResult(mutableDeploymentList, null, 1)
+                        tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    }
+                    is ApiEmptyResponse -> {
+                        tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        tempApiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }
@@ -92,26 +90,24 @@ class DeploymentListDataSource(private val application: Application, private val
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(3000L) {
-                    val response = api.cloudvmbyuserid(param).execute()
-                    when (val apiResponse = ApiResponse.create(response)) {
-                        is ApiSuccessResponse -> {
-                            val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
-                            val jsonArray = JsonParser().parse(stringResponse).asJsonArray
-                            val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
-                            for (jsonObject in jsonArray) {
-                                val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
-                                mutableDeploymentList.add(deployment)
-                            }
-                            callback.onResult(mutableDeploymentList, params.key + 1)
-                            tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                val response = api.cloudvmbyuserid(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
+                        val jsonArray = JsonParser().parse(stringResponse).asJsonArray
+                        val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
+                        for (jsonObject in jsonArray) {
+                            val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
+                            mutableDeploymentList.add(deployment)
                         }
-                        is ApiEmptyResponse -> {
-                            tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            tempApiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
+                        callback.onResult(mutableDeploymentList, params.key + 1)
+                        tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    }
+                    is ApiEmptyResponse -> {
+                        tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        tempApiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }

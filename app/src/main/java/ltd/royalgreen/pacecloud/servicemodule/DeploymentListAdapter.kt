@@ -23,9 +23,11 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 class DeploymentListAdapter(val context: Context,
@@ -34,7 +36,13 @@ class DeploymentListAdapter(val context: Context,
                             private val activity: Activity,
                             private val loggedUser: LoggedUserData?) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
 
+    private val client = OkHttpClient().newBuilder()
+        .connectTimeout(5, TimeUnit.SECONDS)
+        .callTimeout(5, TimeUnit.SECONDS)
+        .build()
+
     val apiService: ApiService = Retrofit.Builder()
+        .client(client)
         .baseUrl("http://123.136.26.98:8081")
         .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())

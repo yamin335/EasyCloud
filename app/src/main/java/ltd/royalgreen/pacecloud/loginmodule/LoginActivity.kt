@@ -8,23 +8,29 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import dagger.android.AndroidInjection
-import kotlinx.android.synthetic.main.login_activity.*
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
+import kotlinx.android.synthetic.main.login_container_activity.*
+import kotlinx.android.synthetic.main.login_fragment.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivity
 import ltd.royalgreen.pacecloud.R
-import ltd.royalgreen.pacecloud.databinding.LoginActivityBinding
+import ltd.royalgreen.pacecloud.databinding.LoginFragmentBinding
 import ltd.royalgreen.pacecloud.network.*
 import javax.inject.Inject
 
 const val SHARED_PREFS_KEY = "LoginStatus"
 
-class LoginActivity : AppCompatActivity(){
+class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject
     lateinit var preferences: SharedPreferences
@@ -37,98 +43,41 @@ class LoginActivity : AppCompatActivity(){
         ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
     }
 
-    public override fun onResume() {
-        super.onResume()
-        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-    }
+    @Inject
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
-    override fun onStart() {
-        super.onStart()
-        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
-    }
+    override fun supportFragmentInjector() = dispatchingAndroidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.login_activity)
-        this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
+        setContentView(R.layout.login_container_activity)
 
-        val binding: LoginActivityBinding = DataBindingUtil.setContentView(
-            this, R.layout.login_activity)
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
+        setSupportActionBar(toolbar)
+        setupActionBarWithNavController(findNavController(R.id.fragment))
 
-        binding.passwordInputLayout.isEndIconVisible = false
+//        val binding: LoginFragmentBinding = DataBindingUtil.setContentView(
+//            this, R.layout.login_fragment)
+//        binding.lifecycleOwner = this
+//        binding.viewModel = viewModel
+    }
 
-        loginButton.setOnClickListener {
-            viewModel.errorMessage.value = false
-            viewModel.processSignIn()
-        }
-
-        viewModel.userName.observe(this, Observer {
-            viewModel.errorMessage.value = false
-            binding.loginButton.isEnabled = !it.isNullOrEmpty() && !viewModel.password.value.isNullOrEmpty()
-
-        })
-
-        viewModel.password.observe(this, Observer {
-            viewModel.errorMessage.value = false
-            binding.loginButton.isEnabled = !it.isNullOrEmpty() && !viewModel.userName.value.isNullOrEmpty()
-            binding.passwordInputLayout.isEndIconVisible = !it.isNullOrEmpty()
-        })
-
-        viewModel.apiCallStatus.observe(this, Observer {
-            when(it) {
-                ApiCallStatus.SUCCESS -> {
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-                    finish()
-                }
-                ApiCallStatus.ERROR -> Toast.makeText(this, "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.TIMEOUT -> Toast.makeText(this, "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.EMPTY -> Toast.makeText(this, "Empty return value!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.INVALIDUSERNAME -> {
-                    viewModel.errorMessage.value = true
-                }
-                ApiCallStatus.INVALIDPASSWORD -> {
-                    viewModel.errorMessage.value = true
-                }
-                else -> Log.d("NOTHING", "Nothing to do")
-            }
-        })
-
-        viewModel.apiResult.observe(this, Observer { loggedUser ->
-            when (loggedUser?.resdata?.message) {
-                "Username does not exist." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALIDUSERNAME
-                "Password is wrong." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALIDPASSWORD
-                else -> {
-                    viewModel.apiCallStatus.value = ApiCallStatus.SUCCESS
-                    val handler = CoroutineExceptionHandler { _, exception ->
-                        exception.printStackTrace()
-                    }
-                    CoroutineScope(Dispatchers.IO).launch(handler) {
-                        val loggedUserSerialized = Gson().toJson(loggedUser)
-                        preferences.edit().apply {
-//                            putBoolean("LoginState", true)
-                            putString("LoggedUser", loggedUserSerialized)
-                            apply()
-                        }
-                    }
-                }
-            }
-        })
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.fragment).navigateUp()
     }
 
     override fun onBackPressed() {
-        val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
-            .setTitle("Do you want to exit?")
-            .setIcon(R.mipmap.app_logo_new)
-            .setCancelable(false)
-            .setPositiveButton("Yes") { _, _ ->
-                finish()
-            }
-            .setNegativeButton("No") { dialog, _ ->
-                dialog.cancel()
-            }
-        exitDialog.show()
+        onBackPressedDispatcher.onBackPressed()
+//        val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
+//            .setTitle("Do you want to exit?")
+//            .setIcon(R.mipmap.app_logo_new)
+//            .setCancelable(false)
+//            .setPositiveButton("Yes") { _, _ ->
+//                finish()
+//            }
+//            .setNegativeButton("No") { dialog, _ ->
+//                dialog.cancel()
+//            }
+//        exitDialog.show()
     }
 }

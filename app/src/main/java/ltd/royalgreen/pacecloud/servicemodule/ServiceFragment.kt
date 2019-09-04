@@ -2,6 +2,7 @@ package ltd.royalgreen.pacecloud.servicemodule
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -164,8 +165,23 @@ class ServiceFragment : Fragment(), Injectable {
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
             when(status) {
+                ApiCallStatus.SUCCESS -> {
+                    binding.loader.visibility = View.GONE
+                }
                 ApiCallStatus.LOADING -> {
                     binding.loader.visibility = View.VISIBLE
+                }
+                ApiCallStatus.ERROR -> {
+                    binding.loader.visibility = View.GONE
+//                    Toast.makeText(requireContext(), "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
+                }
+                ApiCallStatus.TIMEOUT -> {
+                    binding.loader.visibility = View.GONE
+                    Toast.makeText(requireContext(), "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
+                }
+                ApiCallStatus.EMPTY -> {
+                    binding.loader.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Empty return value!!!", Toast.LENGTH_LONG).show()
                 }
                 else -> binding.loader.visibility = View.GONE
             }

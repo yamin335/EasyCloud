@@ -2,11 +2,8 @@ package ltd.royalgreen.pacecloud.paymentmodule
 
 import android.app.Application
 import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.content.SharedPreferences
-import android.text.format.DateFormat
 import android.view.View
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -103,26 +100,23 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                withTimeoutOrNull(3000L) {
-                    val response = apiService.billclouduserbalance(param).execute()
-                    val apiResponse = ApiResponse.create(response)
-                    when (apiResponse) {
-                        is ApiSuccessResponse -> {
-                            val balanceModel = apiResponse.body
-                            userBalance.postValue(BigDecimal(balanceModel.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
-                            val userBalanceSerialized = Gson().toJson(apiResponse.body)
-                            preferences.edit().apply {
-                                putString("UserBalance", userBalanceSerialized)
-                                apply()
-                            }
-                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                val response = apiService.billclouduserbalance(param).execute()
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        val balanceModel = apiResponse.body
+                        userBalance.postValue(BigDecimal(balanceModel.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
+                        val userBalanceSerialized = Gson().toJson(apiResponse.body)
+                        preferences.edit().apply {
+                            putString("UserBalance", userBalanceSerialized)
+                            apply()
                         }
-                        is ApiEmptyResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                        }
-                        is ApiErrorResponse -> {
-                            apiCallStatus.postValue(ApiCallStatus.ERROR)
-                        }
+                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }

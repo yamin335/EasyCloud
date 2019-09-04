@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
-        <variable name="viewModel" type="ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel"/>
-        <variable name="lastPaymentAmount" type="String"/>
-        <variable name="lastPaymentDate" type="String"/>
+        <variable name="viewModel" type="ltd.royalgreen.pacecloud.supportmodule.SupportFragmentViewModel"/>
     </data>
     <LinearLayout
             android:orientation="vertical"

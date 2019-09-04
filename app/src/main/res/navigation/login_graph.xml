@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/login_graph"
+            app:startDestination="@id/loginFragment">
+
+    <fragment android:id="@+id/loginFragment" android:name="ltd.royalgreen.pacecloud.loginmodule.LoginFragment"
+              android:label="login_fragment" tools:layout="@layout/login_fragment">
+        <action android:id="@+id/action_loginFragment_to_faqsFragment" app:destination="@id/faqsFragment"/>
+        <action android:id="@+id/action_loginFragment_to_privacyFragment" app:destination="@id/privacyFragment"/>
+        <action android:id="@+id/action_loginFragment_to_contactFragment" app:destination="@id/contactFragment"/>
+    </fragment>
+    <fragment android:id="@+id/faqsFragment" android:name="ltd.royalgreen.pacecloud.loginmodule.FaqsFragment"
+              android:label="FAQs" tools:layout="@layout/faqs_fragment"/>
+    <fragment android:id="@+id/privacyFragment" android:name="ltd.royalgreen.pacecloud.loginmodule.PrivacyFragment"
+              android:label="Privacy" tools:layout="@layout/privacy_fragment"/>
+    <fragment android:id="@+id/contactFragment" android:name="ltd.royalgreen.pacecloud.loginmodule.ContactFragment"
+              android:label="Contact Us" tools:layout="@layout/contact_fragment"/>
+</navigation>
