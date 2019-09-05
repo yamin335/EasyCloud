@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="ltd.royalgreen.pacecloud.loginmodule.LoginFragmentViewModel" />
+                type="ltd.royalgreen.pacecloud.loginmodule.LoginFragmentViewModel"/>
     </data>
 
     <ScrollView
@@ -50,6 +50,8 @@
                     android:id="@+id/loginFormLinear"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
                     android:layout_centerVertical="true"
                     android:orientation="vertical">
 
@@ -84,7 +86,6 @@
                             android:text="@={viewModel.userName}"
                             android:imeOptions="actionNext"
                             android:inputType="text"
-                            android:textSize="18sp"
                             android:textColor="@color/colorPrimaryLight"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -120,7 +121,6 @@
                             app:hideKeyboardOnInputDone="@{true}"
                             android:imeOptions="actionDone"
                             android:inputType="textPassword"
-                            android:textSize="18sp"
                             android:textColor="@color/colorPrimaryLight"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -141,10 +141,11 @@
                         android:id="@+id/loginButton"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                         android:layout_width="match_parent"
-                        android:layout_height="55dp"
+                        android:layout_height="wrap_content"
                         android:text="@string/signin"
                         android:textSize="16sp"
                         android:enabled="false"
+                        android:textColor="@drawable/button_state_colors"
                         android:windowSoftInputMode="adjustResize"
                         android:textAllCaps="false"
                         android:layout_marginTop="10dp"

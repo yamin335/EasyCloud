@@ -133,41 +133,8 @@ class LoginFragment : Fragment(), Injectable {
         binding.signUp.setOnClickListener {
             val signUpDialog = SignUpDialog(object : SignUpDialog.SignUpCallback {
                 override fun onSignUp(newUser: JsonObject) {
-                    Toast.makeText(context, "Dialog OK", Toast.LENGTH_LONG).show()
-                    if (isNetworkAvailable(requireContext())) {
-//                        val jsonObject = JsonObject().apply {
-//                            addProperty("UserID", loggedUser?.userID)
-//                            addProperty("id", item?.deploymentId)
-//                            addProperty("name", renamedValue)
-//                        }
-//
-//                        val param = JsonArray().apply {
-//                            add(jsonObject)
-//                        }
-//
-//                        val handler = CoroutineExceptionHandler { _, exception ->
-//                            exception.printStackTrace()
-//                        }
-//
-//                        CoroutineScope(Dispatchers.IO).launch(handler) {
-//                            val response = apiService.updatedeploymentname(param).execute()
-//                            when (val apiResponse = ApiResponse.create(response)) {
-//                                is ApiSuccessResponse -> {
-//                                    if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-//                                        renameSuccessCallback.onRenamed()
-//                                    }
-//                                }
-//                                is ApiEmptyResponse -> {
-//
-//                                }
-//                                is ApiErrorResponse -> {
-//
-//                                }
-//                            }
-//                        }
-                    } else {
-                        Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
-                    }
+                    Toast.makeText(context, "Creating Account Please Wait...", Toast.LENGTH_LONG).show()
+                    viewModel.processSignUp(newUser)
                 }
             })
 //            signUpDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -206,7 +173,7 @@ class LoginFragment : Fragment(), Injectable {
 
         viewModel.apiCallStatus.observe(this, Observer {
             when(it) {
-                ApiCallStatus.SUCCESS -> Toast.makeText(requireContext(), "Signed In Successfully", Toast.LENGTH_LONG).show()
+                ApiCallStatus.SUCCESS -> Log.d("SUCCESSFUL", "Nothing to do")
                 ApiCallStatus.ERROR -> Toast.makeText(requireContext(), "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
                 ApiCallStatus.TIMEOUT -> Toast.makeText(requireContext(), "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
                 ApiCallStatus.EMPTY -> Toast.makeText(requireContext(), "Empty return value!!!", Toast.LENGTH_LONG).show()
@@ -217,6 +184,14 @@ class LoginFragment : Fragment(), Injectable {
                     viewModel.errorMessage.value = true
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
+            }
+        })
+
+        viewModel.signUpMsg.observe(this, Observer {
+            if (it == "Save successfully.") {
+                Toast.makeText(requireContext(), "Account Created Successfully", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
             }
         })
 

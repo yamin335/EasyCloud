@@ -93,4 +93,9 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("/api/portal/clouduservmsyncwithlocaldb")
     fun clouduservmsyncwithlocaldb(@Body jsonArray: JsonArray): Call<String>
+
+    //API FOR SIGN UP
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/register")
+    fun register(@Body jsonArray: JsonArray): Call<String>
 }

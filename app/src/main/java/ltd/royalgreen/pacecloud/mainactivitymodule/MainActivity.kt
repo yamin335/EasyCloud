@@ -348,9 +348,9 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 val response = apiService.clouduservmsyncwithlocaldb(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                             reCreate.postValue(true)
-                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         }
                     }
                     is ApiEmptyResponse -> {
