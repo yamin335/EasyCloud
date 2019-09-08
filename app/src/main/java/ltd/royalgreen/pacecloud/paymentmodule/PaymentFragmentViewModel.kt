@@ -2,7 +2,9 @@ package ltd.royalgreen.pacecloud.paymentmodule
 
 import android.app.Application
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.SharedPreferences
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.LiveData
@@ -14,6 +16,7 @@ import androidx.paging.PagedList
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
@@ -87,7 +90,6 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
 
     fun getUserBalance(user: LoggedUser?) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.postValue(ApiCallStatus.LOADING)
             val jsonObject = JsonObject().apply {
                 addProperty("UserID", user?.resdata?.loggeduser?.userID)
             }
@@ -96,10 +98,12 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
             }.toString()
 
             val handler = CoroutineExceptionHandler { _, exception ->
+                exception.printStackTrace()
                 apiCallStatus.postValue(ApiCallStatus.ERROR)
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.billclouduserbalance(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
@@ -121,7 +125,12 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 

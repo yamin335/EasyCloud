@@ -37,39 +37,4 @@ class LoginViewModel @Inject constructor(app: Application) : ViewModel(){
     val errorMessage: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
-
-    fun processSignIn() {
-        if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
-            val jsonObject = JsonObject().apply {
-                addProperty("userName", userName.value)
-                addProperty("userPass", password.value)
-            }
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }.toString()
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                val response = apiService.loginportalusers(param).execute()
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        apiResult.postValue(apiResponse.body)
-                    }
-                    is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-        } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
-        }
-    }
 }

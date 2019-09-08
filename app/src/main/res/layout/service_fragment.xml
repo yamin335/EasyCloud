@@ -15,12 +15,11 @@
                 style="?android:attr/progressBarStyleHorizontal"
                 android:id="@+id/loader"
                 android:layout_width="match_parent"
-                android:layout_marginBottom="-6dp"
                 android:layout_marginTop="-6dp"
-                android:visibility="gone"
+                android:layout_marginBottom="-6dp"
                 android:layout_height="15dp"
                 android:indeterminate="true"
-                android:layout_alignParentTop="true"/>
+                app:isVisible="@{viewModel.apiCallStatus}"/>
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

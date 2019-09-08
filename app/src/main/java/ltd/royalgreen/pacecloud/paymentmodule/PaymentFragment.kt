@@ -1,17 +1,22 @@
 package ltd.royalgreen.pacecloud.paymentmodule
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -26,6 +31,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.payment_fragment.*
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
@@ -156,64 +162,90 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             adapter.submitList(pagedList)
         })
 
-        viewModel.paymentResponse.observe(this, Observer {
-            binding.includedContentMain.lastPaymentAmount = BigDecimal(it.resdata?.listBilCloudUserLedger?.get(0)?.creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
-            val date = it.resdata?.listBilCloudUserLedger?.get(0)?.transactionDate
-            if (date != null && date.contains("T")) {
-                val tempStringArray = date.split("T")
-                var tempString1 = tempStringArray[1]
-                if (tempString1.contains(".")){
-                    tempString1 = tempString1.split(".")[0]
-                    tempString1 = when {
-                        tempString1.split(":")[0].toInt()>12 -> {
-                            val hour = tempString1.split(":")[0].toInt()
-                            val minute = tempString1.split(":")[1].toInt()
-                            val seconds = tempString1.split(":")[2].toInt()
-                            "${hour-12}:$minute:$seconds PM"
+        viewModel.paymentResponse.observe(this, Observer { paymentHistory ->
+            paymentHistory.resdata?.listBilCloudUserLedger?.let {
+                if (it.isNotEmpty()) {
+                    binding.includedContentMain.lastPaymentAmount = BigDecimal(paymentHistory.resdata.listBilCloudUserLedger[0].creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+                    val date = paymentHistory.resdata.listBilCloudUserLedger[0].transactionDate
+                    if (date != null && date.contains("T")) {
+                        val tempStringArray = date.split("T")
+                        var tempString1 = tempStringArray[1]
+                        if (tempString1.contains(".")){
+                            tempString1 = tempString1.split(".")[0]
+                            tempString1 = when {
+                                tempString1.split(":")[0].toInt()>12 -> {
+                                    val hour = tempString1.split(":")[0].toInt()
+                                    val minute = tempString1.split(":")[1].toInt()
+                                    val seconds = tempString1.split(":")[2].toInt()
+                                    "${hour-12}:$minute:$seconds PM"
+                                }
+                                tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
+                                else -> "$tempString1 AM"
+                            }
+                        } else {
+                            tempString1 = when {
+                                tempString1.split(":")[0].toInt()>12 -> {
+                                    val hour = tempString1.split(":")[0].toInt()
+                                    val minute = tempString1.split(":")[1].toInt()
+                                    val seconds = tempString1.split(":")[2].toInt()
+                                    "${hour-12}:$minute:$seconds PM"
+                                }
+                                tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
+                                else -> "$tempString1 AM"
+                            }
                         }
-                        tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
-                        else -> "$tempString1 AM"
-                    }
-                } else {
-                    tempString1 = when {
-                        tempString1.split(":")[0].toInt()>12 -> {
-                            val hour = tempString1.split(":")[0].toInt()
-                            val minute = tempString1.split(":")[1].toInt()
-                            val seconds = tempString1.split(":")[2].toInt()
-                            "${hour-12}:$minute:$seconds PM"
-                        }
-                        tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
-                        else -> "$tempString1 AM"
+                        val year = tempStringArray[0].split("-")[0]
+                        val month = tempStringArray[0].split("-")[1]
+                        val day = tempStringArray[0].split("-")[2]
+                        binding.includedContentMain.lastPaymentDate = "$day-$month-$year  |  $tempString1"
                     }
                 }
-                val year = tempStringArray[0].split("-")[0]
-                val month = tempStringArray[0].split("-")[1]
-                val day = tempStringArray[0].split("-")[2]
-                binding.includedContentMain.lastPaymentDate = "$day-$month-$year  |  $tempString1"
             }
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
             when(status) {
                 ApiCallStatus.SUCCESS -> {
-                    binding.includedContentMain.loader.visibility = View.GONE
-                }
-                ApiCallStatus.LOADING -> {
-                    binding.includedContentMain.loader.visibility = View.VISIBLE
+//                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+//                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+//                    val toastView = inflater.inflate(R.layout.toast_custom_green, null)
+//                    toastView.message.text = requireContext().getString(R.string.success_msg)
+//                    toast.view = toastView
+//                    toast.show()
                 }
                 ApiCallStatus.ERROR -> {
-                    binding.includedContentMain.loader.visibility = View.GONE
-                    Toast.makeText(requireContext(), "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.error_msg)
+                    toast.view = toastView
+                    toast.show()
                 }
-                ApiCallStatus.TIMEOUT -> {
-                    binding.includedContentMain.loader.visibility = View.GONE
-                    Toast.makeText(requireContext(), "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
+                ApiCallStatus.NO_DATA -> {
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.no_data_msg)
+                    toast.view = toastView
+                    toast.show()
                 }
                 ApiCallStatus.EMPTY -> {
-                    binding.includedContentMain.loader.visibility = View.GONE
-                    Toast.makeText(requireContext(), "Empty return value!!!", Toast.LENGTH_LONG).show()
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.empty_msg)
+                    toast.view = toastView
+                    toast.show()
                 }
-                else -> binding.includedContentMain.loader.visibility = View.GONE
+                ApiCallStatus.TIMEOUT -> {
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.timeout_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                else -> Log.d("NOTHING", "Nothing to do")
             }
         })
 
@@ -227,13 +259,12 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         viewModel.paymentList.value?.dataSource?.invalidate()
         if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
             bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-            searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, activity!!.theme))
+            searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, requireContext().theme))
         }
     }
 
     override fun onSavePressed(date: String, amount: String, note: String) {
-        if (isNetworkAvailable(activity!!)) {
-            viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+        if (isNetworkAvailable(requireContext())) {
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
             val jsonObject = JsonObject()
             user?.let {
@@ -257,17 +288,19 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
+                viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.newrechargesave(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         val balanceModel = apiResponse.body
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         if (balanceModel.resdata?.resstate == true) {
+                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                             user?.let {
                                 viewModel.getUserBalance(it)
                             }
                             viewModel.paymentList.value?.dataSource?.invalidate()
-                            Toast.makeText(requireActivity(), "Recharge Successful", Toast.LENGTH_LONG).show()
+                        } else {
+                            viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
                         }
                     }
                     is ApiEmptyResponse -> {
@@ -279,7 +312,12 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 }
             }
         } else {
-            Toast.makeText(requireActivity(), "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = requireContext().getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 

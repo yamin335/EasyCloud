@@ -13,6 +13,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_deployment_row.view.*
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -93,7 +94,12 @@ class DeploymentListAdapter(val context: Context,
                           }
                       }
                   } else {
-                      Toast.makeText(context, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+                      val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                      val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                      val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                      toastView.message.text = context.getString(R.string.net_error_msg)
+                      toast.view = toastView
+                      toast.show()
                   }
               }
           }, loggedUser?.fullName, item?.deploymentName)

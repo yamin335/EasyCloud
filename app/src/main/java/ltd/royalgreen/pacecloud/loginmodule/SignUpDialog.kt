@@ -80,13 +80,10 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
                 binding.firstNameLayout.helperText = "Required"
             } else {
                 binding.firstNameLayout.helperText = ""
-                binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                        viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                        viewModel.email.value != "" && viewModel.email.value != null &&
-                        viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                        viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                        viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                        viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+                binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                        viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                        viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                        viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                         viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
             }
         })
@@ -96,13 +93,10 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
                 binding.lastNameLayout.helperText = "Required"
             } else {
                 binding.lastNameLayout.helperText = ""
-                binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                        viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                        viewModel.email.value != "" && viewModel.email.value != null &&
-                        viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                        viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                        viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                        viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+                binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                        viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                        viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                        viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                         viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
             }
         })
@@ -115,13 +109,10 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
                 if (Patterns.EMAIL_ADDRESS.matcher(it).matches()) {
                     binding.emailLayout.isErrorEnabled = false
                     viewModel.isValidEmail.postValue(true)
-                    binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                            viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                            viewModel.email.value != "" && viewModel.email.value != null &&
-                            viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                            viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                            viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                            viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+                    binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                            viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                            viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                            viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                             viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
                 } else {
                     viewModel.isValidEmail.postValue(false)
@@ -139,13 +130,10 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
                 if ("^(?=\\d)\\d{11}(?!\\d)".toRegex().matches(it)) {
                     binding.mobileLayout.isErrorEnabled = false
                     viewModel.isValidPhone.postValue(true)
-                    binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                            viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                            viewModel.email.value != "" && viewModel.email.value != null &&
-                            viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                            viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                            viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                            viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+                    binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                            viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                            viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                            viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                             viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
                 } else {
                     viewModel.isValidPhone.postValue(false)
@@ -180,13 +168,10 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
             } else {
                 binding.passwordLayout.helperText = ""
                 binding.passwordLayout.isEndIconVisible = true
-                binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                        viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                        viewModel.email.value != "" && viewModel.email.value != null &&
-                        viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                        viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                        viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                        viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+                binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                        viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                        viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                        viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                         viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
             }
         })
@@ -200,13 +185,10 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
                 binding.confPasswordLayout.isEndIconVisible = true
                 if (it == viewModel.signUpPass.value) {
                     binding.confPasswordLayout.isErrorEnabled = false
-                    binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                            viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                            viewModel.email.value != "" && viewModel.email.value != null &&
-                            viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                            viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                            viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                            viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+                    binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                            viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                            viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                            viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                             viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
                 } else {
                     binding.confPasswordLayout.isErrorEnabled = true
@@ -216,24 +198,18 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
         })
 
         viewModel.isValidPhone.observe(this, Observer {
-            binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                    viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                    viewModel.email.value != "" && viewModel.email.value != null &&
-                    viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                    viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                    viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                    viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+            binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                    viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                    viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                    viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                     viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
         })
 
         viewModel.isValidEmail.observe(this, Observer {
-            binding.signUp.isEnabled = viewModel.firstName.value != "" && viewModel.firstName.value != null &&
-                    viewModel.lastName.value != "" && viewModel.lastName.value != null &&
-                    viewModel.email.value != "" && viewModel.email.value != null &&
-                    viewModel.mobile.value != "" && viewModel.mobile.value != null &&
-                    viewModel.signUpPass.value != "" && viewModel.signUpPass.value != null &&
-                    viewModel.signUpConfPass.value != "" && viewModel.signUpConfPass.value != null &&
-                    viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
+            binding.signUp.isEnabled = !viewModel.firstName.value.isNullOrBlank() &&
+                    viewModel.lastName.value.isNullOrBlank() && viewModel.email.value.isNullOrBlank() &&
+                    viewModel.mobile.value.isNullOrBlank() && viewModel.signUpPass.value.isNullOrBlank() &&
+                    viewModel.signUpConfPass.value.isNullOrBlank() && viewModel.signUpPass.value == viewModel.signUpConfPass.value &&
                     viewModel.isValidEmail.value == true && viewModel.isValidPhone.value == true
         })
 

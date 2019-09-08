@@ -1,12 +1,15 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -37,6 +40,7 @@ import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.network.ApiCallStatus
 
 
@@ -102,9 +106,38 @@ class DashboardFragment : Fragment(), Injectable {
         viewModel.apiCallStatus.observe(this, Observer {
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
-                ApiCallStatus.ERROR -> Toast.makeText(requireContext(), "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.TIMEOUT -> Toast.makeText(requireContext(), "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.EMPTY -> Toast.makeText(requireContext(), "Empty return value!!!", Toast.LENGTH_LONG).show()
+                ApiCallStatus.ERROR -> {
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.error_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                ApiCallStatus.NO_DATA -> {
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.no_data_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                ApiCallStatus.EMPTY -> {
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.empty_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                ApiCallStatus.TIMEOUT -> {
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.timeout_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
                 else -> Log.d("NOTHING", "Nothing to do")
             }
         })
@@ -136,11 +169,11 @@ class DashboardFragment : Fragment(), Injectable {
 //        view.osStatusPieChart.setDrawMarkers(false)
         view.osStatusPieChart.setDrawEntryLabels(true)
         view.osStatusPieChart.setEntryLabelTextSize(11f)
-        view.osStatusPieChart.setNoDataTextColor(resources.getColor(R.color.pieColor1))
+        view.osStatusPieChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.pieColor1))
 //        view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
         view.osStatusPieChart.description.isEnabled = false
         view.osStatusPieChart.isRotationEnabled = false
-        view.osStatusPieChart.setEntryLabelColor(resources.getColor(R.color.colorWhite))
+        view.osStatusPieChart.setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.colorWhite))
 //        view.osStatusPieChart.setUsePercentValues(true)
         view.osStatusPieChart.animateXY(900, 900)
 
@@ -181,19 +214,19 @@ class DashboardFragment : Fragment(), Injectable {
                             val legend = LegendEntry()
                             when(it) {
                                 "Running" -> {
-                                    legend.formColor = resources.getColor(R.color.pieColor2)
+                                    legend.formColor = ContextCompat.getColor(requireContext(), R.color.pieColor2)
                                 }
                                 "Stopped" -> {
-                                    legend.formColor = resources.getColor(R.color.pieColor1)
+                                    legend.formColor = ContextCompat.getColor(requireContext(), R.color.pieColor1)
                                 }
                                 "Terminated" -> {
-                                    legend.formColor = resources.getColor(R.color.colorRed)
+                                    legend.formColor = ContextCompat.getColor(requireContext(), R.color.colorRed)
                                 }
                                 "Error" -> {
-                                    legend.formColor = resources.getColor(R.color.barColor4)
+                                    legend.formColor = ContextCompat.getColor(requireContext(), R.color.barColor4)
                                 }
                                 else -> {
-                                    legend.formColor = resources.getColor(R.color.barColor3)
+                                    legend.formColor = ContextCompat.getColor(requireContext(), R.color.barColor3)
                                 }
                             }
                             legend.label = it
@@ -209,13 +242,13 @@ class DashboardFragment : Fragment(), Injectable {
 //                pieDataSet.valueLinePart1OffsetPercentage = 90.0f
 //                pieDataSet.valueLinePart1Length = 0.65f
 //                pieDataSet.valueLinePart2Length = 0.4f
-                pieDataSet.valueTextColor = resources.getColor(R.color.colorWhite)
+                pieDataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.colorWhite)
                 pieDataSet.valueTextSize = 11f
-                pieDataSet.colors = arrayListOf(resources.getColor(R.color.pieColor2),
-                    resources.getColor(R.color.pieColor1),
-                    resources.getColor(R.color.colorRed),
-                    resources.getColor(R.color.barColor4),
-                    resources.getColor(R.color.barColor3))
+                pieDataSet.colors = arrayListOf(ContextCompat.getColor(requireContext(), R.color.pieColor2),
+                    ContextCompat.getColor(requireContext(), R.color.pieColor1),
+                    ContextCompat.getColor(requireContext(), R.color.colorRed),
+                    ContextCompat.getColor(requireContext(), R.color.barColor4),
+                    ContextCompat.getColor(requireContext(), R.color.barColor3))
                 val pieData = PieData(pieDataSet)
                 pieData.setValueFormatter(CustomValueFormatter())
                 view.osStatusPieChart.data = pieData
@@ -244,9 +277,9 @@ class DashboardFragment : Fragment(), Injectable {
                 barDataSet.valueFormatter = CustomValueFormatter()
                 barDataSet.valueTextSize = 11f
                 val barData = BarData(barDataSet)
-                barDataSet.colors = arrayListOf(resources.getColor(R.color.barColor1),
-                    resources.getColor(R.color.barColor2), resources.getColor(R.color.barColor3),
-                    resources.getColor(R.color.barColor4))
+                barDataSet.colors = arrayListOf(ContextCompat.getColor(requireContext(), R.color.barColor1),
+                    ContextCompat.getColor(requireContext(), R.color.barColor2), ContextCompat.getColor(requireContext(), R.color.barColor3),
+                    ContextCompat.getColor(requireContext(), R.color.barColor4))
                 view.osSummaryBarChart.xAxis.valueFormatter = IndexAxisValueFormatter(titles)
                 view.osSummaryBarChart.xAxis.labelCount = titles.size
                 view.osSummaryBarChart.data = barData

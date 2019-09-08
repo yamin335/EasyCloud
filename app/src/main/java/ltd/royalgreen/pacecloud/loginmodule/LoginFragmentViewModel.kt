@@ -1,6 +1,7 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
 import android.app.Application
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,9 +9,13 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.*
+import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
+import android.content.Context.LAYOUT_INFLATER_SERVICE
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
+
 
 class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel(){
 
@@ -81,7 +86,6 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
 
     fun processSignIn() {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
             val jsonObject = JsonObject().apply {
                 addProperty("userName", userName.value)
                 addProperty("userPass", password.value)
@@ -96,6 +100,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.loginportalusers(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
@@ -110,14 +115,17 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 
     fun processSignUp(jsonObject: JsonObject) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.postValue(ApiCallStatus.LOADING)
-
             val param = JsonArray().apply {
                 add(jsonObject)
             }
@@ -128,6 +136,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.register(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
@@ -143,7 +152,12 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 }

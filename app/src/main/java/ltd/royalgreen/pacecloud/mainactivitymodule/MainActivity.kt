@@ -1,10 +1,12 @@
 package ltd.royalgreen.pacecloud.mainactivitymodule
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -30,6 +32,7 @@ import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.main_container.*
 import kotlinx.android.synthetic.main.main_nav_header.view.*
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
@@ -45,9 +48,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
 
-/**
- * An activity that inflates a layout that has a [BottomNavigationView].
- */
 class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject
@@ -127,9 +127,38 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         viewModel.apiCallStatus.observe(this, Observer {
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
-                ApiCallStatus.ERROR -> Toast.makeText(this, "Can not connect to SERVER!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.TIMEOUT -> Toast.makeText(this, "SERVER is not responding!!!", Toast.LENGTH_LONG).show()
-                ApiCallStatus.EMPTY -> Toast.makeText(this, "Empty return value!!!", Toast.LENGTH_LONG).show()
+                ApiCallStatus.ERROR -> {
+                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
+                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = this@MainActivity.getString(R.string.error_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                ApiCallStatus.NO_DATA -> {
+                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
+                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = this@MainActivity.getString(R.string.no_data_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                ApiCallStatus.EMPTY -> {
+                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
+                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = this@MainActivity.getString(R.string.empty_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+                ApiCallStatus.TIMEOUT -> {
+                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
+                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = this@MainActivity.getString(R.string.timeout_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
                 else -> Log.d("NOTHING", "Nothing to do")
             }
         })
@@ -205,27 +234,27 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         currentNavController = controller
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-
-        currentNavController?.observe(this, Observer { navController ->
-            when(navController.graph.id) {
-                R.id.dashboard_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-                R.id.service_graph -> menuInflater.inflate(R.menu.virtual_machine_menu, menu)
-                R.id.payment_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-                R.id.support_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
-            }
-        })
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.refresh -> recreate()
-//            R.id.sync_and_refresh -> recreate()
-            R.id.sync_and_refresh -> syncDatabaseAndRefresh(this)
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//
+//        currentNavController?.observe(this, Observer { navController ->
+//            when(navController.graph.id) {
+//                R.id.dashboard_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//                R.id.service_graph -> menuInflater.inflate(R.menu.virtual_machine_menu, menu)
+//                R.id.payment_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//                R.id.support_graph -> menuInflater.inflate(R.menu.dashboard_menu, menu)
+//            }
+//        })
+//        return true
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when(item.itemId) {
+//            R.id.refresh -> recreate()
+////            R.id.sync_and_refresh -> recreate()
+//            R.id.sync_and_refresh -> syncDatabaseAndRefresh(this)
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     override fun onSupportNavigateUp(): Boolean {
         return currentNavController?.value?.navigateUp(appBarConfiguration) ?: false || super.onSupportNavigateUp()
@@ -322,47 +351,4 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         }
     }
 
-    private fun syncDatabaseAndRefresh(activity: Activity) {
-        if (isNetworkAvailable(activity)) {
-            viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-            val jsonObject = JsonObject()
-            user?.let {
-                jsonObject.apply {
-                    addProperty("pageNumber", "1")
-                    addProperty("pageSize", "20")
-                    addProperty("id", it.resdata?.loggeduser?.userID?.toInt() ?: 0)
-                }
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                exception.printStackTrace()
-            }
-
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                val response = apiService.clouduservmsyncwithlocaldb(param).execute()
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                            reCreate.postValue(true)
-                        }
-                    }
-                    is ApiEmptyResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-        } else {
-            Toast.makeText(activity, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
-        }
-    }
 }

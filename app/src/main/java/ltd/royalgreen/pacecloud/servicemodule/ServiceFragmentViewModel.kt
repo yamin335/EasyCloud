@@ -31,11 +31,10 @@ class ServiceFragmentViewModel @Inject constructor(app: Application) : ViewModel
 
     lateinit var deploymentList: LiveData<PagedList<Deployment>>
 
-    fun initializedPagedListBuilder(config: PagedList.Config):
-            LivePagedListBuilder<Long, Deployment> {
+    fun initializedPagedListBuilder(config: PagedList.Config): LivePagedListBuilder<Long, Deployment> {
         val dataSourceFactory = object : DataSource.Factory<Long, Deployment>() {
             override fun create(): DataSource<Long, Deployment> {
-                return DeploymentListDataSource(application, apiService, preferences, deploymentResponse, apiCallStatus)
+                return DeploymentListDataSource(apiService, preferences, deploymentResponse, apiCallStatus)
             }
         }
         return LivePagedListBuilder<Long, Deployment>(dataSourceFactory, config)

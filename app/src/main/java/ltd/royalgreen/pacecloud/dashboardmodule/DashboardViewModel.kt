@@ -1,13 +1,17 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
+import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
@@ -48,7 +52,6 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
     fun getOsStatus(user: LoggedUser) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
             val jsonObject = JsonObject().apply {
                 addProperty("CompanyID", user.resdata?.loggeduser?.companyID)
                 addProperty("values", "cloudvmstatus")
@@ -60,10 +63,11 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
             val handler = CoroutineExceptionHandler { _, exception ->
                 apiCallStatus.postValue(ApiCallStatus.ERROR)
-                println("Caught $exception")
+                exception.printStackTrace()
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.GetDashboardChartPortal(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
@@ -79,13 +83,17 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 
     fun getOsSummary(user: LoggedUser) {
         if (isNetworkAvailable(application)) {
-            apiCallStatus.value = ApiCallStatus.LOADING
             val jsonObject = JsonObject().apply {
                 addProperty("CompanyID", user.resdata?.loggeduser?.companyID)
                 addProperty("values", "cloudvm")
@@ -97,10 +105,11 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
             val handler = CoroutineExceptionHandler { _, exception ->
                 apiCallStatus.postValue(ApiCallStatus.ERROR)
-                println("Caught $exception")
+                exception.printStackTrace()
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.GetDashboardChartPortalSummery(param).execute()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
@@ -116,7 +125,12 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 }
