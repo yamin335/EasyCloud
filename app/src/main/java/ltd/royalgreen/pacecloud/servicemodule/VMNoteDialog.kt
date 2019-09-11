@@ -5,21 +5,28 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
-import android.view.Window
+import android.view.*
+import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.service_vm_note_dialog.*
 import ltd.royalgreen.pacecloud.R
 
-class VMNoteDialog internal constructor(parentActivity: Activity,
-                                        private val callBack: NoteCallback,
-                                        private val note: String?) : Dialog(parentActivity), View.OnClickListener {
+class VMNoteDialog internal constructor(private val callBack: NoteCallback,
+                                        private val note: String?) : DialogFragment(), View.OnClickListener {
 
     var newNote = note ?: ""
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.service_vm_note_dialog)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        return dialog
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.service_vm_note_dialog, container)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         noteInput.setText(newNote)
 

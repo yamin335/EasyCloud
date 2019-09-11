@@ -4,8 +4,6 @@ package ltd.royalgreen.pacecloud.loginmodule
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -23,7 +21,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
@@ -35,11 +32,12 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.LoginFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
+import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivity
 import ltd.royalgreen.pacecloud.network.ApiCallStatus
 import ltd.royalgreen.pacecloud.network.ApiService
 import ltd.royalgreen.pacecloud.util.autoCleared
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.hideKeyboard
 import javax.inject.Inject
 
 class LoginFragment : Fragment(), Injectable {
@@ -66,21 +64,18 @@ class LoginFragment : Fragment(), Injectable {
         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
         // This callback will only be called when MyFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
-                .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.app_logo_new)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
+            val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
+                override fun onYes() {
                     preferences.edit().apply {
                         putString("LoggedUser", "")
                         apply()
                     }
                     requireActivity().finish()
                 }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.cancel()
-                }
-            exitDialog.show()
+            }, "Do you want to exit?", "")
+            fragmentManager?.let {
+                exitDialog.show(it, "#app_exit_dialog")
+            }
         }
     }
 
@@ -123,8 +118,16 @@ class LoginFragment : Fragment(), Injectable {
 
         binding.passwordInputLayout.isEndIconVisible = false
 
-        binding.loginButton.setOnClickListener {
+        binding.username.setOnFocusChangeListener { _, _ ->
             viewModel.errorMessage.value = false
+        }
+
+        binding.password.setOnFocusChangeListener { _, _ ->
+            viewModel.errorMessage.value = false
+        }
+
+        binding.loginButton.setOnClickListener {
+            hideKeyboard()
             viewModel.processSignIn()
         }
 
@@ -135,15 +138,16 @@ class LoginFragment : Fragment(), Injectable {
         binding.signUp.setOnClickListener {
             val signUpDialog = SignUpDialog(object : SignUpDialog.SignUpCallback {
                 override fun onSignUp(newUser: JsonObject) {
-                    Toast.makeText(context, "Creating Account Please Wait...", Toast.LENGTH_LONG).show()
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    toastView.message.text = requireContext().getString(R.string.loading_msg)
+                    toast.view = toastView
+                    toast.show()
                     viewModel.processSignUp(newUser)
                 }
             })
-//            signUpDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-//            val params = signUpDialog.window?.attributes
-//            signUpDialog.window?.attributes = WindowManager.LayoutParams()
             signUpDialog.isCancelable = true
-            signUpDialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog_FullScreen)
             fragmentManager?.let {
                 signUpDialog.show(it, "#sign_up_dialog")
             }

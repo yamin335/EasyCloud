@@ -31,6 +31,7 @@ import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.ServiceFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
@@ -66,21 +67,18 @@ class ServiceFragment : Fragment(), Injectable {
         setHasOptionsMenu(true)
         // This callback will only be called when MyFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
-                .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.app_logo_new)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
+            val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
+                override fun onYes() {
                     preferences.edit().apply {
                         putString("LoggedUser", "")
                         apply()
                     }
                     requireActivity().finish()
                 }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.cancel()
-                }
-            exitDialog.show()
+            }, "Do you want to exit?", "")
+            fragmentManager?.let {
+                exitDialog.show(it, "#app_exit_dialog")
+            }
         }
     }
 
@@ -105,43 +103,45 @@ class ServiceFragment : Fragment(), Injectable {
         if (isNetworkAvailable(requireContext())) {
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
 
-            adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
-                override fun onNote() {
-
-                }
-
-                override fun onStop(success: Boolean) {
-                    if (success) {
-//                    viewModel.deploymentList.value?.dataSource?.invalidate()
-                    } else {
+            fragmentManager?.let {
+                adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
+                    override fun onNote() {
 
                     }
-                }
 
-                override fun onStart(success: Boolean) {
-                    if (success) {
+                    override fun onStop(success: Boolean) {
+                        if (success) {
 //                    viewModel.deploymentList.value?.dataSource?.invalidate()
-                    } else {
+                        } else {
 
+                        }
                     }
-                }
 
-                override fun onAttachDetach() {
+                    override fun onStart(success: Boolean) {
+                        if (success) {
+//                    viewModel.deploymentList.value?.dataSource?.invalidate()
+                        } else {
+
+                        }
+                    }
+
+                    override fun onAttachDetach() {
 //                Toast.makeText(requireContext(), "Attach clicked from interface!", Toast.LENGTH_LONG).show()
-                }
+                    }
 
-                override fun onReboot() {
+                    override fun onReboot() {
 //                Toast.makeText(requireContext(), "Reboot clicked from interface!", Toast.LENGTH_LONG).show()
-                }
+                    }
 
-                override fun onTerminate() {
+                    override fun onTerminate() {
 //                Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
-                }
-            }, object : DeploymentListAdapter.RenameSuccessCallback {
-                override fun onRenamed() {
-                    viewModel.deploymentList.value?.dataSource?.invalidate()
-                }
-            },requireActivity(), user?.resdata?.loggeduser)
+                    }
+                }, object : DeploymentListAdapter.RenameSuccessCallback {
+                    override fun onRenamed() {
+                        viewModel.deploymentList.value?.dataSource?.invalidate()
+                    }
+                }, it, user?.resdata?.loggeduser)
+            }
 
             vmListRecycler.layoutManager = LinearLayoutManager(requireActivity())
             vmListRecycler.adapter = adapter

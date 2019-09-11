@@ -15,6 +15,7 @@ import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 import android.content.Context.LAYOUT_INFLATER_SERVICE
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
+import ltd.royalgreen.pacecloud.util.ConnectivityLiveData
 
 
 class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel(){

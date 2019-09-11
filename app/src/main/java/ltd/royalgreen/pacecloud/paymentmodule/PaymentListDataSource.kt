@@ -40,6 +40,7 @@ class PaymentListDataSource(private val application: Application, private val ap
         }
 
         val handler = CoroutineExceptionHandler { _, exception ->
+            exception.printStackTrace()
             tempApiCallStatus.postValue(ApiCallStatus.ERROR)
         }
 
@@ -82,6 +83,7 @@ class PaymentListDataSource(private val application: Application, private val ap
         }
 
         val handler = CoroutineExceptionHandler { _, exception ->
+            exception.printStackTrace()
             tempApiCallStatus.postValue(ApiCallStatus.ERROR)
         }
 

@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.NavController
@@ -67,10 +68,11 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     @Inject
     lateinit var preferences: SharedPreferences
 
+    lateinit var exitDialog: NetworkStatusDialog
+
     private var currentNavController: LiveData<NavController>? = null
     private lateinit var appBarConfiguration: AppBarConfiguration
 
-    lateinit var reCreate: MutableLiveData<Boolean>
 
     var listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
             when (key) {
@@ -98,8 +100,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        reCreate = MutableLiveData<Boolean>()
-        reCreate.value = false
         preferences.registerOnSharedPreferenceChangeListener(listener)
         val binding: MainActivityBinding = DataBindingUtil.setContentView(
             this, R.layout.main_activity
@@ -117,11 +117,20 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
             nav_view.getHeaderView(0).loggedUserBalance.text = BigDecimal(balance.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
         })
 
-        reCreate.observe(this, Observer { reCreate ->
-           if (reCreate) {
-               Toast.makeText(this@MainActivity, "Successfully Synced Data!", Toast.LENGTH_LONG).show()
-               this@MainActivity.recreate()
-           }
+        exitDialog = NetworkStatusDialog(object : NetworkStatusDialog.NetworkChangeCallback {
+            override fun onExit() {
+                this@MainActivity.finish()
+            }
+        })
+        exitDialog.isCancelable = false
+
+        viewModel.internetStatus.observe(this, Observer {
+            if (it) {
+                if (exitDialog.isVisible)
+                    exitDialog.dismiss()
+            } else {
+                exitDialog.show(supportFragmentManager, "#net_status_dialog")
+            }
         })
 
         viewModel.apiCallStatus.observe(this, Observer {
@@ -261,11 +270,8 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     private fun doSignOut() {
-        val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
-            .setTitle("Do you want sign out?")
-            .setIcon(R.mipmap.app_logo_new)
-            .setCancelable(false)
-            .setPositiveButton("Yes") { _, _ ->
+        val signOutDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
+            override fun onYes() {
                 val handler = CoroutineExceptionHandler { _, exception ->
                     exception.printStackTrace()
                 }
@@ -278,10 +284,8 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 finish()
             }
-            .setNegativeButton("No") { dialog, _ ->
-                dialog.cancel()
-            }
-        exitDialog.show()
+        }, "Do you want to sign out?", "")
+        signOutDialog.show(supportFragmentManager, "#app_signout_dialog")
     }
 
     private fun prepareSideNavMenu() {
@@ -336,10 +340,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 doSignOut()
             }
             return@setOnGroupClickListener true
-        }
-
-        expandableMenu.setOnChildClickListener { expandableListView, view, headerID, i, l ->
-            return@setOnChildClickListener false
         }
     }
 

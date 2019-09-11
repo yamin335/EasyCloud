@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView
-        xmlns:tools="http://schemas.android.com/tools" android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:layout_gravity="center"
         app:cardCornerRadius="5dp"
-        app:cardBackgroundColor="@android:color/background_light"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:cardBackgroundColor="@android:color/background_light" xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:android="http://schemas.android.com/apk/res/android">
     <RelativeLayout
             android:layout_width="match_parent"
@@ -23,6 +23,8 @@
                     app:boxCornerRadiusTopEnd="2dp"
                     android:hint="Amount"
                     app:helperText="Required"
+                    app:endIconMode="clear_text"
+                    app:endIconTint="@color/colorDarkGray"
                     app:errorTextColor="@color/colorRed"
                     app:helperTextTextColor="@color/colorRed"
                     app:layout_constraintStart_toStartOf="@+id/textView9"
@@ -30,13 +32,14 @@
                     app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0"
                     android:layout_marginTop="12dp">
-
+                <requestFocus/>
                 <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/amount"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionNext"
-                        android:inputType="numberDecimal"/>
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/colorPrimaryLight"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -46,6 +49,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:hint="Note"
+                    app:endIconMode="clear_text"
+                    app:endIconTint="@color/colorDarkGray"
                     app:boxCornerRadiusBottomStart="2dp"
                     app:boxCornerRadiusBottomEnd="2dp"
                     app:boxCornerRadiusTopStart="2dp"
@@ -61,6 +66,8 @@
                         android:layout_height="wrap_content"
                         android:imeOptions="actionDone"
                         android:inputType="textMultiLine"
+                        app:endIconMode="clear_text"
+                        app:endIconTint="@color/colorDarkGray"
                         android:maxLines="10"
                         android:lines="6"
                         android:minLines="4"
@@ -131,7 +138,6 @@
                     android:id="@+id/linearLayout3"/>
 
             <TextView
-                    android:text="Md Yamin Mollah"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/clientName"

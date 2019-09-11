@@ -1,27 +1,35 @@
 package ltd.royalgreen.pacecloud.mainactivitymodule
 
-import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
-import android.view.Window
+import android.view.*
+import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.confirmation_checking_dialog.*
+import kotlinx.android.synthetic.main.confirmation_checking_dialog.view.*
 import ltd.royalgreen.pacecloud.R
 import java.util.*
 
-class ConfirmationCheckingDialog internal constructor(parentActivity: Activity, private val callBack: ConfirmationCallback, private val dialogTitle: String) : Dialog(parentActivity), View.OnClickListener {
+class ConfirmationCheckingDialog internal constructor(private val callBack: ConfirmationCallback, private val dialogTitle: String) : DialogFragment(), View.OnClickListener {
 
-    var firstValue: Int = 0
-    var secondValue: Int = 0
+    var firstValue: Long = 0L
+    var secondValue: Long = 0L
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.confirmation_checking_dialog)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        return dialog
+    }
 
-        title.text = dialogTitle
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.confirmation_checking_dialog, container)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        view.title.text = dialogTitle
         refreshCaptcha()
 
         val answerWatcher = object : TextWatcher {
@@ -37,7 +45,7 @@ class ConfirmationCheckingDialog internal constructor(parentActivity: Activity, 
                         answerInputLayout.error = "Empty Answer!"
                     }
 
-                    value.toString().toInt() == firstValue + secondValue -> {
+                    value.toString().toLong() == firstValue + secondValue -> {
                         yes.isEnabled = true
                         answerInputLayout.isErrorEnabled = false
                     }
@@ -56,11 +64,11 @@ class ConfirmationCheckingDialog internal constructor(parentActivity: Activity, 
             }
         }
 
-        answer.addTextChangedListener(answerWatcher)
+        view.answer.addTextChangedListener(answerWatcher)
 
-        recapcha.setOnClickListener(this)
-        yes.setOnClickListener(this)
-        no.setOnClickListener(this)
+        view.recapcha.setOnClickListener(this)
+        view.yes.setOnClickListener(this)
+        view.no.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -79,8 +87,19 @@ class ConfirmationCheckingDialog internal constructor(parentActivity: Activity, 
     }
 
     private fun refreshCaptcha() {
-        firstValue = Random().nextInt(8)+1
-        secondValue = Random().nextInt(8)+1
+        yes.isEnabled = false
+        firstValue = Random().nextInt(8)+1L
+        secondValue = Random().nextInt(8)+1L
         question.text = "What is $firstValue + $secondValue?"
+        if (!answer.text.toString().isBlank()) {
+            if (answer.text.toString().toLong() == firstValue + secondValue) {
+                yes.isEnabled = true
+                answerInputLayout.isErrorEnabled = false
+            } else {
+                yes.isEnabled = false
+                answerInputLayout.isErrorEnabled = true
+                answerInputLayout.error = "Invalid Answer!"
+            }
+        }
     }
 }

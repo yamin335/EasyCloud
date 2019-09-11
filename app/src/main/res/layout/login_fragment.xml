@@ -76,7 +76,6 @@
                         android:layout_marginStart="24dp"
                         android:layout_marginEnd="24dp"
                         android:layout_marginBottom="10dp">
-
                     <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/username"
                             android:drawableStart="@drawable/login_username_icon"
@@ -125,18 +124,6 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                        android:id="@+id/errorText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/colorRed"
-                        android:layout_gravity="center_horizontal"
-                        app:showIfInvalid="@{viewModel.errorMessage}"
-                        android:visibility="gone"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="0dp"
-                        android:text="@string/invalid_username_or_password"/>
-
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/loginButton"
                         style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
@@ -154,6 +141,18 @@
                         android:layout_marginEnd="24dp"
                         android:backgroundTint="@color/colorGreenTheme"
                         app:cornerRadius="2dp"/>
+
+                <TextView
+                        android:id="@+id/errorText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorRed"
+                        android:layout_gravity="center_horizontal"
+                        app:showIfInvalid="@{viewModel.errorMessage}"
+                        android:visibility="gone"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/invalid_username_or_password"/>
 
                 <TextView
                         android:id="@+id/forgotPassword"

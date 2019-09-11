@@ -42,7 +42,7 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
         super.onResume()
         val params = dialog?.window?.attributes
         params?.width = WindowManager.LayoutParams.MATCH_PARENT
-        params?.height = WindowManager.LayoutParams.MATCH_PARENT
+        params?.height = WindowManager.LayoutParams.WRAP_CONTENT
         dialog?.window?.attributes = params
     }
 

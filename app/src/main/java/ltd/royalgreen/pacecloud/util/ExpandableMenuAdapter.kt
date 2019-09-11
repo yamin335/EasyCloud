@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
+import androidx.core.content.ContextCompat
 import ltd.royalgreen.pacecloud.R
 import java.util.HashMap
 import kotlinx.android.synthetic.main.side_menu_row_item.view.*
@@ -63,9 +64,9 @@ class ExpandableMenuAdapter(
         }
 
         if (isExpanded) {
-            convertedView.indicator.setImageDrawable(mContext.resources.getDrawable(R.drawable.ic_arrow_drop_up_gray_24dp))
+            convertedView.indicator.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_arrow_drop_up_gray_24dp))
         } else {
-            convertedView.indicator.setImageDrawable(mContext.resources.getDrawable(R.drawable.ic_arrow_drop_down_gray_24dp))
+            convertedView.indicator.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.ic_arrow_drop_down_gray_24dp))
         }
         convertedView.headerTitle.text = headerTitle.iconName
         convertedView.headerIcon.setImageResource(headerTitle.iconImg)

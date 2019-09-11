@@ -2,11 +2,9 @@ package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
@@ -16,10 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LegendEntry
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
@@ -33,14 +27,11 @@ import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
 import com.github.mikephil.charting.formatter.ValueFormatter
-import kotlinx.android.synthetic.main.dashboard_fragment.*
-import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import kotlin.math.roundToInt
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
+import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.ApiCallStatus
 
 
@@ -67,21 +58,18 @@ class DashboardFragment : Fragment(), Injectable {
         super.onCreate(savedInstanceState)
         // This callback will only be called when DashboardFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
-                .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.app_logo_new)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
+            val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
+                override fun onYes() {
                     preferences.edit().apply {
                         putString("LoggedUser", "")
                         apply()
                     }
                     requireActivity().finish()
                 }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.cancel()
-                }
-            exitDialog.show()
+            }, "Do you want to exit?", "")
+            fragmentManager?.let {
+                exitDialog.show(it, "#app_exit_dialog")
+            }
         }
     }
 

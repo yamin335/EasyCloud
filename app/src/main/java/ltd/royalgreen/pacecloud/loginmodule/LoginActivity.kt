@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -38,6 +39,8 @@ class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
+    lateinit var exitDialog: NetworkStatusDialog
+
     private val viewModel: LoginViewModel by lazy {
         // Get the ViewModel.
         ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
@@ -56,10 +59,21 @@ class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
         setSupportActionBar(toolbar)
         setupActionBarWithNavController(findNavController(R.id.fragment))
 
-//        val binding: LoginFragmentBinding = DataBindingUtil.setContentView(
-//            this, R.layout.login_fragment)
-//        binding.lifecycleOwner = this
-//        binding.viewModel = viewModel
+        exitDialog = NetworkStatusDialog(object : NetworkStatusDialog.NetworkChangeCallback {
+            override fun onExit() {
+                this@LoginActivity.finish()
+            }
+        })
+        exitDialog.isCancelable = false
+
+        viewModel.internetStatus.observe(this, Observer {
+            if (it) {
+                if (exitDialog.isVisible)
+                    exitDialog.dismiss()
+            } else {
+                exitDialog.show(supportFragmentManager, "#net_status_dialog")
+            }
+        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -68,16 +82,5 @@ class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     override fun onBackPressed() {
         onBackPressedDispatcher.onBackPressed()
-//        val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
-//            .setTitle("Do you want to exit?")
-//            .setIcon(R.mipmap.app_logo_new)
-//            .setCancelable(false)
-//            .setPositiveButton("Yes") { _, _ ->
-//                finish()
-//            }
-//            .setNegativeButton("No") { dialog, _ ->
-//                dialog.cancel()
-//            }
-//        exitDialog.show()
     }
 }

@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -35,7 +37,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.util.concurrent.TimeUnit
 
-class VMListAdapter internal constructor(private val vmList: List<VM>, private val callBack: ActionCallback, private val activity: Activity) : RecyclerView.Adapter<VMListAdapter.MyViewHolder>() {
+class VMListAdapter internal constructor(private val vmList: List<VM>, private val callBack: ActionCallback, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<VMListAdapter.MyViewHolder>() {
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), LifecycleOwner {
         private val lifecycleRegistry = LifecycleRegistry(this)
@@ -117,13 +119,23 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 popupMenu.switchStartStop.isChecked = true
                 popupMenu.labelStartStop.text = "Stop"
                 popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "VM Started Successfully", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
+                toastView.message.text = context.getString(R.string.vm_started_successfully)
+                toast.view = toastView
+                toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuStartStop.isEnabled = true
                 popupMenu.switchStartStop.isEnabled = true
                 popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "VM Can Not Be Started!", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
+                toastView.message.text = context.getString(R.string.vm_can_not_be_started)
+                toast.view = toastView
+                toast.show()
             }
         })
 
@@ -138,13 +150,23 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 popupMenu.switchStartStop.isChecked = false
                 popupMenu.labelStartStop.text = "Start"
                 popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "VM Stopped Successfully", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
+                toastView.message.text = context.getString(R.string.vm_stopped_successfully)
+                toast.view = toastView
+                toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuStartStop.isEnabled = true
                 popupMenu.switchStartStop.isEnabled = true
                 popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "VM Can Not Be Stopped!", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
+                toastView.message.text = context.getString(R.string.vm_can_not_be_stopped)
+                toast.view = toastView
+                toast.show()
             }
         })
 
@@ -154,12 +176,22 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuReboot.isEnabled = true
                 popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "VM Rebooted Successfully", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
+                toastView.message.text = context.getString(R.string.vm_rebooted_successfully)
+                toast.view = toastView
+                toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuReboot.isEnabled = true
                 popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "VM Can Not Be Rebooted!", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
+                toastView.message.text = context.getString(R.string.vm_can_not_be_rebooted)
+                toast.view = toastView
+                toast.show()
             }
         })
 
@@ -170,174 +202,38 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuNote.isEnabled = true
                 popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "Saved Successfully", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
+                toastView.message.text = context.getString(R.string.vm_note_saved)
+                toast.view = toastView
+                toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 popupMenu.menuNote.isEnabled = true
                 popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
-                Toast.makeText(context, "Note Can Not Be Saved!", Toast.LENGTH_LONG).show()
+                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
+                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
+                toastView.message.text = context.getString(R.string.vm_note_not_saved)
+                toast.view = toastView
+                toast.show()
             }
         })
 
         popupMenu.menuStartStop.setOnClickListener {
             if (item.status.equals("Running", true)) {
-                val confirmationDialog = ConfirmationCheckingDialog(
-                    activity,
-                    object :
-                        ConfirmationCheckingDialog.ConfirmationCallback {
-                        override fun onYesPressed() {
-                            holder.itemView.loader.visibility = View.VISIBLE
-                            popupMenu.menuStartStop.isEnabled = false
-                            popupMenu.switchStartStop.isEnabled = false
-                            popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
-                            val firstObject = JsonObject().apply {
-                                addProperty("UserID", item.userId)
-                                addProperty("id", item.id)
-                                addProperty("IsTrue", true)
-                                addProperty("CostPerHour", item.costPerHour)
-                            }
-                            val secondObject = JsonObject().apply {
-                                addProperty("resourceType", "VIRTUAL_MACHINE")
-                                add("executionSpecs", JsonArray())
-                                val jsonArray = JsonArray().apply {
-                                    val jsonObject = JsonObject().apply {
-                                        addProperty("id", item.id)
-                                    }
-                                    add(jsonObject)
-                                }
-                                add("executionResources", jsonArray)
-                            }
-                            val thirdObject = JsonObject().apply {
-                                addProperty("acknowledgedByUser", true)
-                            }
-                            val param = JsonArray().apply {
-                                add(firstObject)
-                                add(secondObject)
-                                add(thirdObject)
-                            }
-
-                            val handler = CoroutineExceptionHandler { _, exception ->
-                                vmStopStatus.postValue(false)
-                                callBack.onStop(false)
-                            }
-
-                            CoroutineScope(Dispatchers.Default).launch(handler) {
-                                val response = apiService.cloudvmstartstop(param).execute()
-                                when (val apiResponse = ApiResponse.create(response)) {
-                                    is ApiSuccessResponse -> {
-                                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                                            delay(45000L)
-                                            vmStopStatus.postValue(true)
-                                            callBack.onStop(true)
-                                        } else {
-                                            callBack.onStop(false)
-                                            vmStopStatus.postValue(false)
-                                        }
-                                    }
-                                    is ApiEmptyResponse -> {
-                                        callBack.onStop(false)
-                                        vmStopStatus.postValue(false)
-                                    }
-                                    is ApiErrorResponse -> {
-                                        callBack.onStop(false)
-                                        vmStopStatus.postValue(false)
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "Are You Sure to Stop This VM ?"
-                )
-                confirmationDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                confirmationDialog.setCancelable(false)
-                confirmationDialog.show()
-            } else {
-                val confirmationDialog = ConfirmationCheckingDialog(
-                    activity,
-                    object :
-                        ConfirmationCheckingDialog.ConfirmationCallback {
-                        override fun onYesPressed() {
-                            holder.itemView.loader.visibility = View.VISIBLE
-                            popupMenu.menuStartStop.isEnabled = false
-                            popupMenu.switchStartStop.isEnabled = false
-                            popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
-                            val firstObject = JsonObject().apply {
-                                addProperty("UserID", item.userId)
-                                addProperty("id", item.id)
-                                addProperty("IsTrue", false)
-                                addProperty("CostPerHour", item.costPerHour)
-                            }
-                            val secondObject = JsonObject().apply {
-                                addProperty("resourceType", "VIRTUAL_MACHINE")
-                                add("executionSpecs", JsonArray())
-                                val jsonArray = JsonArray().apply {
-                                    val jsonObject = JsonObject().apply {
-                                        addProperty("id", item.id)
-                                    }
-                                    add(jsonObject)
-                                }
-                                add("executionResources", jsonArray)
-                            }
-                            val thirdObject = JsonObject().apply {
-                                addProperty("acknowledgedByUser", true)
-                            }
-                            val param = JsonArray().apply {
-                                add(firstObject)
-                                add(secondObject)
-                                add(thirdObject)
-                            }
-
-                            val handler = CoroutineExceptionHandler { _, exception ->
-                                vmStartStatus.postValue(false)
-                                callBack.onStart(false)
-                            }
-
-                            CoroutineScope(Dispatchers.Default).launch(handler) {
-                                val response = apiService.cloudvmstartstop(param).execute()
-                                when (val apiResponse = ApiResponse.create(response)) {
-                                    is ApiSuccessResponse -> {
-                                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                                            delay(70000L)
-                                            vmStartStatus.postValue(true)
-                                            callBack.onStart(true)
-                                        } else {
-                                            vmStartStatus.postValue(false)
-                                            callBack.onStart(false)
-                                        }
-                                    }
-                                    is ApiEmptyResponse -> {
-                                        vmStartStatus.postValue(false)
-                                        callBack.onStart(false)
-                                    }
-                                    is ApiErrorResponse -> {
-                                        vmStartStatus.postValue(false)
-                                        callBack.onStart(false)
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "Are You Sure to Start This VM ?"
-                )
-                confirmationDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                confirmationDialog.setCancelable(false)
-                confirmationDialog.show()
-            }
-            actionMenuPopupWindow.dismiss()
-        }
-
-        popupMenu.menuReboot.setOnClickListener {
-            val confirmationDialog = ConfirmationCheckingDialog(
-                activity,
-                object : ConfirmationCheckingDialog.ConfirmationCallback {
+                val confirmationDialog = ConfirmationCheckingDialog(object : ConfirmationCheckingDialog.ConfirmationCallback {
                     override fun onYesPressed() {
                         holder.itemView.loader.visibility = View.VISIBLE
-                        popupMenu.menuReboot.isEnabled = false
-                        popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                        popupMenu.menuStartStop.isEnabled = false
+                        popupMenu.switchStartStop.isEnabled = false
+                        popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
                         val firstObject = JsonObject().apply {
                             addProperty("UserID", item.userId)
                             addProperty("id", item.id)
                             addProperty("IsTrue", true)
+                            addProperty("CostPerHour", item.costPerHour)
                         }
                         val secondObject = JsonObject().apply {
                             addProperty("resourceType", "VIRTUAL_MACHINE")
@@ -350,49 +246,181 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                             }
                             add("executionResources", jsonArray)
                         }
+                        val thirdObject = JsonObject().apply {
+                            addProperty("acknowledgedByUser", true)
+                        }
                         val param = JsonArray().apply {
                             add(firstObject)
                             add(secondObject)
+                            add(thirdObject)
                         }
 
                         val handler = CoroutineExceptionHandler { _, exception ->
-                            vmRebootStatus.postValue(false)
-                            callBack.onReboot()
+                            exception.printStackTrace()
+                            vmStopStatus.postValue(false)
+                            callBack.onStop(false)
                         }
 
                         CoroutineScope(Dispatchers.Default).launch(handler) {
-                            val response = apiService.cloudvmreboot(param).execute()
+                            val response = apiService.cloudvmstartstop(param).execute()
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
-                                    if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
-                                            "resstate"
-                                        ).asBoolean
-                                    ) {
-//                                        delay(50000L)
-                                        vmRebootStatus.postValue(true)
-                                        callBack.onReboot()
+                                    if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                                        delay(45000L)
+                                        vmStopStatus.postValue(true)
+                                        callBack.onStop(true)
                                     } else {
-                                        callBack.onReboot()
-                                        vmRebootStatus.postValue(false)
+                                        callBack.onStop(false)
+                                        vmStopStatus.postValue(false)
                                     }
                                 }
                                 is ApiEmptyResponse -> {
-                                    callBack.onReboot()
-                                    vmRebootStatus.postValue(false)
+                                    callBack.onStop(false)
+                                    vmStopStatus.postValue(false)
                                 }
                                 is ApiErrorResponse -> {
-                                    callBack.onReboot()
-                                    vmRebootStatus.postValue(false)
+                                    callBack.onStop(false)
+                                    vmStopStatus.postValue(false)
                                 }
                             }
                         }
                     }
-                },
-                "Are You Sure to Reboot This VM ?"
-            )
-            confirmationDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            confirmationDialog.setCancelable(false)
-            confirmationDialog.show()
+                }, "Are you sure to stop ${item.vmName?:"this"} VM ?")
+                confirmationDialog.isCancelable = false
+                confirmationDialog.show(fragmentManager, "#conf_dialog_1")
+            } else {
+                val confirmationDialog = ConfirmationCheckingDialog(object : ConfirmationCheckingDialog.ConfirmationCallback {
+                    override fun onYesPressed() {
+                        holder.itemView.loader.visibility = View.VISIBLE
+                        popupMenu.menuStartStop.isEnabled = false
+                        popupMenu.switchStartStop.isEnabled = false
+                        popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                        val firstObject = JsonObject().apply {
+                            addProperty("UserID", item.userId)
+                            addProperty("id", item.id)
+                            addProperty("IsTrue", false)
+                            addProperty("CostPerHour", item.costPerHour)
+                        }
+                        val secondObject = JsonObject().apply {
+                            addProperty("resourceType", "VIRTUAL_MACHINE")
+                            add("executionSpecs", JsonArray())
+                            val jsonArray = JsonArray().apply {
+                                val jsonObject = JsonObject().apply {
+                                    addProperty("id", item.id)
+                                }
+                                add(jsonObject)
+                            }
+                            add("executionResources", jsonArray)
+                        }
+                        val thirdObject = JsonObject().apply {
+                            addProperty("acknowledgedByUser", true)
+                        }
+                        val param = JsonArray().apply {
+                            add(firstObject)
+                            add(secondObject)
+                            add(thirdObject)
+                        }
+
+                        val handler = CoroutineExceptionHandler { _, exception ->
+                            exception.printStackTrace()
+                            vmStartStatus.postValue(false)
+                            callBack.onStart(false)
+                        }
+
+                        CoroutineScope(Dispatchers.Default).launch(handler) {
+                            val response = apiService.cloudvmstartstop(param).execute()
+                            when (val apiResponse = ApiResponse.create(response)) {
+                                is ApiSuccessResponse -> {
+                                    if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                                        delay(70000L)
+                                        vmStartStatus.postValue(true)
+                                        callBack.onStart(true)
+                                    } else {
+                                        vmStartStatus.postValue(false)
+                                        callBack.onStart(false)
+                                    }
+                                }
+                                is ApiEmptyResponse -> {
+                                    vmStartStatus.postValue(false)
+                                    callBack.onStart(false)
+                                }
+                                is ApiErrorResponse -> {
+                                    vmStartStatus.postValue(false)
+                                    callBack.onStart(false)
+                                }
+                            }
+                        }
+                    }
+                }, "Are you sure to start ${item.vmName?:"this"} VM ?")
+                confirmationDialog.isCancelable = false
+                confirmationDialog.show(fragmentManager, "#conf_dialog_2")
+            }
+            actionMenuPopupWindow.dismiss()
+        }
+
+        popupMenu.menuReboot.setOnClickListener {
+            val confirmationDialog = ConfirmationCheckingDialog(object : ConfirmationCheckingDialog.ConfirmationCallback {
+                override fun onYesPressed() {
+                    holder.itemView.loader.visibility = View.VISIBLE
+                    popupMenu.menuReboot.isEnabled = false
+                    popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                    val firstObject = JsonObject().apply {
+                        addProperty("UserID", item.userId)
+                        addProperty("id", item.id)
+                        addProperty("IsTrue", true)
+                    }
+                    val secondObject = JsonObject().apply {
+                        addProperty("resourceType", "VIRTUAL_MACHINE")
+                        add("executionSpecs", JsonArray())
+                        val jsonArray = JsonArray().apply {
+                            val jsonObject = JsonObject().apply {
+                                addProperty("id", item.id)
+                            }
+                            add(jsonObject)
+                        }
+                        add("executionResources", jsonArray)
+                    }
+                    val param = JsonArray().apply {
+                        add(firstObject)
+                        add(secondObject)
+                    }
+
+                    val handler = CoroutineExceptionHandler { _, exception ->
+                        exception.printStackTrace()
+                        vmRebootStatus.postValue(false)
+                        callBack.onReboot()
+                    }
+
+                    CoroutineScope(Dispatchers.Default).launch(handler) {
+                        val response = apiService.cloudvmreboot(param).execute()
+                        when (val apiResponse = ApiResponse.create(response)) {
+                            is ApiSuccessResponse -> {
+                                if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
+                                        "resstate"
+                                    ).asBoolean
+                                ) {
+//                                        delay(50000L)
+                                    vmRebootStatus.postValue(true)
+                                    callBack.onReboot()
+                                } else {
+                                    callBack.onReboot()
+                                    vmRebootStatus.postValue(false)
+                                }
+                            }
+                            is ApiEmptyResponse -> {
+                                callBack.onReboot()
+                                vmRebootStatus.postValue(false)
+                            }
+                            is ApiErrorResponse -> {
+                                callBack.onReboot()
+                                vmRebootStatus.postValue(false)
+                            }
+                        }
+                    }
+                }
+            }, "Are you sure to reboot ${item.vmName?:"this"} VM ?")
+            confirmationDialog.isCancelable = false
+            confirmationDialog.show(fragmentManager, "#conf_dialog_3")
             actionMenuPopupWindow.dismiss()
         }
 
@@ -402,7 +430,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         }
 
         popupMenu.menuNote.setOnClickListener {
-            val vmNoteDialog = VMNoteDialog(activity, object : VMNoteDialog.NoteCallback{
+            val vmNoteDialog = VMNoteDialog(object : VMNoteDialog.NoteCallback{
                 override fun onNoteSaved(noteValue: String) {
                     if (isNetworkAvailable(context)) {
                         holder.itemView.loader.visibility = View.VISIBLE
@@ -417,6 +445,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                         }
 
                         val handler = CoroutineExceptionHandler { _, exception ->
+                            exception.printStackTrace()
                             vmNoteStatus.postValue("^^^^^")
                         }
 
@@ -449,9 +478,8 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                     }
                 }
             }, item.vmNote)
-            vmNoteDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            vmNoteDialog.setCancelable(false)
-            vmNoteDialog.show()
+            vmNoteDialog.isCancelable = false
+            vmNoteDialog.show(fragmentManager, "#vm_note_dialog")
             actionMenuPopupWindow.dismiss()
         }
         actionMenuPopupWindow.elevation = 16F

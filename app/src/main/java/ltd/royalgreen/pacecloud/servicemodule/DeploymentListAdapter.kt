@@ -7,6 +7,8 @@ import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.JsonArray
@@ -34,7 +36,7 @@ import java.util.concurrent.TimeUnit
 class DeploymentListAdapter(val context: Context,
                             private val callBack: VMListAdapter.ActionCallback,
                             private val renameSuccessCallback: RenameSuccessCallback,
-                            private val activity: Activity,
+                            private val fragmentManager: FragmentManager,
                             private val loggedUser: LoggedUserData?) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
 
     private val client = OkHttpClient().newBuilder()
@@ -60,7 +62,7 @@ class DeploymentListAdapter(val context: Context,
       val item = getItem(position)
       val context = holder.itemView.context
       holder.itemView.edit.setOnClickListener {
-          val renameDialog = DeploymentRenameDialog(activity, object : DeploymentRenameDialog.RenameCallback {
+          val renameDialog = DeploymentRenameDialog(object : DeploymentRenameDialog.RenameCallback {
               override fun onSavePressed(renamedValue: String) {
                   if (isNetworkAvailable(context)) {
                       val jsonObject = JsonObject().apply {
@@ -103,15 +105,14 @@ class DeploymentListAdapter(val context: Context,
                   }
               }
           }, loggedUser?.fullName, item?.deploymentName)
-          renameDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-          renameDialog.setCancelable(true)
-          renameDialog.show()
+          renameDialog.isCancelable = false
+          renameDialog.show(fragmentManager, "#rename_dialog")
       }
 
       holder.itemView.deploymentName.text = item?.deploymentName.toString()
 
       item?.vmLists?.let {
-          val vmAdapter = VMListAdapter(it, callBack, activity)
+          val vmAdapter = VMListAdapter(it, callBack, fragmentManager)
           holder.itemView.vmRecycler.layoutManager = LinearLayoutManager(context)
           holder.itemView.vmRecycler.addItemDecoration(RecyclerItemDivider(context, LinearLayoutManager.VERTICAL, 8))
           holder.itemView.vmRecycler.adapter = vmAdapter

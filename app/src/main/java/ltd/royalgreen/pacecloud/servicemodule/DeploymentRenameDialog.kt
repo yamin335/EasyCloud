@@ -5,22 +5,29 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.View
-import android.view.Window
+import android.view.*
+import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.service_deployment_rename_dialog.*
 import ltd.royalgreen.pacecloud.R
 
-class DeploymentRenameDialog internal constructor(parentActivity: Activity,
-                                                  private val callBack: RenameCallback,
+class DeploymentRenameDialog internal constructor(private val callBack: RenameCallback,
                                                   private val dialogTitle: String?,
-                                                  private val name: String?) : Dialog(parentActivity), View.OnClickListener {
+                                                  private val name: String?) : DialogFragment(), View.OnClickListener {
 
     var rename = name ?: ""
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.service_deployment_rename_dialog)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        return dialog
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.service_deployment_rename_dialog, container)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         title.text = dialogTitle ?: "Change Deployment Name"
         renameInput.setText(rename)

@@ -16,6 +16,7 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.SupportFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
+import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.ApiService
 import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
@@ -43,21 +44,18 @@ class SupportFragment : Fragment(), Injectable {
         super.onCreate(savedInstanceState)
         // This callback will only be called when MyFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
-                .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.app_logo_new)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
+            val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
+                override fun onYes() {
                     preferences.edit().apply {
                         putString("LoggedUser", "")
                         apply()
                     }
                     requireActivity().finish()
                 }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.cancel()
-                }
-            exitDialog.show()
+            }, "Do you want to exit?", "")
+            fragmentManager?.let {
+                exitDialog.show(it, "#app_exit_dialog")
+            }
         }
     }
 

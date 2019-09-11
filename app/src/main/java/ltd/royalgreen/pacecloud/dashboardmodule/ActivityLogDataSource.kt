@@ -1,13 +1,17 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
 import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
+import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.paging.PageKeyedDataSource
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
+import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
@@ -52,7 +56,12 @@ class ActivityLogDataSource(private val application: Application, private val ap
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 
@@ -95,7 +104,12 @@ class ActivityLogDataSource(private val application: Application, private val ap
                 }
             }
         } else {
-            Toast.makeText(application, "Please check Your internet connection!", Toast.LENGTH_LONG).show()
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 

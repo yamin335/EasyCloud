@@ -38,6 +38,7 @@ import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.PaymentFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
@@ -75,21 +76,18 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         super.onCreate(savedInstanceState)
         // This callback will only be called when MyFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            val exitDialog: MaterialAlertDialogBuilder = MaterialAlertDialogBuilder(requireActivity())
-                .setTitle("Do you want to exit?")
-                .setIcon(R.mipmap.app_logo_new)
-                .setCancelable(false)
-                .setPositiveButton("Yes") { _, _ ->
+            val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
+                override fun onYes() {
                     preferences.edit().apply {
                         putString("LoggedUser", "")
                         apply()
                     }
                     requireActivity().finish()
                 }
-                .setNegativeButton("No") { dialog, _ ->
-                    dialog.cancel()
-                }
-            exitDialog.show()
+            }, "Do you want to exit?", "")
+            fragmentManager?.let {
+                exitDialog.show(it, "#app_exit_dialog")
+            }
         }
     }
 
@@ -322,9 +320,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     private fun showRechargeDialog() {
-        val rechargeDialog = PaymentRechargeDialog(requireActivity(), this)
-        rechargeDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        rechargeDialog.setCancelable(true)
-        rechargeDialog.show()
+        val rechargeDialog = PaymentRechargeDialog(this)
+        rechargeDialog.isCancelable = true
+        fragmentManager?.let {
+            rechargeDialog.show(it, "#recharge_dialog")
+        }
     }
 }

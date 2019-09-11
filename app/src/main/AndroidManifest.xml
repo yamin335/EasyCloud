@@ -24,11 +24,7 @@
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
         <activity
-                android:name=".TestActivity"
-                android:theme="@style/AppTheme.NoActionBar"
-                android:windowSoftInputMode="adjustResize">
-        </activity>
-        <activity
+                android:screenOrientation="portrait"
                 android:name=".mainactivitymodule.SplashActivity"
                 android:theme="@style/SplashScreen">
             <intent-filter>
@@ -38,10 +34,13 @@
             </intent-filter>
         </activity>
         <activity
+                android:screenOrientation="portrait"
                 android:name=".mainactivitymodule.MainActivity"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:theme="@style/AppTheme.NoActionBar"
+                android:windowSoftInputMode="adjustResize|adjustPan">
         </activity>
         <activity
+                android:screenOrientation="portrait"
                 android:name=".loginmodule.LoginActivity"
                 android:theme="@style/AppTheme.NoActionBar"
                 android:windowSoftInputMode="adjustResize">

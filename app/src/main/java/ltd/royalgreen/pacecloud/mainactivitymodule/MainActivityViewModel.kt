@@ -16,6 +16,7 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.util.ConnectivityLiveData
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 
@@ -35,6 +36,10 @@ class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() 
 
     val userBalance: MutableLiveData<BalanceModel> by lazy {
         MutableLiveData<BalanceModel>()
+    }
+
+    val internetStatus: ConnectivityLiveData by lazy {
+        ConnectivityLiveData(application)
     }
 
     fun getUserBalance(user: LoggedUser?) {

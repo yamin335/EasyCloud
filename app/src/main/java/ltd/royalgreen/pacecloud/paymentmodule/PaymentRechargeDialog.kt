@@ -8,8 +8,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Patterns
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -19,16 +22,24 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 
-class PaymentRechargeDialog internal constructor(parentActivity: Activity, private val callBack: RechargeCallback) : Dialog(parentActivity), View.OnClickListener {
+class PaymentRechargeDialog internal constructor(private val callBack: RechargeCallback) : DialogFragment(), View.OnClickListener {
 
     var selectedDate = ""
     var rechargeAmount = ""
     var rechargeNote = ""
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.payment_recharge_dialog)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        return dialog
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.payment_recharge_dialog, container)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val amountWatcher = object : TextWatcher {
             override fun beforeTextChanged(value: CharSequence, start: Int, count: Int, after: Int) {
