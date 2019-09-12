@@ -108,17 +108,39 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
         popupMenu.menuStartStop.switchStartStop.isChecked = item.status.equals("Running", true)
 
+        fun enablePopupMenu() {
+            popupMenu.menuStartStop.isEnabled = true
+            popupMenu.switchStartStop.isEnabled = true
+            popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+
+            popupMenu.menuReboot.isEnabled = true
+            popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+
+            popupMenu.menuNote.isEnabled = true
+            popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+        }
+
+        fun disablePopupMenu() {
+            popupMenu.menuStartStop.isEnabled = false
+            popupMenu.switchStartStop.isEnabled = false
+            popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+
+            popupMenu.menuReboot.isEnabled = false
+            popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+
+            popupMenu.menuNote.isEnabled = false
+            popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+        }
+
         var vmStartStatus: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
         vmStartStatus.observe(holder, androidx.lifecycle.Observer {
             if (it) {
                 item.status = "Running"
                 holder.itemView.statusIcon.setColorFilter(ContextCompat.getColor(context, R.color.colorGreenTheme))
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuStartStop.isEnabled = true
-                popupMenu.switchStartStop.isEnabled = true
-                popupMenu.switchStartStop.isChecked = true
                 popupMenu.labelStartStop.text = "Stop"
-                popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                popupMenu.switchStartStop.isChecked = true
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
@@ -127,9 +149,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuStartStop.isEnabled = true
-                popupMenu.switchStartStop.isEnabled = true
-                popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
@@ -145,11 +165,9 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 item.status = "Stopped"
                 holder.itemView.statusIcon.setColorFilter(ContextCompat.getColor(context, R.color.colorRed))
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuStartStop.isEnabled = true
-                popupMenu.switchStartStop.isEnabled = true
                 popupMenu.switchStartStop.isChecked = false
                 popupMenu.labelStartStop.text = "Start"
-                popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
@@ -158,9 +176,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuStartStop.isEnabled = true
-                popupMenu.switchStartStop.isEnabled = true
-                popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
@@ -174,8 +190,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         vmRebootStatus.observe(holder, androidx.lifecycle.Observer {
             if (it) {
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuReboot.isEnabled = true
-                popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
@@ -184,8 +199,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuReboot.isEnabled = true
-                popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
@@ -200,8 +214,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             if (it != "^^^^^") {
                 item.vmNote = it
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuNote.isEnabled = true
-                popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
@@ -210,8 +223,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 toast.show()
             } else {
                 holder.itemView.loader.visibility = View.GONE
-                popupMenu.menuNote.isEnabled = true
-                popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryLight))
+                enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
@@ -226,9 +238,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 val confirmationDialog = ConfirmationCheckingDialog(object : ConfirmationCheckingDialog.ConfirmationCallback {
                     override fun onYesPressed() {
                         holder.itemView.loader.visibility = View.VISIBLE
-                        popupMenu.menuStartStop.isEnabled = false
-                        popupMenu.switchStartStop.isEnabled = false
-                        popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                        disablePopupMenu()
                         val firstObject = JsonObject().apply {
                             addProperty("UserID", item.userId)
                             addProperty("id", item.id)
@@ -292,9 +302,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 val confirmationDialog = ConfirmationCheckingDialog(object : ConfirmationCheckingDialog.ConfirmationCallback {
                     override fun onYesPressed() {
                         holder.itemView.loader.visibility = View.VISIBLE
-                        popupMenu.menuStartStop.isEnabled = false
-                        popupMenu.switchStartStop.isEnabled = false
-                        popupMenu.labelStartStop.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                        disablePopupMenu()
                         val firstObject = JsonObject().apply {
                             addProperty("UserID", item.userId)
                             addProperty("id", item.id)
@@ -362,8 +370,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             val confirmationDialog = ConfirmationCheckingDialog(object : ConfirmationCheckingDialog.ConfirmationCallback {
                 override fun onYesPressed() {
                     holder.itemView.loader.visibility = View.VISIBLE
-                    popupMenu.menuReboot.isEnabled = false
-                    popupMenu.labelReboot.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                    disablePopupMenu()
                     val firstObject = JsonObject().apply {
                         addProperty("UserID", item.userId)
                         addProperty("id", item.id)
@@ -434,8 +441,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 override fun onNoteSaved(noteValue: String) {
                     if (isNetworkAvailable(context)) {
                         holder.itemView.loader.visibility = View.VISIBLE
-                        popupMenu.menuNote.isEnabled = false
-                        popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
+                        disablePopupMenu()
                         val jsonObject = JsonObject().apply {
                             addProperty("vmNote", noteValue)
                             addProperty("id", item.id)

@@ -71,7 +71,8 @@ class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 if (exitDialog.isVisible)
                     exitDialog.dismiss()
             } else {
-                exitDialog.show(supportFragmentManager, "#net_status_dialog")
+                if (!exitDialog.isAdded )
+                    exitDialog.show(supportFragmentManager, "#net_status_dialog")
             }
         })
     }

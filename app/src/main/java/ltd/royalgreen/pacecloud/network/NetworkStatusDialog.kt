@@ -6,7 +6,6 @@ import android.view.*
 import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.net_status_dialog.view.*
 import ltd.royalgreen.pacecloud.R
-import ltd.royalgreen.pacecloud.dinjectors.Injectable
 
 class NetworkStatusDialog internal constructor(private val callBack: NetworkChangeCallback) : DialogFragment(), View.OnClickListener {
 

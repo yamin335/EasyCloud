@@ -9,9 +9,7 @@ import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
@@ -74,6 +72,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         // This callback will only be called when MyFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
             val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
@@ -163,7 +162,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         viewModel.paymentResponse.observe(this, Observer { paymentHistory ->
             paymentHistory.resdata?.listBilCloudUserLedger?.let {
                 if (it.isNotEmpty()) {
-                    binding.includedContentMain.lastPaymentAmount = BigDecimal(paymentHistory.resdata.listBilCloudUserLedger[0].creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+                    viewModel.lastPaymentAmount.postValue(BigDecimal(paymentHistory.resdata.listBilCloudUserLedger[0].creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
                     val date = paymentHistory.resdata.listBilCloudUserLedger[0].transactionDate
                     if (date != null && date.contains("T")) {
                         val tempStringArray = date.split("T")
@@ -195,7 +194,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                         val year = tempStringArray[0].split("-")[0]
                         val month = tempStringArray[0].split("-")[1]
                         val day = tempStringArray[0].split("-")[2]
-                        binding.includedContentMain.lastPaymentDate = "$day-$month-$year  |  $tempString1"
+                        viewModel.lastPaymentDate.postValue("$day-$month-$year  |  $tempString1")
                     }
                 }
             }
@@ -319,11 +318,37 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         }
     }
 
+    private fun refreshUI() {
+        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+        user?.let {
+            viewModel.getUserBalance(it)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.dashboard_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.refresh -> {
+                refreshUI()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
     private fun showRechargeDialog() {
-        val rechargeDialog = PaymentRechargeDialog(this)
-        rechargeDialog.isCancelable = true
-        fragmentManager?.let {
-            rechargeDialog.show(it, "#recharge_dialog")
+        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+        user?.let {
+            val rechargeDialog = PaymentRechargeDialog(this, it.resdata?.loggeduser?.fullName)
+            rechargeDialog.isCancelable = true
+            fragmentManager?.let { fragmentManager ->
+                rechargeDialog.show(fragmentManager, "#recharge_dialog")
+            }
         }
     }
 }

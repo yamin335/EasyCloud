@@ -48,6 +48,14 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<String>()
     }
 
+    val lastPaymentAmount: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val lastPaymentDate: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
     val toDate: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }

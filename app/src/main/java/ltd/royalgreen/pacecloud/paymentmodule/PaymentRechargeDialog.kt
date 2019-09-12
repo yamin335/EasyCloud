@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
 
-class PaymentRechargeDialog internal constructor(private val callBack: RechargeCallback) : DialogFragment(), View.OnClickListener {
+class PaymentRechargeDialog internal constructor(private val callBack: RechargeCallback, private val userFullName: String?) : DialogFragment(), View.OnClickListener {
 
     var selectedDate = ""
     var rechargeAmount = ""
@@ -40,6 +40,10 @@ class PaymentRechargeDialog internal constructor(private val callBack: RechargeC
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        userFullName?.let {
+            clientName.text = it
+        }
 
         val amountWatcher = object : TextWatcher {
             override fun beforeTextChanged(value: CharSequence, start: Int, count: Int, after: Int) {

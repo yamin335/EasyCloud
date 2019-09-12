@@ -56,6 +56,7 @@ class DashboardFragment : Fragment(), Injectable {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         // This callback will only be called when DashboardFragment is at least Started.
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
             val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
@@ -175,14 +176,7 @@ class DashboardFragment : Fragment(), Injectable {
         view.osSummaryBarChart.xAxis.setDrawGridLines(false)
         view.osSummaryBarChart.animateY(900)
 
-        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-
-        user?.let {
-            viewModel.getOsStatus(user)
-            viewModel.getOsSummary(user)
-//            binding.name = user.resdata?.loggeduser?.fullName
-            binding.versionNo = "Version:1.0.0"
-        }
+        refreshUI()
 
         viewModel.osStatus.observe(this, Observer { status ->
             val dataSet = status?.resdata?.dashboardchartdata
@@ -274,6 +268,32 @@ class DashboardFragment : Fragment(), Injectable {
                 view.osSummaryBarChart.invalidate()
             }
         })
+    }
+
+    private fun refreshUI() {
+        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+
+        user?.let {
+            viewModel.getOsStatus(user)
+            viewModel.getOsSummary(user)
+//            binding.name = user.resdata?.loggeduser?.fullName
+            binding.versionNo = "Version:1.0.0"
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.dashboard_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.refresh -> {
+                refreshUI()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     inner class CustomValueFormatter : ValueFormatter() {

@@ -18,8 +18,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:hint="Rename"
-                    app:endIconMode="clear_text"
-                    app:endIconTint="@color/colorDarkGray"
                     app:boxCornerRadiusBottomStart="2dp"
                     app:boxCornerRadiusBottomEnd="2dp"
                     app:boxCornerRadiusTopStart="2dp"

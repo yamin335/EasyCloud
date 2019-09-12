@@ -13,8 +13,8 @@ import java.util.*
 
 class ConfirmationCheckingDialog internal constructor(private val callBack: ConfirmationCallback, private val dialogTitle: String) : DialogFragment(), View.OnClickListener {
 
-    var firstValue: Long = 0L
-    var secondValue: Long = 0L
+    var firstValue: Int = 0
+    var secondValue: Int = 0
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -45,7 +45,7 @@ class ConfirmationCheckingDialog internal constructor(private val callBack: Conf
                         answerInputLayout.error = "Empty Answer!"
                     }
 
-                    value.toString().toLong() == firstValue + secondValue -> {
+                    value.toString() == "${firstValue + secondValue}" -> {
                         yes.isEnabled = true
                         answerInputLayout.isErrorEnabled = false
                     }
@@ -88,11 +88,11 @@ class ConfirmationCheckingDialog internal constructor(private val callBack: Conf
 
     private fun refreshCaptcha() {
         yes.isEnabled = false
-        firstValue = Random().nextInt(8)+1L
-        secondValue = Random().nextInt(8)+1L
+        firstValue = Random().nextInt(8)+1
+        secondValue = Random().nextInt(8)+1
         question.text = "What is $firstValue + $secondValue?"
         if (!answer.text.toString().isBlank()) {
-            if (answer.text.toString().toLong() == firstValue + secondValue) {
+            if (answer.text.toString() == "${firstValue + secondValue}") {
                 yes.isEnabled = true
                 answerInputLayout.isErrorEnabled = false
             } else {
