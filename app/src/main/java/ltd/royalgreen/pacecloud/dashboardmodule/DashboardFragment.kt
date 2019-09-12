@@ -164,7 +164,6 @@ class DashboardFragment : Fragment(), Injectable {
         view.osStatusPieChart.isRotationEnabled = false
         view.osStatusPieChart.setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.colorWhite))
 //        view.osStatusPieChart.setUsePercentValues(true)
-        view.osStatusPieChart.animateXY(900, 900)
 
         //Bar Chart Configuration
         view.osSummaryBarChart.isLogEnabled = false
@@ -174,11 +173,12 @@ class DashboardFragment : Fragment(), Injectable {
         view.osSummaryBarChart.description.isEnabled = false
         view.osSummaryBarChart.setScaleEnabled(false)
         view.osSummaryBarChart.xAxis.setDrawGridLines(false)
-        view.osSummaryBarChart.animateY(900)
 
         refreshUI()
 
         viewModel.osStatus.observe(this, Observer { status ->
+            view.osStatusPieChart.legend.resetCustom()
+            view.osStatusPieChart.notifyDataSetChanged()
             val dataSet = status?.resdata?.dashboardchartdata
             val entries: List<PieEntry>
             entries = ArrayList<PieEntry>()
@@ -237,6 +237,7 @@ class DashboardFragment : Fragment(), Injectable {
                 view.osStatusPieChart.legend.setCustom(legends)
                 view.osStatusPieChart.invalidate()
             }
+            view.osStatusPieChart.animateXY(900, 900)
         })
 
         viewModel.osSummary.observe(this, Observer { summary ->
@@ -267,6 +268,7 @@ class DashboardFragment : Fragment(), Injectable {
                 view.osSummaryBarChart.data = barData
                 view.osSummaryBarChart.invalidate()
             }
+            view.osSummaryBarChart.animateY(900)
         })
     }
 
