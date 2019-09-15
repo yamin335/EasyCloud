@@ -77,6 +77,10 @@ class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
         })
     }
 
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//    }
+
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.fragment).navigateUp()
     }

@@ -1,176 +1,388 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
-        <TextView
-                android:text="ROYAL GREEN LTD."
-                android:layout_marginStart="8dp"
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <ImageView
+                android:id="@+id/logoRoyal"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/pace_cloud_logo" app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:gravity="start"
-                android:textColor="@color/colorCustom1"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.050000012"/>
+
         <TextView
-                android:text="ADDRESS"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="2dp"
-                android:gravity="start"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:textColor="@color/colorWhite"
-                android:background="@color/colorGreenTheme"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <TextView
-                android:text="Royal Green Ltd\n114 Motijheel C/A, Dhaka-1000"
-                android:layout_marginStart="7dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
+                android:id="@+id/concernLabel"
+                android:text="Sister Concern of Royal Green Ltd."
+                android:gravity="center"
                 android:padding="1dp"
-                android:gravity="start"
+                android:textSize="10sp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="1.0"
+                android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/copyright"/>
+
+        <TextView
+                android:id="@+id/addressRoyal"
+                android:text="114, Motijheel (Level 9 &amp; 18), Dhaka, 1000"
+                android:gravity="center"
+                android:padding="1dp"
+                android:textSize="12sp"
                 android:textColor="@color/colorPrimaryLight"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        <TextView
-                android:text="CONTACTS"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="2dp"
-                android:gravity="start"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:textColor="@color/colorWhite"
-                android:background="@color/colorGreenTheme"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-            <TextView
-                    android:text="Tel:"
-                    android:layout_marginStart="7dp"
-                    android:layout_marginEnd="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintVertical_bias="0.0"
+                app:layout_constraintTop_toBottomOf="@+id/logoRoyal" android:layout_marginTop="8dp"/>
+
+        <View
+                android:id="@+id/divider1"
+                android:background="?android:attr/listDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="24dp" app:layout_constraintTop_toBottomOf="@+id/addressRoyal"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
+                app:layout_constraintVertical_bias="0.0"/>
+
+        <RelativeLayout
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/divider1"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:id="@+id/relativeLayout">
+            <ImageView
+                    android:id="@+id/iconTel"
+                    android:tint="@color/colorGreenTheme"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:padding="1dp"
-                    android:gravity="start"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorPrimaryLight"
+                    android:layout_marginStart="24dp"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_call_black_24dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-            <TextView
-                    android:text="+88-09603-111999, +88-01777706745-46"
-                    android:layout_marginEnd="8dp"
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_marginTop="6dp"
                     android:layout_marginBottom="8dp"
-                    android:padding="1dp"
-                    android:gravity="start"
-                    android:textColor="@color/colorPrimaryLight"
+                    android:layout_toEndOf="@id/iconTel"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <TextView
-                android:text="WEB"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="2dp"
-                android:gravity="start"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:textColor="@color/colorWhite"
-                android:background="@color/colorGreenTheme"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <LinearLayout
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:text="+88-09603-111999"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:text="Telephone"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorGray"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+                android:id="@+id/divider2"
+                android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
+                android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
+                app:layout_constraintVertical_bias="0.0"/>
+
+        <RelativeLayout
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-            <TextView
-                    android:text="Mail:"
-                    android:layout_marginStart="7dp"
-                    android:layout_marginEnd="4dp"
+                app:layout_constraintTop_toBottomOf="@+id/divider2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:id="@+id/relativeLayout1">
+            <ImageView
+                    android:id="@+id/iconTel1"
+                    android:tint="@color/colorGreenTheme"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
-                    android:padding="1dp"
-                    android:gravity="start"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:textColor="@color/colorPrimaryLight"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_call_black_24dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-            <TextView
-                    android:text="support@royalgreen.net"
-                    android:layout_marginEnd="8dp"
+            <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_marginTop="6dp"
                     android:layout_marginBottom="8dp"
-                    android:padding="1dp"
-                    android:gravity="start"
-                    android:textColor="@color/colorPrimaryLight"
+                    android:layout_toEndOf="@id/iconTel1"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <TextView
-                android:text="SOCIAL"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="2dp"
-                android:gravity="start"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:textColor="@color/colorWhite"
-                android:background="@color/colorGreenTheme"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <LinearLayout
-                android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:text="+88-01777706745"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:text="Mobile"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorGray"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+                android:id="@+id/divider3"
+                android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
-                android:layout_marginTop="4dp"
-                android:layout_height="wrap_content">
+                android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relativeLayout1"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
+                app:layout_constraintVertical_bias="0.0"/>
+
+        <RelativeLayout
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/divider3"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:id="@+id/relativeLayout2">
             <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/icon_facebook"/>
+                    android:id="@+id/iconTel2"
+                    android:tint="@color/colorGreenTheme"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_call_black_24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <LinearLayout
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical"
+                    android:layout_toEndOf="@id/iconTel2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:text="+88-01777706746"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:text="Mobile"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorGray"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+                android:id="@+id/divider4"
+                android:background="?android:attr/listDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
+                app:layout_constraintVertical_bias="0.0"/>
+
+        <RelativeLayout
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/divider4"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:id="@+id/relativeLayout3">
             <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/icon_twitter"/>
+                    android:id="@+id/iconMail"
+                    android:tint="#FF714E"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_mail_black_24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <LinearLayout
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical"
+                    android:layout_toEndOf="@id/iconMail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:text="support@royalgreen.net"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:text="Email"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorGray"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+                android:id="@+id/divider5"
+                android:background="?android:attr/listDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relativeLayout3"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
+                app:layout_constraintVertical_bias="0.0"/>
+
+        <RelativeLayout
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/divider5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:id="@+id/relativeLayout4">
             <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/icon_youtube"/>
+                    android:id="@+id/iconWeb"
+                    android:tint="#eea11a"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/ic_public_black_24dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <LinearLayout
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical"
+                    android:layout_toEndOf="@id/iconWeb"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:text="www.royalgreen.net"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:text="Web"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorGray"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+                android:id="@+id/divider6"
+                android:background="?android:attr/listDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/relativeLayout4"
+                app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
+                app:layout_constraintVertical_bias="0.0"/>
+
+        <RelativeLayout
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/divider6"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:id="@+id/relativeLayout5">
             <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_marginStart="8dp"
-                    android:src="@drawable/icon_linkedin"/>
-        </LinearLayout>
-    </LinearLayout>
+                    android:id="@+id/iconFacebook"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_centerVertical="true"
+                    app:srcCompat="@drawable/icon_facebook_circle_48"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"/>
+            <LinearLayout
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical"
+                    android:layout_toEndOf="@id/iconFacebook"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                <TextView
+                        android:text="www.facebook.com/Royalgreenbd"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:text="Facebook"
+                        android:textSize="10sp"
+                        android:textColor="@color/colorGray"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <TextView
+                android:id="@+id/copyright"
+                android:gravity="center"
+                android:padding="2dp"
+                android:textSize="10sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/copyright" app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_bias="1.0"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
