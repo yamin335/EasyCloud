@@ -159,43 +159,41 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             adapter.submitList(pagedList)
         })
 
-        viewModel.paymentResponse.observe(this, Observer { paymentHistory ->
-            paymentHistory.resdata?.listBilCloudUserLedger?.let {
-                if (it.isNotEmpty()) {
-                    viewModel.lastPaymentAmount.postValue(BigDecimal(paymentHistory.resdata.listBilCloudUserLedger[0].creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
-                    val date = paymentHistory.resdata.listBilCloudUserLedger[0].transactionDate
-                    if (date != null && date.contains("T")) {
-                        val tempStringArray = date.split("T")
-                        var tempString1 = tempStringArray[1]
-                        if (tempString1.contains(".")){
-                            tempString1 = tempString1.split(".")[0]
-                            tempString1 = when {
-                                tempString1.split(":")[0].toInt()>12 -> {
-                                    val hour = tempString1.split(":")[0].toInt()
-                                    val minute = tempString1.split(":")[1].toInt()
-                                    val seconds = tempString1.split(":")[2].toInt()
-                                    "${hour-12}:$minute:$seconds PM"
-                                }
-                                tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
-                                else -> "$tempString1 AM"
+        viewModel.lastRechargeResponse.observe(this, Observer { lastRecharge ->
+            lastRecharge.resdata?.objBilCloudUserLedger?.let {
+                viewModel.lastPaymentAmount.postValue(BigDecimal(it.creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
+                val date = it.transactionDate
+                if (date != null && date.contains("T")) {
+                    val tempStringArray = date.split("T")
+                    var tempString1 = tempStringArray[1]
+                    if (tempString1.contains(".")){
+                        tempString1 = tempString1.split(".")[0]
+                        tempString1 = when {
+                            tempString1.split(":")[0].toInt()>12 -> {
+                                val hour = tempString1.split(":")[0].toInt()
+                                val minute = tempString1.split(":")[1].toInt()
+                                val seconds = tempString1.split(":")[2].toInt()
+                                "${hour-12}:$minute:$seconds PM"
                             }
-                        } else {
-                            tempString1 = when {
-                                tempString1.split(":")[0].toInt()>12 -> {
-                                    val hour = tempString1.split(":")[0].toInt()
-                                    val minute = tempString1.split(":")[1].toInt()
-                                    val seconds = tempString1.split(":")[2].toInt()
-                                    "${hour-12}:$minute:$seconds PM"
-                                }
-                                tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
-                                else -> "$tempString1 AM"
-                            }
+                            tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
+                            else -> "$tempString1 AM"
                         }
-                        val year = tempStringArray[0].split("-")[0]
-                        val month = tempStringArray[0].split("-")[1]
-                        val day = tempStringArray[0].split("-")[2]
-                        viewModel.lastPaymentDate.postValue("$day-$month-$year  |  $tempString1")
+                    } else {
+                        tempString1 = when {
+                            tempString1.split(":")[0].toInt()>12 -> {
+                                val hour = tempString1.split(":")[0].toInt()
+                                val minute = tempString1.split(":")[1].toInt()
+                                val seconds = tempString1.split(":")[2].toInt()
+                                "${hour-12}:$minute:$seconds PM"
+                            }
+                            tempString1.split(":")[0].toInt()==12 -> "$tempString1 PM"
+                            else -> "$tempString1 AM"
+                        }
                     }
+                    val year = tempStringArray[0].split("-")[0]
+                    val month = tempStringArray[0].split("-")[1]
+                    val day = tempStringArray[0].split("-")[2]
+                    viewModel.lastPaymentDate.postValue("$day-$month-$year  |  $tempString1")
                 }
             }
         })
@@ -249,6 +247,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
         user?.let {
             viewModel.getUserBalance(it)
+            viewModel.getLastRechargeBalance(it)
         }
     }
 
@@ -294,6 +293,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                             viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                             user?.let {
                                 viewModel.getUserBalance(it)
+                                viewModel.getLastRechargeBalance(it)
                             }
                             viewModel.paymentList.value?.dataSource?.invalidate()
                         } else {

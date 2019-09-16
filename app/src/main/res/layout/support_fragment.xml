@@ -73,7 +73,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                android:id="@+id/relativeLayout">
+                android:id="@+id/contact1">
             <ImageView
                     android:id="@+id/iconTel"
                     android:tint="@color/colorGreenTheme"
@@ -111,7 +111,7 @@
                 android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
+                app:layout_constraintTop_toBottomOf="@+id/contact1"
                 app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
                 app:layout_constraintVertical_bias="0.0"/>
@@ -127,7 +127,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                android:id="@+id/relativeLayout1">
+                android:id="@+id/contact2">
             <ImageView
                     android:id="@+id/iconTel1"
                     android:tint="@color/colorGreenTheme"
@@ -165,7 +165,7 @@
                 android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/relativeLayout1"
+                app:layout_constraintTop_toBottomOf="@+id/contact2"
                 app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
                 app:layout_constraintVertical_bias="0.0"/>
@@ -181,7 +181,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                android:id="@+id/relativeLayout2">
+                android:id="@+id/contact3">
             <ImageView
                     android:id="@+id/iconTel2"
                     android:tint="@color/colorGreenTheme"
@@ -219,7 +219,7 @@
                 android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/relativeLayout2"
+                app:layout_constraintTop_toBottomOf="@+id/contact3"
                 app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
                 app:layout_constraintVertical_bias="0.0"/>
@@ -235,7 +235,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                android:id="@+id/relativeLayout3">
+                android:id="@+id/mail">
             <ImageView
                     android:id="@+id/iconMail"
                     android:tint="#FF714E"
@@ -273,7 +273,7 @@
                 android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/relativeLayout3"
+                app:layout_constraintTop_toBottomOf="@+id/mail"
                 app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
                 app:layout_constraintVertical_bias="0.0"/>
@@ -289,7 +289,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                android:id="@+id/relativeLayout4">
+                android:id="@+id/web">
             <ImageView
                     android:id="@+id/iconWeb"
                     android:tint="#eea11a"
@@ -327,7 +327,7 @@
                 android:background="?android:attr/listDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1px" app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/relativeLayout4"
+                app:layout_constraintTop_toBottomOf="@+id/web"
                 app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="49dp"
                 app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="49dp"
                 app:layout_constraintVertical_bias="0.0"/>
@@ -343,7 +343,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                android:id="@+id/relativeLayout5">
+                android:id="@+id/facebook">
             <ImageView
                     android:id="@+id/iconFacebook"
                     android:layout_marginTop="8dp"
@@ -386,7 +386,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintVertical_bias="1.0"/>
+                app:layout_constraintVertical_bias="1.0" android:layout_marginBottom="4dp"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

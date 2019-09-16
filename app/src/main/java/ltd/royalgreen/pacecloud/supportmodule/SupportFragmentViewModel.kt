@@ -20,4 +20,8 @@ class SupportFragmentViewModel @Inject constructor(app: Application) : ViewModel
     val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
     }
+
+    val currentNumber: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 }

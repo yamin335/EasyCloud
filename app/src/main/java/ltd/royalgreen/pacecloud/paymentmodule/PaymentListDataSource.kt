@@ -13,11 +13,10 @@ import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 
-class PaymentListDataSource(private val application: Application, private val api: ApiService,
-                            private val preferences: SharedPreferences, paymentResponse: MutableLiveData<PaymentHistory>,
+class PaymentListDataSource(private val api: ApiService,
+                            private val preferences: SharedPreferences,
                             apiCallStatus: MutableLiveData<ApiCallStatus>, jsonValues: JsonObject) : PageKeyedDataSource<Long, BilCloudUserLedger>() {
 
-    val tempPaymentResponse = paymentResponse
     val tempApiCallStatus = apiCallStatus
     val tempValues = jsonValues
 
@@ -50,7 +49,6 @@ class PaymentListDataSource(private val application: Application, private val ap
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         callback.onResult(apiResponse.body.resdata?.listBilCloudUserLedger as MutableList<BilCloudUserLedger>, null, 1)
-                        tempPaymentResponse.postValue(apiResponse.body)
                         tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
                     }
                     is ApiEmptyResponse -> {

@@ -7,6 +7,7 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
 import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.paymentmodule.LastRechargeBalance
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
 import ltd.royalgreen.pacecloud.paymentmodule.RechargeResponse
 import retrofit2.Call
@@ -64,6 +65,10 @@ interface ApiService {
     //API FOR USER PAYMENT HISTORY
     @GET("/api/portal/billhistory")
     fun billhistory(@Query("param") param: String): Call<PaymentHistory>
+
+    //API FOR LAST PAYMENT AMOUNT
+    @GET("/api/portal/lastbillbyuser")
+    fun lastbillbyuser(@Query("param") param: String): Call<LastRechargeBalance>
 
     //API FOR VM START_STOP
     @Headers("Content-Type: application/json")

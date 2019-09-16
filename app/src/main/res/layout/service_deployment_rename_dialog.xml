@@ -33,9 +33,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:imeOptions="actionDone"
-                        android:inputType="textMultiLine"
-                        android:textColor="@color/colorPrimaryLight"
-                        android:maxLines="4"/>
+                        android:inputType="text"
+                        android:maxLength="30"
+                        android:textColor="@color/colorPrimaryLight"/>
 
             </com.google.android.material.textfield.TextInputLayout>
 
