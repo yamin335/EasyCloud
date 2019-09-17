@@ -16,7 +16,6 @@ import androidx.paging.PagedList
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R

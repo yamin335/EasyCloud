@@ -25,21 +25,6 @@
                 app:layout_constraintVertical_bias="0.050000012"/>
 
         <TextView
-                android:id="@+id/concernLabel"
-                android:text="Sister Concern of Royal Green Ltd."
-                android:gravity="center"
-                android:padding="1dp"
-                android:textSize="10sp"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="16dp" android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintVertical_bias="1.0"
-                android:layout_marginTop="8dp" app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/copyright"/>
-
-        <TextView
                 android:id="@+id/addressRoyal"
                 android:text="114, Motijheel (Level 9 &amp; 18), Dhaka, 1000"
                 android:gravity="center"

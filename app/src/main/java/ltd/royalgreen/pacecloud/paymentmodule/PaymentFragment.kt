@@ -322,6 +322,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
         user?.let {
             viewModel.getUserBalance(it)
+            viewModel.getLastRechargeBalance(it)
         }
     }
 
