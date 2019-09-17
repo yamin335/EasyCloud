@@ -39,6 +39,19 @@ import java.util.concurrent.TimeUnit
 
 class VMListAdapter internal constructor(private val vmList: List<VM>, private val callBack: ActionCallback, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<VMListAdapter.MyViewHolder>() {
 
+    val vmIcons = mapOf("awscloud-gray-logo.png" to R.drawable.awscloud_gray_logo, "awscloud-logo.png" to R.drawable.awscloud_logo,
+        "azureRMcloud-gray-logo.png" to R.drawable.azurermcloud_gray_logo, "azureRMcloud-logo.png" to R.drawable.azurermcloud_logo,
+        "centos-apache.png" to R.drawable.centos_apache, "centos-mysql.png" to R.drawable.centos_mysql,
+        "centos.png" to R.drawable.centos, "containercloud-gray-logo.png" to R.drawable.containercloud_gray_logo,
+        "containercloud-logo.png" to R.drawable.containercloud_logo, "default.png" to R.drawable.defaults,
+        "googlecloud-gray-logo.png" to R.drawable.googlecloud_gray_logo, "googlecloud-logo.png" to R.drawable.googlecloud_logo,
+        "nfs.png" to R.drawable.nfs, "openstack-gray-logo.png" to R.drawable.openstack_gray_logo,
+        "openstack-logo.png" to R.drawable.openstack_logo, "ubuntu-apache-mysql.png" to R.drawable.ubuntu_apache_mysql,
+        "ubuntu-apache.png" to R.drawable.ubuntu_apache, "ubuntu-mysql.png" to R.drawable.ubuntu_mysql,
+        "ubuntu.png" to R.drawable.ubuntu, "vmware-gray-logo.png" to R.drawable.vmware_gray_logo,
+        "vmware-logo.png" to R.drawable.vmware_logo, "windows.png" to R.drawable.windows,
+        "wordpress-docker.png" to R.drawable.wordpress_docker, "wordpress.png" to R.drawable.wordpress)
+
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), LifecycleOwner {
         private val lifecycleRegistry = LifecycleRegistry(this)
 
@@ -491,6 +504,18 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         actionMenuPopupWindow.elevation = 16F
 
         holder.itemView.vmName.text = item.vmName
+//        item.appIcon.replace("-", "_", true)
+        item.appIcon?.let { iconName ->
+            if (vmIcons.containsKey(iconName)) {
+                vmIcons[iconName]?.let {
+                    holder.itemView.vmIcon.setImageResource(it)
+                }
+            } else {
+                vmIcons["default.png"]?.let {
+                    holder.itemView.vmIcon.setImageResource(it)
+                }
+            }
+        }
 //      holder.itemView.config.text = item?.numberOfCpus.toString()+" CPU, "+item?.memorySize?.toDouble()?.div(1024.0).toString().split(".")[0]+" GB Memory"
         holder.itemView.nodeHour.text = BigDecimal(item.nodeHours?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
         holder.itemView.cloudCost.text = BigDecimal(item.costPerHour?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()

@@ -22,7 +22,7 @@ data class VM(val tenantId: Number?, val userId: Number?, val id: String?, val r
               val dtJobStartTime: String?, val jobEndTime: Number?, val dtJobEndTime: String?, val parentJobId: String?,
               val parentJobName: String?, val parentJobStatus: String?, val benchmarkId: Number?,
               val deploymentEnvironmentId: String?, val deploymentEnvironmentName: String?, val appId: String?,
-              val appName: String?, val vmName: String?, val appVersion: String?, val appLogoPath: String?,
+              val appName: String?, val vmName: String?, val appIcon: String?, val appVersion: String?, val appLogoPath: String?,
               val serviceId: String?, val serviceName: String?, val tags: String?, val publicIpAddresses: String?,
               val privateIpAddresses: String?, val cloudCost: Number?, val nodeHours: Number?, val userFavorite: Boolean?,
               val recordTimestamp: Number?, val dtRecordTimestamp: String?, val imageId: String?,
