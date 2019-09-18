@@ -63,8 +63,8 @@
                     app:layout_constraintVertical_bias="0.0" app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"/>
             <TextView
-                    android:id="@+id/totalVM"
-                    android:text="@{tVM}"
+                    android:id="@+id/runVM"
+                    android:text="@{rVM}"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="@color/colorPrimaryLight"
@@ -84,16 +84,16 @@
                     android:textColor="@color/colorPrimaryLight"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toEndOf="@+id/totalVM" android:layout_marginStart="8dp"
-                    app:layout_constraintTop_toTopOf="@+id/totalVM"
-                    app:layout_constraintBottom_toBottomOf="@+id/totalVM"
+                    app:layout_constraintStart_toEndOf="@+id/runVM" android:layout_marginStart="8dp"
+                    app:layout_constraintTop_toTopOf="@+id/runVM"
+                    app:layout_constraintBottom_toBottomOf="@+id/runVM"
                     app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
                     app:layout_constraintHorizontal_bias="0.0"/>
             <TextView
-                    android:id="@+id/runningVM"
+                    android:id="@+id/totalVM"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimaryLight"
-                    android:text="@{rVM}"
+                    android:text="@{tVM}"
                     android:textSize="16sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
