@@ -74,8 +74,8 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
     }
 
     private val client = OkHttpClient().newBuilder()
-        .connectTimeout(5, TimeUnit.SECONDS)
-        .callTimeout(5, TimeUnit.SECONDS)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .callTimeout(10, TimeUnit.SECONDS)
         .build()
 
     val apiService: ApiService = Retrofit.Builder()
@@ -145,9 +145,9 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             popupMenu.labelNote.setTextColor(ContextCompat.getColor(context, R.color.colorGrayLight))
         }
 
-        var vmStartStatus: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+        var vmStartStatus: MutableLiveData<String> = MutableLiveData<String>()
         vmStartStatus.observe(holder, androidx.lifecycle.Observer {
-            if (it) {
+            if (it == "!$&^") {
                 item.status = "Running"
                 holder.itemView.statusIcon.setColorFilter(ContextCompat.getColor(context, R.color.colorGreenTheme))
                 holder.itemView.loader.visibility = View.GONE
@@ -166,15 +166,15 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = context.getString(R.string.vm_can_not_be_started)
+                toastView.message.text = it
                 toast.view = toastView
                 toast.show()
             }
         })
 
-        var vmStopStatus: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+        var vmStopStatus: MutableLiveData<String> = MutableLiveData<String>()
         vmStopStatus.observe(holder, androidx.lifecycle.Observer {
-            if (it) {
+            if (it == "!$&^") {
                 item.status = "Stopped"
                 holder.itemView.statusIcon.setColorFilter(ContextCompat.getColor(context, R.color.colorRed))
                 holder.itemView.loader.visibility = View.GONE
@@ -193,15 +193,15 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = context.getString(R.string.vm_can_not_be_stopped)
+                toastView.message.text = it
                 toast.view = toastView
                 toast.show()
             }
         })
 
-        var vmRebootStatus: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+        var vmRebootStatus: MutableLiveData<String> = MutableLiveData<String>()
         vmRebootStatus.observe(holder, androidx.lifecycle.Observer {
-            if (it) {
+            if (it == "!$&^") {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
@@ -216,7 +216,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = context.getString(R.string.vm_can_not_be_rebooted)
+                toastView.message.text = it
                 toast.view = toastView
                 toast.show()
             }
@@ -224,7 +224,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
         var vmNoteStatus: MutableLiveData<String> = MutableLiveData<String>()
         vmNoteStatus.observe(holder, androidx.lifecycle.Observer {
-            if (it != "^^^^^") {
+            if (it == "!$&^") {
                 item.vmNote = it
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
@@ -240,7 +240,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
                 val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = context.getString(R.string.vm_note_not_saved)
+                toastView.message.text = it
                 toast.view = toastView
                 toast.show()
             }
@@ -280,7 +280,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
                         val handler = CoroutineExceptionHandler { _, exception ->
                             exception.printStackTrace()
-                            vmStopStatus.postValue(false)
+                            vmStopStatus.postValue(exception.toString())
                             callBack.onStop(false)
                         }
 
@@ -290,20 +290,20 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                                 is ApiSuccessResponse -> {
                                     if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                                         delay(45000L)
-                                        vmStopStatus.postValue(true)
+                                        vmStopStatus.postValue("!$&^")
                                         callBack.onStop(true)
                                     } else {
                                         callBack.onStop(false)
-                                        vmStopStatus.postValue(false)
+                                        vmStopStatus.postValue(JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
                                     }
                                 }
                                 is ApiEmptyResponse -> {
                                     callBack.onStop(false)
-                                    vmStopStatus.postValue(false)
+                                    vmStopStatus.postValue("Server Error")
                                 }
                                 is ApiErrorResponse -> {
                                     callBack.onStop(false)
-                                    vmStopStatus.postValue(false)
+                                    vmStopStatus.postValue("Server Error")
                                 }
                             }
                         }
@@ -344,7 +344,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
                         val handler = CoroutineExceptionHandler { _, exception ->
                             exception.printStackTrace()
-                            vmStartStatus.postValue(false)
+                            vmStartStatus.postValue(exception.toString())
                             callBack.onStart(false)
                         }
 
@@ -354,19 +354,19 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                                 is ApiSuccessResponse -> {
                                     if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                                         delay(70000L)
-                                        vmStartStatus.postValue(true)
+                                        vmStartStatus.postValue("!$&^")
                                         callBack.onStart(true)
                                     } else {
-                                        vmStartStatus.postValue(false)
+                                        vmStartStatus.postValue(JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
                                         callBack.onStart(false)
                                     }
                                 }
                                 is ApiEmptyResponse -> {
-                                    vmStartStatus.postValue(false)
+                                    vmStartStatus.postValue("Server Error")
                                     callBack.onStart(false)
                                 }
                                 is ApiErrorResponse -> {
-                                    vmStartStatus.postValue(false)
+                                    vmStartStatus.postValue("Server Error")
                                     callBack.onStart(false)
                                 }
                             }
@@ -407,7 +407,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
 
                     val handler = CoroutineExceptionHandler { _, exception ->
                         exception.printStackTrace()
-                        vmRebootStatus.postValue(false)
+                        vmRebootStatus.postValue(exception.toString())
                         callBack.onReboot()
                     }
 
@@ -415,25 +415,22 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                         val response = apiService.cloudvmreboot(param).execute()
                         when (val apiResponse = ApiResponse.create(response)) {
                             is ApiSuccessResponse -> {
-                                if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get(
-                                        "resstate"
-                                    ).asBoolean
-                                ) {
+                                if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
 //                                        delay(50000L)
-                                    vmRebootStatus.postValue(true)
+                                    vmRebootStatus.postValue("!$&^")
                                     callBack.onReboot()
                                 } else {
                                     callBack.onReboot()
-                                    vmRebootStatus.postValue(false)
+                                    vmRebootStatus.postValue(JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
                                 }
                             }
                             is ApiEmptyResponse -> {
                                 callBack.onReboot()
-                                vmRebootStatus.postValue(false)
+                                vmRebootStatus.postValue("Server Error")
                             }
                             is ApiErrorResponse -> {
                                 callBack.onReboot()
-                                vmRebootStatus.postValue(false)
+                                vmRebootStatus.postValue("Server Error")
                             }
                         }
                     }
@@ -476,7 +473,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                                         vmNoteStatus.postValue(noteValue)
                                         callBack.onNote()
                                     } else {
-                                        vmNoteStatus.postValue("^^^^^")
+                                        vmNoteStatus.postValue(JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
                                     }
                                 }
                                 is ApiEmptyResponse -> {

@@ -42,12 +42,12 @@
     <string name="no_data_msg">No data found!</string>
     <string name="acc_successful">Account created successfully</string>
     <string name="user_not_active">User not activated!</string>
-    <string name="vm_started_successfully">VM started successfully</string>
+    <string name="vm_started_successfully">Started successfully</string>
     <string name="vm_can_not_be_started">VM can not be started, please try again later</string>
-    <string name="vm_stopped_successfully">VM stopped successfully</string>
+    <string name="vm_stopped_successfully">Stopped successfully</string>
     <string name="vm_can_not_be_stopped">VM can not be stopped, please try again later</string>
-    <string name="vm_rebooted_successfully">VM rebooted successfully</string>
+    <string name="vm_rebooted_successfully">Rebooted successfully</string>
     <string name="vm_can_not_be_rebooted">VM can not be rebooted, please try again later</string>
-    <string name="vm_note_saved">Note saved successfully</string>
+    <string name="vm_note_saved">Saved successfully</string>
     <string name="vm_note_not_saved">Note can not be saved, please try again later</string>
 </resources>

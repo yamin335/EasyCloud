@@ -26,8 +26,8 @@ object AppModule {
     @JvmStatic
     fun provideApiService(): ApiService {
         val client = OkHttpClient().newBuilder()
-            .connectTimeout(5, TimeUnit.SECONDS)
-            .callTimeout(5, TimeUnit.SECONDS)
+            .connectTimeout(7, TimeUnit.SECONDS)
+            .callTimeout(7, TimeUnit.SECONDS)
             .build()
         return Retrofit.Builder()
             .client(client)
