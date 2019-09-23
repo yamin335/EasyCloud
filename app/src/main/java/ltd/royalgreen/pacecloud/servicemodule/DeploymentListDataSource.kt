@@ -1,8 +1,6 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
-import android.app.Application
 import android.content.SharedPreferences
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.PageKeyedDataSource
 import com.google.gson.Gson
@@ -12,7 +10,6 @@ import com.google.gson.JsonParser
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 
 class DeploymentListDataSource(private val api: ApiService, private val preferences: SharedPreferences,
                                deployment: MutableLiveData<Deployment>, apiCallStatus: MutableLiveData<ApiCallStatus>) : PageKeyedDataSource<Long, Deployment>() {
