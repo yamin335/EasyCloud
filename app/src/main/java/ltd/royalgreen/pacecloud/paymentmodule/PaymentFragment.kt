@@ -84,9 +84,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                     requireActivity().finish()
                 }
             }, "Do you want to exit?", "")
-            fragmentManager?.let {
-                exitDialog.show(it, "#app_exit_dialog")
-            }
+            exitDialog.show(parentFragmentManager, "#app_exit_dialog")
         }
     }
 
@@ -199,6 +197,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
+            val parent: ViewGroup? = null
             when(status) {
                 ApiCallStatus.SUCCESS -> {
 //                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
@@ -211,7 +210,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 ApiCallStatus.ERROR -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.error_msg)
                     toast.view = toastView
                     toast.show()
@@ -219,7 +218,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 ApiCallStatus.NO_DATA -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.no_data_msg)
                     toast.view = toastView
                     toast.show()
@@ -227,7 +226,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 ApiCallStatus.EMPTY -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.empty_msg)
                     toast.view = toastView
                     toast.show()
@@ -235,7 +234,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 ApiCallStatus.TIMEOUT -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.timeout_msg)
                     toast.view = toastView
                     toast.show()
@@ -309,9 +308,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 }
             }
         } else {
+            val parent: ViewGroup? = null
             val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
             val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
             toastView.message.text = requireContext().getString(R.string.net_error_msg)
             toast.view = toastView
             toast.show()
@@ -347,9 +347,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         user?.let {
             val rechargeDialog = PaymentRechargeDialog(this, it.resdata?.loggeduser?.fullName)
             rechargeDialog.isCancelable = true
-            fragmentManager?.let { fragmentManager ->
-                rechargeDialog.show(fragmentManager, "#recharge_dialog")
-            }
+            rechargeDialog.show(parentFragmentManager, "#recharge_dialog")
         }
     }
 }

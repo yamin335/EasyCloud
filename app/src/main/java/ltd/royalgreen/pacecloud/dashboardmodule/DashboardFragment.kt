@@ -68,9 +68,7 @@ class DashboardFragment : Fragment(), Injectable {
                     requireActivity().finish()
                 }
             }, "Do you want to exit?", "")
-            fragmentManager?.let {
-                exitDialog.show(it, "#app_exit_dialog")
-            }
+            exitDialog.show(parentFragmentManager, "#app_exit_dialog")
         }
     }
 
@@ -93,12 +91,13 @@ class DashboardFragment : Fragment(), Injectable {
         binding.viewModel = viewModel
 
         viewModel.apiCallStatus.observe(this, Observer {
+            val parent: ViewGroup? = null
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
                 ApiCallStatus.ERROR -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.error_msg)
                     toast.view = toastView
                     toast.show()
@@ -106,7 +105,7 @@ class DashboardFragment : Fragment(), Injectable {
                 ApiCallStatus.NO_DATA -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.no_data_msg)
                     toast.view = toastView
                     toast.show()
@@ -114,7 +113,7 @@ class DashboardFragment : Fragment(), Injectable {
                 ApiCallStatus.EMPTY -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.empty_msg)
                     toast.view = toastView
                     toast.show()
@@ -122,7 +121,7 @@ class DashboardFragment : Fragment(), Injectable {
                 ApiCallStatus.TIMEOUT -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.timeout_msg)
                     toast.view = toastView
                     toast.show()

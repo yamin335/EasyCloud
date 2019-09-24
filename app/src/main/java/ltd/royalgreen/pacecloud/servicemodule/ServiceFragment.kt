@@ -76,9 +76,7 @@ class ServiceFragment : Fragment(), Injectable {
                     requireActivity().finish()
                 }
             }, "Do you want to exit?", "")
-            fragmentManager?.let {
-                exitDialog.show(it, "#app_exit_dialog")
-            }
+            exitDialog.show(parentFragmentManager, "#app_exit_dialog")
         }
     }
 
@@ -103,45 +101,43 @@ class ServiceFragment : Fragment(), Injectable {
         if (isNetworkAvailable(requireContext())) {
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
 
-            fragmentManager?.let {
-                adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
-                    override fun onNote() {
+            adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
+                override fun onNote() {
 
-                    }
+                }
 
-                    override fun onStop(success: Boolean) {
-                        if (success) {
-//                    viewModel.deploymentList.value?.dataSource?.invalidate()
-                        } else {
+                override fun onStop(success: Boolean) {
+//                    if (success) {
+////                    viewModel.deploymentList.value?.dataSource?.invalidate()
+//                    } else {
+//
+//                    }
+                }
 
-                        }
-                    }
+                override fun onStart(success: Boolean) {
+//                    if (success) {
+////                    viewModel.deploymentList.value?.dataSource?.invalidate()
+//                    } else {
+//
+//                    }
+                }
 
-                    override fun onStart(success: Boolean) {
-                        if (success) {
-//                    viewModel.deploymentList.value?.dataSource?.invalidate()
-                        } else {
-
-                        }
-                    }
-
-                    override fun onAttachDetach() {
+                override fun onAttachDetach() {
 //                Toast.makeText(requireContext(), "Attach clicked from interface!", Toast.LENGTH_LONG).show()
-                    }
+                }
 
-                    override fun onReboot() {
+                override fun onReboot() {
 //                Toast.makeText(requireContext(), "Reboot clicked from interface!", Toast.LENGTH_LONG).show()
-                    }
+                }
 
-                    override fun onTerminate() {
+                override fun onTerminate() {
 //                Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
-                    }
-                }, object : DeploymentListAdapter.RenameSuccessCallback {
-                    override fun onRenamed() {
-                        viewModel.deploymentList.value?.dataSource?.invalidate()
-                    }
-                }, it, user?.resdata?.loggeduser)
-            }
+                }
+            }, object : DeploymentListAdapter.RenameSuccessCallback {
+                override fun onRenamed() {
+                    viewModel.deploymentList.value?.dataSource?.invalidate()
+                }
+            }, parentFragmentManager, user?.resdata?.loggeduser)
 
             vmListRecycler.layoutManager = LinearLayoutManager(requireActivity())
             vmListRecycler.adapter = adapter
@@ -160,9 +156,10 @@ class ServiceFragment : Fragment(), Injectable {
                 adapter.submitList(pagedList)
             })
         } else {
+            val parent: ViewGroup? = null
             val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
             val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
             toastView.message.text = requireContext().getString(R.string.net_error_msg)
             toast.view = toastView
             toast.show()
@@ -176,6 +173,7 @@ class ServiceFragment : Fragment(), Injectable {
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
+            val parent: ViewGroup? = null
             when(status) {
                 ApiCallStatus.SUCCESS -> {
                     Log.d("NOTHING", "Nothing to do")
@@ -183,7 +181,7 @@ class ServiceFragment : Fragment(), Injectable {
                 ApiCallStatus.ERROR -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.error_msg)
                     toast.view = toastView
                     toast.show()
@@ -191,7 +189,7 @@ class ServiceFragment : Fragment(), Injectable {
                 ApiCallStatus.NO_DATA -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.no_data_msg)
                     toast.view = toastView
                     toast.show()
@@ -199,7 +197,7 @@ class ServiceFragment : Fragment(), Injectable {
                 ApiCallStatus.EMPTY -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.empty_msg)
                     toast.view = toastView
                     toast.show()
@@ -207,7 +205,7 @@ class ServiceFragment : Fragment(), Injectable {
                 ApiCallStatus.TIMEOUT -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.timeout_msg)
                     toast.view = toastView
                     toast.show()
@@ -272,9 +270,10 @@ class ServiceFragment : Fragment(), Injectable {
                 }
             }
         } else {
+            val parent: ViewGroup? = null
             val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
             toastView.message.text = context.getString(R.string.net_error_msg)
             toast.view = toastView
             toast.show()

@@ -73,7 +73,7 @@ class LoginFragment : Fragment(), Injectable {
                     requireActivity().finish()
                 }
             }, "Do you want to exit?", "")
-            fragmentManager?.let {
+            parentFragmentManager.let {
                 exitDialog.show(it, "#app_exit_dialog")
             }
         }
@@ -138,9 +138,10 @@ class LoginFragment : Fragment(), Injectable {
         binding.signUp.setOnClickListener {
             val signUpDialog = SignUpDialog(object : SignUpDialog.SignUpCallback {
                 override fun onSignUp(newUser: JsonObject) {
+                    val parent: ViewGroup? = null
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.loading_msg)
                     toast.view = toastView
                     toast.show()
@@ -148,9 +149,7 @@ class LoginFragment : Fragment(), Injectable {
                 }
             })
             signUpDialog.isCancelable = true
-            fragmentManager?.let {
-                signUpDialog.show(it, "#sign_up_dialog")
-            }
+            signUpDialog.show(parentFragmentManager, "#sign_up_dialog")
         }
 
         binding.faq.setOnClickListener {
@@ -178,12 +177,13 @@ class LoginFragment : Fragment(), Injectable {
         })
 
         viewModel.apiCallStatus.observe(this, Observer {
+            val parent: ViewGroup? = null
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("SUCCESSFUL", "Nothing to do")
                 ApiCallStatus.ERROR -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.error_msg)
                     toast.view = toastView
                     toast.show()
@@ -191,7 +191,7 @@ class LoginFragment : Fragment(), Injectable {
                 ApiCallStatus.NO_DATA -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.no_data_msg)
                     toast.view = toastView
                     toast.show()
@@ -199,7 +199,7 @@ class LoginFragment : Fragment(), Injectable {
                 ApiCallStatus.EMPTY -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.empty_msg)
                     toast.view = toastView
                     toast.show()
@@ -207,7 +207,7 @@ class LoginFragment : Fragment(), Injectable {
                 ApiCallStatus.TIMEOUT -> {
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = requireContext().getString(R.string.timeout_msg)
                     toast.view = toastView
                     toast.show()
@@ -223,17 +223,18 @@ class LoginFragment : Fragment(), Injectable {
         })
 
         viewModel.signUpMsg.observe(this, Observer {
+            val parent: ViewGroup? = null
             if (it == "Save successfully.") {
                 val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                 val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = inflater.inflate(R.layout.toast_custom_green, null)
+                val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
                 toastView.message.text = requireContext().getString(R.string.acc_successful)
                 toast.view = toastView
                 toast.show()
             } else {
                 val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                 val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                 toastView.message.text = it
                 toast.view = toastView
                 toast.show()
@@ -241,6 +242,7 @@ class LoginFragment : Fragment(), Injectable {
         })
 
         viewModel.apiResult.observe(this, Observer { loggedUser ->
+            val parent: ViewGroup? = null
             when (loggedUser?.resdata?.message) {
                 "Username does not exist." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_USERNAME
                 "Password is wrong." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_PASSWORD
@@ -248,7 +250,7 @@ class LoginFragment : Fragment(), Injectable {
                     viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                     val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                     val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_green, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
                     toastView.message.text = requireContext().getString(R.string.user_not_active)
                     toast.view = toastView
                     toast.show()

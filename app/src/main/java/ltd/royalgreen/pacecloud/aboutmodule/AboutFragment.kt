@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -121,7 +122,7 @@ class AboutFragment : Fragment(), Injectable {
     }
 
     private fun callPhone(number: String) {
-        if (PermissionChecker.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+        if (PermissionChecker.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PermissionChecker.PERMISSION_GRANTED) {
             val callingIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:$number"))
             requireActivity().startActivity(callingIntent)
         } else {
@@ -137,9 +138,7 @@ class AboutFragment : Fragment(), Injectable {
                         requestPermissions(arrayOf(Manifest.permission.CALL_PHONE), CALL_REQUEST_CODE)
                     }
                 }, "Allow Permission", "You have to allow permission for making call.\n\nDo you want to allow permission?")
-                fragmentManager?.let {
-                    explanationDialog.show(it, "#call_permission_dialog")
-                }
+                explanationDialog.show(parentFragmentManager, "#call_permission_dialog")
 
             } else {
                 // No explanation needed, we can request the permission.
@@ -188,13 +187,14 @@ class AboutFragment : Fragment(), Injectable {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    if (PermissionChecker.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    if (PermissionChecker.checkSelfPermission(requireActivity(), Manifest.permission.CALL_PHONE) == PermissionChecker.PERMISSION_GRANTED) {
                         val callingIntent = Intent(Intent.ACTION_CALL, Uri.parse("tel:${viewModel.currentNumber.value}"))
                         requireActivity().startActivity(callingIntent)
                     }
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
+                    Log.d("ACTION:", "Nothing to do")
                 }
                 return
             }

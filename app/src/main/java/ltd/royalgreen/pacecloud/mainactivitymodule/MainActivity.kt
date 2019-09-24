@@ -6,10 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -135,12 +132,13 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         })
 
         viewModel.apiCallStatus.observe(this, Observer {
+            val parent: ViewGroup? = null
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
                 ApiCallStatus.ERROR -> {
                     val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
                     val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = this@MainActivity.getString(R.string.error_msg)
                     toast.view = toastView
                     toast.show()
@@ -148,7 +146,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 ApiCallStatus.NO_DATA -> {
                     val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
                     val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = this@MainActivity.getString(R.string.no_data_msg)
                     toast.view = toastView
                     toast.show()
@@ -156,7 +154,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 ApiCallStatus.EMPTY -> {
                     val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
                     val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = this@MainActivity.getString(R.string.empty_msg)
                     toast.view = toastView
                     toast.show()
@@ -164,7 +162,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 ApiCallStatus.TIMEOUT -> {
                     val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
                     val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                     toastView.message.text = this@MainActivity.getString(R.string.timeout_msg)
                     toast.view = toastView
                     toast.show()
@@ -215,7 +213,10 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
         // Whenever the selected controller changes, setup the action bar.
         controller.observe(this, Observer { navController ->
-            appBarConfiguration = AppBarConfiguration(navController.graph, drawer_layout)
+            appBarConfiguration = AppBarConfiguration(
+                navGraph = navController.graph,
+                drawerLayout = drawer_layout
+            )
             // Set up ActionBar
             setSupportActionBar(toolbar)
             setupActionBarWithNavController(navController, appBarConfiguration)
