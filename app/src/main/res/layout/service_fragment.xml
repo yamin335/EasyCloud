@@ -11,6 +11,16 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+        <TextView
+                android:id="@+id/noVM"
+                android:text="@string/no_deployment_found"
+                android:textSize="15sp"
+                android:layout_centerInParent="true"
+                android:elevation="1dp"
+                android:visibility="gone"
+                android:textColor="@color/colorRed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
         <ProgressBar
                 style="?android:attr/progressBarStyleHorizontal"
                 android:id="@+id/loader"
@@ -50,7 +60,7 @@
 
             <TextView
                     android:id="@+id/label11"
-                    android:text="Running VM:"
+                    android:text="@string/running_vm"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="@color/colorPrimaryLight"
@@ -78,7 +88,7 @@
 
             <TextView
                     android:id="@+id/label2"
-                    android:text="of"
+                    android:text="@string/of"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="@color/colorPrimaryLight"
@@ -104,7 +114,7 @@
 
             <TextView
                     android:id="@+id/label3"
-                    android:text="Total Hour:"
+                    android:text="@string/total_hour"
                     android:textStyle="bold"
                     android:textColor="@color/colorPrimaryLight"
                     android:textSize="16sp"
@@ -140,7 +150,7 @@
                     app:layout_constraintBottom_toBottomOf="@+id/label3"/>
             <TextView
                     android:id="@+id/label4"
-                    android:text="Total Cost:"
+                    android:text="@string/total_cost"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:visibility="gone"

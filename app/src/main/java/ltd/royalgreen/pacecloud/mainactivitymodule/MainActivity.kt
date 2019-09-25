@@ -26,7 +26,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.main_container.*
 import kotlinx.android.synthetic.main.main_nav_header.view.*
@@ -46,7 +46,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
+class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var apiService: ApiService
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
     @Inject
     lateinit var preferences: SharedPreferences
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
         preferences.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
-    override fun supportFragmentInjector() = dispatchingAndroidInjector
+    override fun androidInjector() = dispatchingAndroidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

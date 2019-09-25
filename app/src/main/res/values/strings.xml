@@ -50,4 +50,9 @@
     <string name="vm_can_not_be_rebooted">VM can not be rebooted, please try again later</string>
     <string name="vm_note_saved">Saved successfully</string>
     <string name="vm_note_not_saved">Note can not be saved, please try again later</string>
+    <string name="no_deployment_found">No Deployment Found</string>
+    <string name="running_vm">Running VM:</string>
+    <string name="of">of</string>
+    <string name="total_hour">Total Hour:</string>
+    <string name="total_cost">Total Cost:</string>
 </resources>

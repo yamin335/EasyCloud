@@ -19,7 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import dagger.android.AndroidInjection
 import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
+import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.login_container_activity.*
 import kotlinx.android.synthetic.main.login_fragment.*
 import kotlinx.coroutines.*
@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 const val SHARED_PREFS_KEY = "LoginStatus"
 
-class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
+class LoginActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
     lateinit var preferences: SharedPreferences
@@ -47,9 +47,9 @@ class LoginActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Any>
 
-    override fun supportFragmentInjector() = dispatchingAndroidInjector
+    override fun androidInjector() = dispatchingAndroidInjector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)

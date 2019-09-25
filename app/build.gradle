@@ -40,8 +40,8 @@ android {
 }
 
 dependencies {
-    kapt 'com.google.dagger:dagger-compiler:2.23.2'
-    kapt 'com.google.dagger:dagger-android-processor:2.23.2'
+    kapt 'com.google.dagger:dagger-compiler:2.24'
+    kapt 'com.google.dagger:dagger-android-processor:2.24'
     def glide_version = '4.10.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "com.github.bumptech.glide:compiler:$glide_version"
@@ -84,9 +84,9 @@ dependencies {
     def work_version = "2.2.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
     //Dagger2 DI for android
-    implementation 'com.google.dagger:dagger:2.23.2'
-    implementation 'com.google.dagger:dagger-android:2.23.2'
-    implementation 'com.google.dagger:dagger-android-support:2.23.2'
+    implementation 'com.google.dagger:dagger:2.24'
+    implementation 'com.google.dagger:dagger-android:2.24'
+    implementation 'com.google.dagger:dagger-android-support:2.24'
     //Retrofit2 for Network operation
     implementation 'com.squareup.retrofit2:retrofit:2.6.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.6.2'

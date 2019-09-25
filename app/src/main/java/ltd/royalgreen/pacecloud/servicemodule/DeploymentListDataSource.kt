@@ -52,14 +52,18 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
                                 tempDeployment.postValue(deployment)
                         }
                         callback.onResult(mutableDeploymentList, null, 1)
+                    } else {
+                        tempDeployment.postValue(null)
                     }
                     tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
                 }
                 is ApiEmptyResponse -> {
                     tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    tempDeployment.postValue(null)
                 }
                 is ApiErrorResponse -> {
                     tempApiCallStatus.postValue(ApiCallStatus.ERROR)
+                    tempDeployment.postValue(null)
                 }
             }
         }

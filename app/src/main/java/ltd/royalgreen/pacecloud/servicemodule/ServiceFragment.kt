@@ -166,10 +166,17 @@ class ServiceFragment : Fragment(), Injectable {
         }
 
         viewModel.deploymentResponse.observe(this, Observer<Deployment> { value ->
-            binding.tvm = value.totalNumberOfVMs.toString()
-            binding.rvm = value.totalNumberOfRunningVMs.toString()
-            binding.tNodeHour = BigDecimal(value.totalNodeHours?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
-            binding.tCloudCost = BigDecimal(value.totalCloudCost?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+            value?.let {
+                binding.noVM.visibility = View.GONE
+                binding.tvm = value.totalNumberOfVMs.toString()
+                binding.rvm = value.totalNumberOfRunningVMs.toString()
+                binding.tNodeHour = BigDecimal(value.totalNodeHours?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+                binding.tCloudCost = BigDecimal(value.totalCloudCost?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
+            } ?: run {
+                binding.tvm = "0"
+                binding.rvm = "0"
+                binding.noVM.visibility = View.VISIBLE
+            }
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
