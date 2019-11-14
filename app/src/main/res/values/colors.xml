@@ -35,4 +35,6 @@
     <color name="barColor2">#FEBF00</color>
     <color name="barColor3">#c4ea7c</color>
     <color name="barColor4">#fd973c</color>
+
+    <color name="test">#C6FF00</color>
 </resources>

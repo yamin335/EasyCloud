@@ -1,13 +1,10 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
-import android.app.Activity
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,6 +23,7 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,9 +37,17 @@ class DeploymentListAdapter(val context: Context,
                             private val fragmentManager: FragmentManager,
                             private val loggedUser: LoggedUserData?) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
 
+    val interceptor = Interceptor { chain ->
+        val newRequest = chain.request().newBuilder()
+            .addHeader("AuthorizedToken", "cmdsX3NlY3JldF9hcGlfa2V5")
+            .build()
+        chain.proceed(newRequest)
+    }
+
     private val client = OkHttpClient().newBuilder()
         .connectTimeout(5, TimeUnit.SECONDS)
         .callTimeout(5, TimeUnit.SECONDS)
+        .addInterceptor(interceptor)
         .build()
 
     val apiService: ApiService = Retrofit.Builder()
@@ -88,10 +94,10 @@ class DeploymentListAdapter(val context: Context,
                                   }
                               }
                               is ApiEmptyResponse -> {
-
+                                  Log.d("EMPTY","EMPTY_VALUE")
                               }
                               is ApiErrorResponse -> {
-
+                                  Log.d("ERROR","ERROR_RESPONSE")
                               }
                           }
                       }

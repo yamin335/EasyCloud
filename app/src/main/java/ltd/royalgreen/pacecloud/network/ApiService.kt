@@ -48,11 +48,11 @@ interface ApiService {
 
     //API FOR USER VM STATUS
     @GET("/api/portal/GetDashboardChartPortal")
-    fun GetDashboardChartPortal(@Query("param") param: String): Call<DashOsStatus>
+    fun getDashboardChartPortal(@Query("param") param: String): Call<DashOsStatus>
 
     //API FOR USER VM SUMMERY
     @GET("/api/portal/GetDashboardChartPortal")
-    fun GetDashboardChartPortalSummery(@Query("param") param: String): Call<DashOsSummary>
+    fun getDashboardChartPortalSummery(@Query("param") param: String): Call<DashOsSummary>
 
     //API FOR USER ACTIVITY LOG
     @GET("/api/portal/cloudactivitylog")
@@ -82,7 +82,7 @@ interface ApiService {
 
     //API FOR RENAME DEPLOYMENT
     @Headers("Content-Type: application/json")
-    @POST("/api/portal/updatedeploymentname")
+        @POST("/api/portal/updatedeploymentname")
     fun updatedeploymentname(@Body jsonArray: JsonArray): Call<String>
 
     //API FOR DEPLOYMENT NOTE

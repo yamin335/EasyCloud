@@ -244,7 +244,7 @@ class LoginFragment : Fragment(), Injectable {
         viewModel.apiResult.observe(this, Observer { loggedUser ->
             val parent: ViewGroup? = null
             when (loggedUser?.resdata?.message) {
-                "Username does not exist." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_USERNAME
+                    "Username does not exist." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_USERNAME
                 "Password is wrong." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_PASSWORD
                 "User not active." -> {
                     viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)

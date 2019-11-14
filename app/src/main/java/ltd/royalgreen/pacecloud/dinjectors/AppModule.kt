@@ -10,6 +10,7 @@ import dagger.Provides
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.SHARED_PREFS_KEY
 import ltd.royalgreen.pacecloud.network.ApiService
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,10 +26,20 @@ object AppModule {
     @Provides
     @JvmStatic
     fun provideApiService(): ApiService {
+
+        val interceptor = Interceptor { chain ->
+            val newRequest = chain.request().newBuilder()
+                .addHeader("AuthorizedToken", "cmdsX3NlY3JldF9hcGlfa2V5")
+                .build()
+            chain.proceed(newRequest)
+        }
+
         val client = OkHttpClient().newBuilder()
             .connectTimeout(7, TimeUnit.SECONDS)
             .callTimeout(7, TimeUnit.SECONDS)
+            .addInterceptor(interceptor)
             .build()
+
         return Retrofit.Builder()
             .client(client)
             .baseUrl("http://123.136.26.98:8081")
