@@ -24,7 +24,7 @@
 
         <TextView
                 android:id="@+id/addressRoyal"
-                android:text="114, Motijheel (Level 9 &amp; 18), Dhaka, 1000"
+                android:text="114, Motijheel (Level 9 &amp; 17), Dhaka, 1000"
                 android:gravity="center"
                 android:padding="1dp"
                 android:textSize="12sp"

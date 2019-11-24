@@ -1,43 +1,24 @@
 package ltd.royalgreen.pacecloud.network
 
 import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsStatus
 import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
 import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.mainactivitymodule.DefaultResponse
 import ltd.royalgreen.pacecloud.paymentmodule.LastRechargeBalance
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
 import ltd.royalgreen.pacecloud.paymentmodule.RechargeResponse
+import ltd.royalgreen.pacecloud.paymentmodule.RechargeStatusFosterCheckModel
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 /**
  * REST API access points
  */
 interface ApiService {
-//    @GET("users/{login}")
-//    fun getUser(@Path("login") login: String): LiveData<ApiResponse<User>>
-//
-//    @GET("users/{login}/repos")
-//    fun getRepos(@Path("login") login: String): LiveData<ApiResponse<List<Repo>>>
-//
-//    @GET("repos/{owner}/{name}")
-//    fun getRepo(
-//        @Path("owner") owner: String,
-//        @Path("name") name: String
-//    ): LiveData<ApiResponse<Repo>>
-//
-//    @GET("repos/{owner}/{name}/contributors")
-//    fun getContributors(
-//        @Path("owner") owner: String,
-//        @Path("name") name: String
-//    ): LiveData<ApiResponse<List<Contributor>>>
-
-//    @GET("/api/portal/loginportalusers")
-//    fun loginToPaceCloudByLiveData(@Query("param") param: String): LiveData<ApiResponse<LoggedUser>>
-
     //API FOR LOGIN
     @GET("/api/portal/loginportalusers")
     fun loginportalusers(@Query("param") param: String): Call<LoggedUser>
@@ -48,7 +29,7 @@ interface ApiService {
 
     //API FOR USER VM STATUS
     @GET("/api/portal/GetDashboardChartPortal")
-    fun getDashboardChartPortal(@Query("param") param: String): Call<DashOsStatus>
+    suspend fun getDashboardChartPortal(@Query("param") param: String): Response<DashOsStatus>
 
     //API FOR USER VM SUMMERY
     @GET("/api/portal/GetDashboardChartPortal")
@@ -90,10 +71,6 @@ interface ApiService {
     @POST("/api/portal/updatevmnote")
     fun updatevmnote(@Body jsonArray: JsonArray): Call<String>
 
-    //API FOR RECHARGE
-    @POST("/api/portal/newrechargesave")
-    fun newrechargesave(@Body jsonArray: JsonArray): Call<RechargeResponse>
-
     //API FOR SYNC DATABASE
     @Headers("Content-Type: application/json")
     @POST("/api/portal/clouduservmsyncwithlocaldb")
@@ -103,4 +80,22 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("/api/portal/register")
     fun register(@Body jsonArray: JsonArray): Call<String>
+
+    //API FOR RECHARGE
+    @Headers("Content-Type: application/json")
+    @POST("/api/billclouduserclient/cloudrecharge")
+    suspend fun cloudrecharge(@Body jsonArray: JsonArray): Response<RechargeResponse>
+
+    //API FOR RECHARGE STATUS CHECK
+    @Headers("Content-Type: application/json")
+    @POST("/api/billclouduserclient/cloudrechargesave")
+    suspend fun cloudrechargesave(@Body jsonArray: JsonArray): Response<RechargeStatusFosterCheckModel>
+
+    //API FOR RECHARGE SAVE
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/newrechargesave")
+    suspend fun newrechargesave(@Body jsonArray: JsonArray): Response<DefaultResponse>
+
+
+
 }

@@ -62,6 +62,7 @@ class PaymentRechargeDialog internal constructor(private val callBack: RechargeC
                         save.isEnabled = true
                         amountInputLayout.isErrorEnabled = false
                         rechargeAmount = value.toString()
+                        amountInputLayout.helperText = ""
                     }
 
                     else -> {

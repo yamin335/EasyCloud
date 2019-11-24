@@ -306,7 +306,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
                 }
                 R.id.payment_graph -> {
                     if (i == 0 && l == 0L) {
-                        currentNavController?.value?.navigate(R.id.action_paymentScreen_to_about_graph)
+                        currentNavController?.value?.navigate(R.id.action_paymentScreen_to_aboutFragment)
                     }
                 }
                 R.id.support_graph -> {

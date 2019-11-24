@@ -12,7 +12,7 @@ data class PaymentHistoryResdata(val listBilCloudUserLedger: List<BilCloudUserLe
 //Recharge response model
 data class RechargeResponse(val resdata: RechargeResdata?)
 
-data class RechargeResdata(val message: String?, val resstate: Boolean?)
+data class RechargeResdata(val message: String?, val resstate: Boolean?, val paymentProcessUrl: String?, val paymentStatusUrl: String?, val amount: String?)
 
 data class LastRechargeBalance(val resdata: LastRechargeResdata?)
 
@@ -22,3 +22,9 @@ data class LastRechargeUserLedger(val cloudUserLedgerId: Number?, val cloudUserI
                                   val isActive: Boolean?, val companyId: Number?, val createDate: String?, val createdBy: Number?)
 
 data class LastRechargeResdata(val objBilCloudUserLedger: LastRechargeUserLedger?)
+
+data class RechargeStatusFosterCheckModel(val resdata: RechargeStatusFosterResdata)
+
+data class RechargeStatusFosterResdata(val resstate: Boolean, val fosterRes: String)
+
+data class FosterModel(val MerchantTxnNo: String?, val TxnResponse: String?, val TxnAmount: String?, val Currency: String?, val ConvertionRate: String?, val OrderNo: String?, val fosterid: String?, val hashkey: String?, val message: String?)

@@ -1,33 +1,27 @@
 package ltd.royalgreen.pacecloud.paymentmodule
 
-import android.app.DatePickerDialog
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.TextView
 import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.activity.addCallback
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import kotlinx.android.synthetic.main.about_fragment.*
 import kotlinx.android.synthetic.main.payment_fragment.*
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
@@ -38,15 +32,17 @@ import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.servicemodule.Deployment
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCallback {
+class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCallback, RechargeConfirmDialog.RechargeConfirmCallback {
 
     @Inject
     lateinit var apiService: ApiService
@@ -115,23 +111,96 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         }
 
         binding.includedContentMain.rechargeButton.setOnClickListener {
-            showRechargeDialog()
+            val action = PaymentFragmentDirections.actionPaymentScreenToPaymentFosterWebViewFragment("")
+            findNavController().navigate(action)
+//            showRechargeDialog()
         }
 
         binding.includedBottomSheet.applyFilter.setOnClickListener {
             applySearch()
         }
 
-        binding.includedBottomSheet.reset.setOnClickListener {
-            viewModel.paymentList.value?.dataSource?.invalidate()
-            viewModel.fromDate.value = "dd/mm/yyyy"
-            viewModel.toDate.value = "dd/mm/yyyy"
-            viewModel.searchValue.value = ""
-            if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-                searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, activity!!.theme))
+        val paymentStatus = preferences.getString("paymentRechargeStatus", null)
+        paymentStatus?.let {
+            if (it == "true") {
+
+                if (isNetworkAvailable(requireContext())) {
+
+                    val jsonObject = JsonObject().apply {
+                        addProperty("statusCheckUrl", "https://demo.fosterpayments.com.bd/fosterpayments/TransactionStatus/txstatus.php?mcnt_TxnNo=Txn522&mcnt_SecureHashValue=087a0abb04d51c84a952231db8fd5f69")
+                    }
+
+                    val param = JsonArray().apply {
+                        add(jsonObject)
+                    }
+
+                    val handler = CoroutineExceptionHandler { _, exception ->
+                        exception.printStackTrace()
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+                    }
+
+                    CoroutineScope(Dispatchers.IO).launch(handler) {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+                        val response = apiService.cloudrechargesave(param)
+                        when (val apiResponse = ApiResponse.create(response)) {
+                            is ApiSuccessResponse -> {
+                                viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                                val rechargeStatusFosterResponse = apiResponse.body
+                                if (rechargeStatusFosterResponse.resdata.resstate) {
+                                    saveNewRecharge(rechargeStatusFosterResponse.resdata.fosterRes)
+                                } else {
+                                    val parent: ViewGroup? = null
+                                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
+                                    toastView.message.text = "Payment not successful!"
+                                    toast.view = toastView
+                                    toast.show()
+                                }
+                            }
+                            is ApiEmptyResponse -> {
+                                viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                            }
+                            is ApiErrorResponse -> {
+                                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+                            }
+                        }
+                    }
+                } else {
+                    val parent: ViewGroup? = null
+                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
+                    toastView.message.text = requireContext().getString(R.string.net_error_msg)
+                    toast.view = toastView
+                    toast.show()
+                }
+            } else if (it == "false"){
+                val parent: ViewGroup? = null
+                val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
+                toastView.message.text = "Payment not successful!"
+                toast.view = toastView
+                toast.show()
+            }
+
+            preferences.edit().apply {
+                putString("paymentRechargeStatus", "null")
+                apply()
             }
         }
+
+//        binding.includedBottomSheet.reset.setOnClickListener {
+//            viewModel.paymentList.value?.dataSource?.invalidate()
+//            viewModel.fromDate.value = "dd/mm/yyyy"
+//            viewModel.toDate.value = "dd/mm/yyyy"
+//            viewModel.searchValue.value = ""
+//            if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+//                bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+//                searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, activity!!.theme))
+//            }
+//        }
 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.includedBottomSheet.viewModel = viewModel
@@ -144,18 +213,18 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         binding.includedContentMain.paymentRecycler.adapter = adapter
 
         //1
-        val config = PagedList.Config.Builder()
-            .setPageSize(30)
-            .setEnablePlaceholders(false)
-            .build()
+//        val config = PagedList.Config.Builder()
+//            .setPageSize(30)
+//            .setEnablePlaceholders(false)
+//            .build()
 
         //2
-        viewModel.paymentList = viewModel.initializedPagedListBuilder(config).build()
+//        viewModel.paymentList = viewModel.initializedPagedListBuilder(config).build()
 
         //3
-        viewModel.paymentList.observe(this, Observer<PagedList<BilCloudUserLedger>> { pagedList ->
-            adapter.submitList(pagedList)
-        })
+//        viewModel.paymentList.observe(this, Observer<PagedList<BilCloudUserLedger>> { pagedList ->
+//            adapter.submitList(pagedList)
+//        })
 
         viewModel.lastRechargeResponse.observe(this, Observer { lastRecharge ->
             lastRecharge.resdata?.objBilCloudUserLedger?.let {
@@ -251,11 +320,11 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     private fun applySearch() {
-        viewModel.paymentList.value?.dataSource?.invalidate()
-        if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
-            bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
-            searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, requireContext().theme))
-        }
+//        viewModel.paymentList.value?.dataSource?.invalidate()
+//        if (bottomSheeetBehaviour.state == BottomSheetBehavior.STATE_EXPANDED) {
+//            bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
+//            searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, requireContext().theme))
+//        }
     }
 
     override fun onSavePressed(date: String, amount: String, note: String) {
@@ -263,15 +332,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
             val jsonObject = JsonObject()
             user?.let {
-                jsonObject.addProperty("CloudUserID", user.resdata?.loggeduser?.userID)
-                jsonObject.addProperty("UserName", user.resdata?.loggeduser?.fullName)
-                jsonObject.addProperty("Running", false)
-                jsonObject.addProperty("vmName", "")
-                jsonObject.addProperty("vmID", 0)
-                jsonObject.addProperty("TransactionDate", date)
-                jsonObject.addProperty("BalanceAmount", amount)
-                jsonObject.addProperty("Particulars", note)
-                jsonObject.addProperty("IsActive", true)
+                jsonObject.addProperty("UserID", user.resdata?.loggeduser?.userID)
+                jsonObject.addProperty("rechargeAmount", amount)
+//                jsonObject.addProperty("Particulars", note)
+//                jsonObject.addProperty("IsActive", true)
             }
             val param = JsonArray().apply {
                 add(jsonObject)
@@ -284,17 +348,23 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.newrechargesave(param).execute()
+                val response = apiService.cloudrecharge(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
-                        val balanceModel = apiResponse.body
-                        if (balanceModel.resdata?.resstate == true) {
+                        val rechargeResponse = apiResponse.body
+                        if (rechargeResponse.resdata?.resstate == true) {
+                            showRechargeConfirmDialog(rechargeResponse)
+                            preferences.edit().apply {
+                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
+                                apply()
+                            }
+
                             viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                             user?.let {
                                 viewModel.getUserBalance(it)
                                 viewModel.getLastRechargeBalance(it)
                             }
-                            viewModel.paymentList.value?.dataSource?.invalidate()
+//                            viewModel.paymentList.value?.dataSource?.invalidate()
                         } else {
                             viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
                         }
@@ -346,8 +416,99 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
         user?.let {
             val rechargeDialog = PaymentRechargeDialog(this, it.resdata?.loggeduser?.fullName)
-            rechargeDialog.isCancelable = true
+            rechargeDialog.isCancelable = false
             rechargeDialog.show(parentFragmentManager, "#recharge_dialog")
+        }
+    }
+
+    private fun showRechargeConfirmDialog(rechargeResponse: RechargeResponse) {
+        val rechargeConfirmDialog = RechargeConfirmDialog(this, rechargeResponse.resdata?.amount, rechargeResponse.resdata?.paymentProcessUrl)
+        rechargeConfirmDialog.isCancelable = false
+        rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
+    }
+
+    override fun onClicked(url: String?) {
+        viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+        val action = PaymentFragmentDirections.actionPaymentScreenToPaymentFosterWebViewFragment(url)
+        findNavController().navigate(action)
+    }
+
+    private fun saveNewRecharge(fosterString: String) {
+
+        if (isNetworkAvailable(requireContext())) {
+            val fosterJsonObject = JsonParser().parse(fosterString).asJsonArray[0].asJsonObject
+            val fosterModel = Gson().fromJson(fosterJsonObject, FosterModel::class.java)
+            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+            //Current Date
+            val todayInMilSec = Calendar.getInstance().time
+            val df = SimpleDateFormat("yyyy-MM-dd")
+            val today = df.format(todayInMilSec)
+            val jsonObject = JsonObject().apply {
+                addProperty("CloudUserID", user?.resdata?.loggeduser?.userID)
+                addProperty("UserTypeId", user?.resdata?.loggeduser?.userType)
+                addProperty("TransactionNo", fosterModel.MerchantTxnNo)
+                addProperty("InvoiceId", 0)
+                addProperty("UserName", user?.resdata?.loggeduser?.displayName)
+                addProperty("TransactionDate", today)
+                addProperty("RechargeType", "foster")
+                addProperty("BalanceAmount", fosterModel.TxnAmount)
+                addProperty("Particulars", "")
+                addProperty("IsActive", true)
+
+            }
+
+            val param = JsonArray().apply {
+                add(jsonObject)
+                add(fosterJsonObject)
+            }
+
+            val handler = CoroutineExceptionHandler { _, exception ->
+                exception.printStackTrace()
+                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+                val response = apiService.newrechargesave(param)
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        val rechargeFinalSaveResponse = apiResponse.body
+                        if (rechargeFinalSaveResponse.resdata.resstate == true) {
+                            val parent: ViewGroup? = null
+                            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                            val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
+                            toastView.message.text = rechargeFinalSaveResponse.resdata.message
+                            toast.view = toastView
+                            toast.show()
+                            refreshUI()
+                        } else {
+                            val parent: ViewGroup? = null
+                            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+                            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
+                            toastView.message.text = rechargeFinalSaveResponse.resdata.message
+                            toast.view = toastView
+                            toast.show()
+                        }
+                    }
+                    is ApiEmptyResponse -> {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+                    }
+                }
+            }
+        } else {
+            val parent: ViewGroup? = null
+            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
+            toastView.message.text = requireContext().getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
         }
     }
 }

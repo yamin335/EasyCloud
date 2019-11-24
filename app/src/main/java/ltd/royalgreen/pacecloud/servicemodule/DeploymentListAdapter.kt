@@ -74,7 +74,7 @@ class DeploymentListAdapter(val context: Context,
                       val jsonObject = JsonObject().apply {
                           addProperty("UserID", loggedUser?.userID)
                           addProperty("id", item?.deploymentId)
-                          addProperty("name", renamedValue)
+                          addProperty("Name", renamedValue)
                       }
 
                       val param = JsonArray().apply {

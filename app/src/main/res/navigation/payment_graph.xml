@@ -12,7 +12,32 @@
             android:name="ltd.royalgreen.pacecloud.paymentmodule.PaymentFragment"
             android:label="@string/payment"
     >
-        <action android:id="@+id/action_paymentScreen_to_about_graph" app:destination="@id/about_graph"/>
+        <action
+                android:id="@+id/action_paymentScreen_to_paymentFosterWebViewFragment"
+                app:destination="@id/paymentFosterWebViewFragment"
+                app:popUpToInclusive="false">
+            <argument
+                    android:name="FosterProcessLink"
+                    android:defaultValue="@null"
+                    app:argType="string"
+                    app:nullable="true" />
+        </action>
+        <action
+                android:id="@+id/action_paymentScreen_to_aboutFragment"
+                app:destination="@id/aboutFragment" />
     </fragment>
-    <include app:graph="@navigation/about_graph"/>
+    <fragment
+            android:id="@+id/paymentFosterWebViewFragment"
+            android:name="ltd.royalgreen.pacecloud.paymentmodule.PaymentFosterWebViewFragment"
+            android:label="Payment" >
+        <argument
+                android:name="FosterProcessLink"
+                android:defaultValue="@null"
+                app:argType="string"
+                app:nullable="true" />
+    </fragment>
+    <fragment
+            android:id="@+id/aboutFragment"
+            android:name="ltd.royalgreen.pacecloud.aboutmodule.AboutFragment"
+            android:label="About" />
 </navigation>

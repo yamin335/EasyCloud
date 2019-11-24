@@ -68,19 +68,23 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.getDashboardChartPortal(param).execute()
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        osStatus.postValue(apiResponse.body)
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                    }
-                    is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
+                val response = apiService.getDashboardChartPortal(param)
+                if (response.isSuccessful) {
+                    osStatus.postValue(response.body())
                 }
+                print(response.toString())
+//                when (val apiResponse = ApiResponse.create(response)) {
+//                    is ApiSuccessResponse -> {
+//                        osStatus.postValue(apiResponse.body)
+//                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+//                    }
+//                    is ApiEmptyResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+//                    }
+//                    is ApiErrorResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+//                    }
+//                }
             }
         } else {
             val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
