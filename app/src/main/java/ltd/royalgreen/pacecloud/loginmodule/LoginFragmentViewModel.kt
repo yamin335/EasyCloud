@@ -91,9 +91,10 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
                 addProperty("userName", userName.value)
                 addProperty("userPass", password.value)
             }
+
             val param = JsonArray().apply {
                 add(jsonObject)
-            }.toString()
+            }
 
             val handler = CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
@@ -102,7 +103,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.loginportalusers(param).execute()
+                val response = apiService.loginportalusers(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         apiResult.postValue(apiResponse.body)
@@ -138,7 +139,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.register(param).execute()
+                val response = apiService.register(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.SUCCESS)

@@ -114,7 +114,7 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.getDashboardChartPortalSummery(param).execute()
+                val response = apiService.getDashboardChartPortalSummery(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         osSummary.postValue(apiResponse.body)

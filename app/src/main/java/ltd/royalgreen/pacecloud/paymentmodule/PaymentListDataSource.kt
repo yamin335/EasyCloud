@@ -45,7 +45,7 @@ class PaymentListDataSource(private val api: ApiService,
 
         CoroutineScope(Dispatchers.IO).launch(handler) {
             withTimeoutOrNull(3000L) {
-                val response = api.billhistory(param).execute()
+                val response = api.billhistory(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         callback.onResult(apiResponse.body.resdata?.listBilCloudUserLedger as MutableList<BilCloudUserLedger>, null, 1)
@@ -87,7 +87,7 @@ class PaymentListDataSource(private val api: ApiService,
 
         CoroutineScope(Dispatchers.IO).launch(handler) {
             withTimeoutOrNull(3000L) {
-                val response = api.billhistory(param).execute()
+                val response = api.billhistory(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         callback.onResult(apiResponse.body.resdata?.listBilCloudUserLedger as MutableList<BilCloudUserLedger>, params.key + 1)

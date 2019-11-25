@@ -285,7 +285,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                         }
 
                         CoroutineScope(Dispatchers.Default).launch(handler) {
-                            val response = apiService.cloudvmstartstop(param).execute()
+                            val response = apiService.cloudvmstartstop(param)
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
                                     if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
@@ -349,7 +349,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                         }
 
                         CoroutineScope(Dispatchers.Default).launch(handler) {
-                            val response = apiService.cloudvmstartstop(param).execute()
+                            val response = apiService.cloudvmstartstop(param)
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
                                     if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
@@ -412,7 +412,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                     }
 
                     CoroutineScope(Dispatchers.Default).launch(handler) {
-                        val response = apiService.cloudvmreboot(param).execute()
+                        val response = apiService.cloudvmreboot(param)
                         when (val apiResponse = ApiResponse.create(response)) {
                             is ApiSuccessResponse -> {
                                 if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
@@ -466,7 +466,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                         }
 
                         CoroutineScope(Dispatchers.Default).launch(handler) {
-                            val response = apiService.updatevmnote(param).execute()
+                            val response = apiService.updatevmnote(param)
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
                                     if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {

@@ -260,7 +260,7 @@ class ServiceFragment : Fragment(), Injectable {
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                val response = api.clouduservmsyncwithlocaldb(param).execute()
+                val response = api.clouduservmsyncwithlocaldb(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)

@@ -58,7 +58,7 @@ class MainActivityViewModel @Inject constructor(app: Application) : ViewModel() 
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.billclouduserbalance(param).execute()
+                val response = apiService.billclouduserbalance(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         userBalance.postValue(apiResponse.body)

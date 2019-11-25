@@ -11,7 +11,6 @@ import ltd.royalgreen.pacecloud.paymentmodule.LastRechargeBalance
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
 import ltd.royalgreen.pacecloud.paymentmodule.RechargeResponse
 import ltd.royalgreen.pacecloud.paymentmodule.RechargeStatusFosterCheckModel
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -20,12 +19,13 @@ import retrofit2.http.*
  */
 interface ApiService {
     //API FOR LOGIN
-    @GET("/api/portal/loginportalusers")
-    fun loginportalusers(@Query("param") param: String): Call<LoggedUser>
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/loginportalusers")
+    suspend fun loginportalusers(@Body jsonArray: JsonArray): Response<LoggedUser>
 
     //API FOR USER BALANCE
     @GET("/api/portal/billclouduserbalance")
-    fun billclouduserbalance(@Query("param") param: String): Call<BalanceModel>
+    suspend fun billclouduserbalance(@Query("param") param: String): Response<BalanceModel>
 
     //API FOR USER VM STATUS
     @GET("/api/portal/GetDashboardChartPortal")
@@ -33,53 +33,53 @@ interface ApiService {
 
     //API FOR USER VM SUMMERY
     @GET("/api/portal/GetDashboardChartPortal")
-    fun getDashboardChartPortalSummery(@Query("param") param: String): Call<DashOsSummary>
+    suspend fun getDashboardChartPortalSummery(@Query("param") param: String): Response<DashOsSummary>
 
     //API FOR USER ACTIVITY LOG
     @GET("/api/portal/cloudactivitylog")
-    fun cloudactivitylog(@Query("param") param: String): Call<UserActivityLog>
+    suspend fun cloudactivitylog(@Query("param") param: String): Response<UserActivityLog>
 
     //API FOR USER VM LIST
     @GET("/api/portal/cloudvmbyuserid")
-    fun cloudvmbyuserid(@Query("param") param: String): Call<String>
+    suspend fun cloudvmbyuserid(@Query("param") param: String): Response<String>
 
     //API FOR USER PAYMENT HISTORY
     @GET("/api/portal/billhistory")
-    fun billhistory(@Query("param") param: String): Call<PaymentHistory>
+    suspend fun billhistory(@Query("param") param: String): Response<PaymentHistory>
 
     //API FOR LAST PAYMENT AMOUNT
     @GET("/api/portal/lastbillbyuser")
-    fun lastbillbyuser(@Query("param") param: String): Call<LastRechargeBalance>
+    suspend fun lastbillbyuser(@Query("param") param: String): Response<LastRechargeBalance>
 
     //API FOR VM START_STOP
     @Headers("Content-Type: application/json")
     @POST("/api/portal/cloudvmstartstop")
-    fun cloudvmstartstop(@Body jsonArray: JsonArray): Call<String>
+    suspend fun cloudvmstartstop(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR VM REBOOT
     @Headers("Content-Type: application/json")
     @POST("/api/portal/cloudvmreboot")
-    fun cloudvmreboot(@Body jsonArray: JsonArray): Call<String>
+    suspend fun cloudvmreboot(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR RENAME DEPLOYMENT
     @Headers("Content-Type: application/json")
         @POST("/api/portal/updatedeploymentname")
-    fun updatedeploymentname(@Body jsonArray: JsonArray): Call<String>
+    suspend fun updatedeploymentname(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR DEPLOYMENT NOTE
     @Headers("Content-Type: application/json")
     @POST("/api/portal/updatevmnote")
-    fun updatevmnote(@Body jsonArray: JsonArray): Call<String>
+    suspend fun updatevmnote(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR SYNC DATABASE
     @Headers("Content-Type: application/json")
     @POST("/api/portal/clouduservmsyncwithlocaldb")
-    fun clouduservmsyncwithlocaldb(@Body jsonArray: JsonArray): Call<String>
+    suspend fun clouduservmsyncwithlocaldb(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR SIGN UP
     @Headers("Content-Type: application/json")
     @POST("/api/portal/register")
-    fun register(@Body jsonArray: JsonArray): Call<String>
+    suspend fun register(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR RECHARGE
     @Headers("Content-Type: application/json")

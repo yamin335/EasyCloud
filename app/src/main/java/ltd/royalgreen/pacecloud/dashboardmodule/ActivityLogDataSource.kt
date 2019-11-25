@@ -39,7 +39,7 @@ class ActivityLogDataSource(private val application: Application, private val ap
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 withTimeoutOrNull(7000L) {
-                    val response = api.cloudactivitylog(param).execute()
+                    val response = api.cloudactivitylog(param)
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {
                             callback.onResult(apiResponse.body.resdata?.listCmnUserCloudActivityLog as MutableList<CloudActivityLog>, null, 1)
@@ -87,7 +87,7 @@ class ActivityLogDataSource(private val application: Application, private val ap
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
                 withTimeoutOrNull(7000L) {
-                    val response = api.cloudactivitylog(param).execute()
+                    val response = api.cloudactivitylog(param)
                     when (val apiResponse = ApiResponse.create(response)) {
                         is ApiSuccessResponse -> {
                             callback.onResult(apiResponse.body.resdata?.listCmnUserCloudActivityLog as MutableList<CloudActivityLog>, params.key + 1)

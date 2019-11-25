@@ -86,7 +86,7 @@ class DeploymentListAdapter(val context: Context,
                       }
 
                       CoroutineScope(Dispatchers.IO).launch(handler) {
-                          val response = apiService.updatedeploymentname(param).execute()
+                          val response = apiService.updatedeploymentname(param)
                           when (val apiResponse = ApiResponse.create(response)) {
                               is ApiSuccessResponse -> {
                                   if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {

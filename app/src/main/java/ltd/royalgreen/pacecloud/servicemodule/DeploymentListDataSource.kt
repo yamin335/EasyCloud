@@ -38,7 +38,7 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
 
         CoroutineScope(Dispatchers.IO).launch(handler) {
             tempApiCallStatus.postValue(ApiCallStatus.LOADING)
-            val response = api.cloudvmbyuserid(param).execute()
+            val response = api.cloudvmbyuserid(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
                     val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
@@ -91,7 +91,7 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
 
         CoroutineScope(Dispatchers.IO).launch(handler) {
             tempApiCallStatus.postValue(ApiCallStatus.LOADING)
-            val response = api.cloudvmbyuserid(param).execute()
+            val response = api.cloudvmbyuserid(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
                     val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
