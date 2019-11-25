@@ -14,14 +14,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.about_fragment.*
 import kotlinx.android.synthetic.main.payment_fragment.*
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
@@ -32,7 +30,6 @@ import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.servicemodule.Deployment
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
@@ -120,6 +117,23 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             applySearch()
         }
 
+        viewModel.showMessage.observe(this, Observer { (type, message) ->
+            val parent: ViewGroup? = null
+            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
+            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            if (type == "SUCCESS") {
+                val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
+                toastView.message.text = message
+                toast.view = toastView
+                toast.show()
+            } else if (type == "ERROR") {
+                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
+                toastView.message.text = message
+                toast.view = toastView
+                toast.show()
+            }
+        })
+
         val paymentStatus = preferences.getString("paymentRechargeStatus", null)
         paymentStatus?.let {
             if (it == "true") {
@@ -149,13 +163,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                                 if (rechargeStatusFosterResponse.resdata.resstate) {
                                     saveNewRecharge(rechargeStatusFosterResponse.resdata.fosterRes)
                                 } else {
-                                    val parent: ViewGroup? = null
-                                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                                    toastView.message.text = "Payment not successful!"
-                                    toast.view = toastView
-                                    toast.show()
+                                    viewModel.showMessage.postValue(Pair("ERROR", "Payment not successful !"))
                                 }
                             }
                             is ApiEmptyResponse -> {
@@ -180,7 +188,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                 val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                toastView.message.text = "Payment not successful!"
+                toastView.message.text = "Payment not successful !"
                 toast.view = toastView
                 toast.show()
             }
@@ -475,22 +483,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                         viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         val rechargeFinalSaveResponse = apiResponse.body
                         if (rechargeFinalSaveResponse.resdata.resstate == true) {
-                            val parent: ViewGroup? = null
-                            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                            val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
-                            toastView.message.text = rechargeFinalSaveResponse.resdata.message
-                            toast.view = toastView
-                            toast.show()
+                            viewModel.showMessage.postValue(Pair("SUCCESS", rechargeFinalSaveResponse.resdata.message))
                             refreshUI()
                         } else {
-                            val parent: ViewGroup? = null
-                            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                            toastView.message.text = rechargeFinalSaveResponse.resdata.message
-                            toast.view = toastView
-                            toast.show()
+                            viewModel.showMessage.postValue(Pair("ERROR", rechargeFinalSaveResponse.resdata.message))
                         }
                     }
                     is ApiEmptyResponse -> {

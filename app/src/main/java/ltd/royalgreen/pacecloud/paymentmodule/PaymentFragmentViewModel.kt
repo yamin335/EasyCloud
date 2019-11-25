@@ -72,6 +72,10 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<String>()
     }
 
+    val showMessage: MutableLiveData<Pair<String, String>> by lazy {
+        MutableLiveData<Pair<String, String>>()
+    }
+
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
 
     init {
