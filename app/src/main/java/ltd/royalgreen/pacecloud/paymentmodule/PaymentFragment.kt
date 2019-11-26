@@ -108,9 +108,9 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         }
 
         binding.includedContentMain.rechargeButton.setOnClickListener {
-            val action = PaymentFragmentDirections.actionPaymentScreenToPaymentFosterWebViewFragment("")
-            findNavController().navigate(action)
-//            showRechargeDialog()
+//            val action = PaymentFragmentDirections.actionPaymentScreenToPaymentFosterWebViewFragment("")
+//            findNavController().navigate(action)
+            showRechargeDialog()
         }
 
         binding.includedBottomSheet.applyFilter.setOnClickListener {
@@ -126,11 +126,13 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 toastView.message.text = message
                 toast.view = toastView
                 toast.show()
+                viewModel.showMessage.postValue(Pair("null", ""))
             } else if (type == "ERROR") {
                 val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                 toastView.message.text = message
                 toast.view = toastView
                 toast.show()
+                viewModel.showMessage.postValue(Pair("null", ""))
             }
         })
 
@@ -141,7 +143,8 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 if (isNetworkAvailable(requireContext())) {
 
                     val jsonObject = JsonObject().apply {
-                        addProperty("statusCheckUrl", "https://demo.fosterpayments.com.bd/fosterpayments/TransactionStatus/txstatus.php?mcnt_TxnNo=Txn522&mcnt_SecureHashValue=087a0abb04d51c84a952231db8fd5f69")
+                        addProperty("statusCheckUrl", preferences.getString("paymentStatusUrl", null))
+//                        addProperty("statusCheckUrl", "https://demo.fosterpayments.com.bd/fosterpayments/TransactionStatus/txstatus.php?mcnt_TxnNo=Txn522&mcnt_SecureHashValue=087a0abb04d51c84a952231db8fd5f69")
                     }
 
                     val param = JsonArray().apply {
@@ -368,10 +371,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                             }
 
                             viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                            user?.let {
-                                viewModel.getUserBalance(it)
-                                viewModel.getLastRechargeBalance(it)
-                            }
+//                            user?.let {
+//                                viewModel.getUserBalance(it)
+//                                viewModel.getLastRechargeBalance(it)
+//                            }
 //                            viewModel.paymentList.value?.dataSource?.invalidate()
                         } else {
                             viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)

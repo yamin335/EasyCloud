@@ -116,7 +116,8 @@ class PaymentFosterWebViewFragment: Fragment(), Injectable {
         }
 
         args.FosterProcessLink?.let {
-            mWebView.loadUrl("https://demo.fosterpayments.com.bd/fosterpayments/validationalldata.php?payment_id=Fost9316872.29227452-94528-uIAjD")
+//            mWebView.loadUrl("https://demo.fosterpayments.com.bd/fosterpayments/validationalldata.php?payment_id=Fost9316872.29227452-94528-uIAjD")
+            mWebView.loadUrl(it)
         }
     }
 }
