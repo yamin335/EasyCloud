@@ -1,16 +1,12 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
-import android.app.Activity
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -29,6 +25,7 @@ import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -73,9 +70,17 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
         }
     }
 
+    val interceptor = Interceptor { chain ->
+        val newRequest = chain.request().newBuilder()
+            .addHeader("AuthorizedToken", "cmdsX3NlY3JldF9hcGlfa2V5")
+            .build()
+        chain.proceed(newRequest)
+    }
+
     private val client = OkHttpClient().newBuilder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .callTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor(interceptor)
         .build()
 
     val apiService: ApiService = Retrofit.Builder()
