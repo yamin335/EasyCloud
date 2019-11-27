@@ -10,7 +10,7 @@ import androidx.fragment.app.DialogFragment
 import kotlinx.android.synthetic.main.payment_recharge_confirm_dialog.*
 import ltd.royalgreen.pacecloud.R
 
-class RechargeConfirmDialog internal constructor(private val callBack: RechargeConfirmCallback, private val rechargeAmount: String?, private val rechargeUrl: String?) : DialogFragment(), View.OnClickListener {
+class RechargeConfirmDialog internal constructor(private val callBack: RechargeConfirmCallback, private val rechargeAmount: String?, private val note: String, private val rechargeUrl: String?) : DialogFragment(), View.OnClickListener {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -24,7 +24,8 @@ class RechargeConfirmDialog internal constructor(private val callBack: RechargeC
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rechargeQuestion.text = "Are sure to recharge amount $rechargeAmount ?"
+        rechargeQuestion.text = "Recharge Amount: $rechargeAmount"
+        rechargeNote.text = "Note: $note"
         processToRecharge.setOnClickListener(this)
         cancel.setOnClickListener(this)
     }

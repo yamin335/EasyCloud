@@ -364,7 +364,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                     is ApiSuccessResponse -> {
                         val rechargeResponse = apiResponse.body
                         if (rechargeResponse.resdata?.resstate == true) {
-                            showRechargeConfirmDialog(rechargeResponse)
+                            showRechargeConfirmDialog(rechargeResponse, note)
                             preferences.edit().apply {
                                 putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
                                 apply()
@@ -432,8 +432,8 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         }
     }
 
-    private fun showRechargeConfirmDialog(rechargeResponse: RechargeResponse) {
-        val rechargeConfirmDialog = RechargeConfirmDialog(this, rechargeResponse.resdata?.amount, rechargeResponse.resdata?.paymentProcessUrl)
+    private fun showRechargeConfirmDialog(rechargeResponse: RechargeResponse, note: String) {
+        val rechargeConfirmDialog = RechargeConfirmDialog(this, rechargeResponse.resdata?.amount, note, rechargeResponse.resdata?.paymentProcessUrl)
         rechargeConfirmDialog.isCancelable = false
         rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
     }
@@ -465,7 +465,6 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 addProperty("BalanceAmount", fosterModel.TxnAmount)
                 addProperty("Particulars", "")
                 addProperty("IsActive", true)
-
             }
 
             val param = JsonArray().apply {
