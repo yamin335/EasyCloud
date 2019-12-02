@@ -102,8 +102,10 @@ class ServiceFragment : Fragment(), Injectable {
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
 
             adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
-                override fun onNote() {
-
+                override fun onNote(success: Boolean) {
+                    if (success) {
+                        viewModel.deploymentList.value?.dataSource?.invalidate()
+                    }
                 }
 
                 override fun onStop(success: Boolean) {
@@ -126,7 +128,7 @@ class ServiceFragment : Fragment(), Injectable {
 //                Toast.makeText(requireContext(), "Attach clicked from interface!", Toast.LENGTH_LONG).show()
                 }
 
-                override fun onReboot() {
+                override fun onReboot(success: Boolean) {
 //                Toast.makeText(requireContext(), "Reboot clicked from interface!", Toast.LENGTH_LONG).show()
                 }
 
