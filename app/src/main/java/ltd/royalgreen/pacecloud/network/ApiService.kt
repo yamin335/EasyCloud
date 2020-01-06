@@ -7,10 +7,7 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashOsSummary
 import ltd.royalgreen.pacecloud.dashboardmodule.UserActivityLog
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.DefaultResponse
-import ltd.royalgreen.pacecloud.paymentmodule.LastRechargeBalance
-import ltd.royalgreen.pacecloud.paymentmodule.PaymentHistory
-import ltd.royalgreen.pacecloud.paymentmodule.RechargeResponse
-import ltd.royalgreen.pacecloud.paymentmodule.RechargeStatusFosterCheckModel
+import ltd.royalgreen.pacecloud.paymentmodule.*
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -63,7 +60,7 @@ interface ApiService {
 
     //API FOR RENAME DEPLOYMENT
     @Headers("Content-Type: application/json")
-        @POST("/api/portal/updatedeploymentname")
+    @POST("/api/portal/updatedeploymentname")
     suspend fun updatedeploymentname(@Body jsonArray: JsonArray): Response<String>
 
     //API FOR DEPLOYMENT NOTE
@@ -96,6 +93,9 @@ interface ApiService {
     @POST("/api/portal/newrechargesave")
     suspend fun newrechargesave(@Body jsonArray: JsonArray): Response<DefaultResponse>
 
+    //API FOR GENERATE TOKEN FOR BKASH PAYMENT
+    @GET("/api/portal/generatebkashtoken")
+    suspend fun generatebkashtoken(@Query("param") param: String): Response<BKashTokenResponse>
 
 
 }

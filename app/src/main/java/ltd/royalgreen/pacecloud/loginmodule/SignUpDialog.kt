@@ -1,11 +1,7 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
-import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
-import android.os.PatternMatcher
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Patterns
 import android.view.*
 import androidx.databinding.DataBindingComponent
@@ -22,7 +18,6 @@ import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.SignUpDialogBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.util.autoCleared
-import java.util.regex.Pattern
 import javax.inject.Inject
 
 class SignUpDialog internal constructor(private val callBack: SignUpCallback) : DialogFragment(), View.OnClickListener, Injectable {

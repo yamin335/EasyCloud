@@ -23,11 +23,6 @@ class CustomAlertDialog internal constructor(private val callBack: YesCallback, 
         return exitDialog.create()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-        return inflater.inflate(R.layout.net_status_dialog, container)
-    }
-
     interface YesCallback{
         fun onYes()
     }

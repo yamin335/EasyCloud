@@ -41,9 +41,9 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
             val response = api.cloudvmbyuserid(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
-                    val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
+                    val stringResponse = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
                     if (!stringResponse.isNullOrBlank()) {
-                        val jsonArray = JsonParser().parse(stringResponse).asJsonArray
+                        val jsonArray = JsonParser.parseString(stringResponse).asJsonArray
                         val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
                         for ((index, jsonObject) in jsonArray.withIndex()) {
                             val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
@@ -94,9 +94,9 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
             val response = api.cloudvmbyuserid(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
-                    val stringResponse = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
+                    val stringResponse = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
                     if (!stringResponse.isNullOrBlank()) {
-                        val jsonArray = JsonParser().parse(stringResponse).asJsonArray
+                        val jsonArray = JsonParser.parseString(stringResponse).asJsonArray
                         val mutableDeploymentList: MutableList<Deployment> = mutableListOf<Deployment>()
                         for (jsonObject in jsonArray) {
                             val deployment = Gson().fromJson(jsonObject, Deployment::class.java)

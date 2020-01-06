@@ -11,20 +11,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.main_activity.*
@@ -41,7 +34,6 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.setupWithNavController
 import ltd.royalgreen.pacecloud.util.ExpandableMenuAdapter
 import ltd.royalgreen.pacecloud.util.ExpandableMenuModel
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -72,14 +64,14 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
 
     var listener: SharedPreferences.OnSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { prefs, key ->
-            when (key) {
-                "UserBalance" -> {
-                    val userBalance = Gson().fromJson(prefs.getString("UserBalance", null), BalanceModel::class.java)
-                    userBalance?.let {
-                        viewModel.userBalance.value = it
-                    }
+        when (key) {
+            "UserBalance" -> {
+                val userBalance = Gson().fromJson(prefs.getString("UserBalance", null), BalanceModel::class.java)
+                userBalance?.let {
+                    viewModel.userBalance.value = it
                 }
             }
+        }
     }
 
     override fun onResume() {

@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.util.ConnectivityLiveData
 
 
-class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel(){
+class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel() {
 
     @Inject
     lateinit var apiService: ApiService

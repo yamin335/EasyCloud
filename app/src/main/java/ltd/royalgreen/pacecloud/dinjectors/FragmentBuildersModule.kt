@@ -7,6 +7,7 @@ import ltd.royalgreen.pacecloud.dashboardmodule.DashboardFragment
 import ltd.royalgreen.pacecloud.loginmodule.*
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFosterWebViewFragment
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragment
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebViewFragment
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragment
 import ltd.royalgreen.pacecloud.supportmodule.SupportFragment
 
@@ -37,6 +38,9 @@ abstract class FragmentBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributePaymentFragment(): PaymentFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeBKashPaymentWebViewFragment(): BKashPaymentWebViewFragment
 
     @ContributesAndroidInjector
     abstract fun contributeSupportFragment(): SupportFragment

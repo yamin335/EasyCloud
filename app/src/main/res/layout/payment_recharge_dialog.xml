@@ -99,7 +99,7 @@
                     android:textAllCaps="false"
                     android:backgroundTint="@color/colorGreenTheme"
                     android:enabled="false"
-                    android:text="Save"
+                    android:text="Pay"
                     app:cornerRadius="2dp"
                     android:layout_marginEnd="16dp"
                     app:layout_constraintEnd_toEndOf="parent" android:layout_marginTop="24dp"

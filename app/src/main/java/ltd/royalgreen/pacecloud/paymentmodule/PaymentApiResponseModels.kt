@@ -28,3 +28,10 @@ data class RechargeStatusFosterCheckModel(val resdata: RechargeStatusFosterResda
 data class RechargeStatusFosterResdata(val resstate: Boolean, val fosterRes: String)
 
 data class FosterModel(val MerchantTxnNo: String?, val TxnResponse: String?, val TxnAmount: String?, val Currency: String?, val ConvertionRate: String?, val OrderNo: String?, val fosterid: String?, val hashkey: String?, val message: String?)
+
+// BKash Payment Token Generation Models
+data class BKashTokenResponse(val resdata: BKashTokenResdata?)
+
+data class BKashTokenResdata(val resstate: Boolean?, val tModel: TModel?)
+
+data class TModel(val token: String?, val appKey: String?, val currency: String?, val marchantInvNo: String?)
