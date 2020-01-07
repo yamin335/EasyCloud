@@ -30,7 +30,6 @@ import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.paymentmodule.bkash.Checkout
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
@@ -135,6 +134,11 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 toast.show()
                 viewModel.showMessage.postValue(Pair("null", ""))
             }
+        })
+
+        viewModel.bKashToken.observe(this, Observer { (paymentRequestModel, createPaymentModel) ->
+            val action = PaymentFragmentDirections.actionPaymentScreenToBKashPaymentWebViewFragment(paymentRequestModel, createPaymentModel)
+            findNavController().navigate(action)
         })
 
         val paymentStatus = preferences.getString("paymentRechargeStatus", null)
@@ -364,67 +368,19 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         val rechargeResponse = apiResponse.body
-//                        if (rechargeResponse.resdata?.resstate == true) {
-//                            showRechargeConfirmDialog(rechargeResponse, note)
-//                            preferences.edit().apply {
-//                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
-//                                apply()
-//                            }
-//
-//                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-////                            user?.let {
-////                                viewModel.getUserBalance(it)
-////                                viewModel.getLastRechargeBalance(it)
-////                            }
-////                            viewModel.paymentList.value?.dataSource?.invalidate()
-//                        } else {
-//                            viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
-//                        }
-                    }
-                    is ApiEmptyResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-
-
-            val bKashJsonObject = JsonObject().apply {
-                jsonObject.addProperty("id", 0)
-            }
-
-            val bKashParam = JsonArray().apply {
-                add(bKashJsonObject)
-            }.toString()
-
-            val bKashHandler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(bKashHandler) {
-                viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.generatebkashtoken(bKashParam)
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        val bKashTokenResponse = apiResponse.body
-                        if (bKashTokenResponse.resdata?.resstate == true) {
-                            val tokenID = JsonParser.parseString(bKashTokenResponse.resdata.tModel?.token).asJsonObject.get("id_token").asString
-
-                            showRechargeConfirmDialog(null, tokenID, amount, note)
-//                            preferences.edit().apply {
-//                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
-//                                apply()
-//                            }
+                        if (rechargeResponse.resdata?.resstate == true) {
+                            showRechargeConfirmDialog(rechargeResponse, amount, note)
+                            preferences.edit().apply {
+                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
+                                apply()
+                            }
 
                             viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-////                            user?.let {
-////                                viewModel.getUserBalance(it)
-////                                viewModel.getLastRechargeBalance(it)
-////                            }
-////                            viewModel.paymentList.value?.dataSource?.invalidate()
+//                            user?.let {
+//                                viewModel.getUserBalance(it)
+//                                viewModel.getLastRechargeBalance(it)
+//                            }
+//                            viewModel.paymentList.value?.dataSource?.invalidate()
                         } else {
                             viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
                         }
@@ -437,6 +393,54 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
                     }
                 }
             }
+
+
+//            val bKashJsonObject = JsonObject().apply {
+//                jsonObject.addProperty("id", 0)
+//            }
+//
+//            val bKashParam = JsonArray().apply {
+//                add(bKashJsonObject)
+//            }.toString()
+//
+//            val bKashHandler = CoroutineExceptionHandler { _, exception ->
+//                exception.printStackTrace()
+//                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+//            }
+//
+//            CoroutineScope(Dispatchers.IO).launch(bKashHandler) {
+//                viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
+//                val response = apiService.generatebkashtoken(bKashParam)
+//                when (val apiResponse = ApiResponse.create(response)) {
+//                    is ApiSuccessResponse -> {
+//                        val bKashTokenResponse = apiResponse.body
+//                        if (bKashTokenResponse.resdata?.resstate == true) {
+//                            val tokenID = JsonParser.parseString(bKashTokenResponse.resdata.tModel?.token).asJsonObject.get("id_token").asString
+//
+//                            showRechargeConfirmDialog(null, tokenID, amount, note)
+////                            preferences.edit().apply {
+////                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
+////                                apply()
+////                            }
+//
+//                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+//////                            user?.let {
+//////                                viewModel.getUserBalance(it)
+//////                                viewModel.getLastRechargeBalance(it)
+//////                            }
+//////                            viewModel.paymentList.value?.dataSource?.invalidate()
+//                        } else {
+//                            viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+//                        }
+//                    }
+//                    is ApiEmptyResponse -> {
+//                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
+//                    }
+//                    is ApiErrorResponse -> {
+//                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
+//                    }
+//                }
+//            }
         } else {
             val parent: ViewGroup? = null
             val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
@@ -481,12 +485,12 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         }
     }
 
-    private fun showRechargeConfirmDialog(rechargeResponse: RechargeResponse?, bkashToken: String?, amount: String, note: String) {
+    private fun showRechargeConfirmDialog(rechargeResponse: RechargeResponse?, amount: String, note: String) {
 //        val rechargeConfirmDialog = RechargeConfirmDialog(this, rechargeResponse?.resdata?.amount, note, rechargeResponse?.resdata?.paymentProcessUrl)
 //        rechargeConfirmDialog.isCancelable = false
 //        rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
 
-        val rechargeConfirmDialog = RechargeConfirmDialog(this, amount, bkashToken, note, " ")
+        val rechargeConfirmDialog = RechargeConfirmDialog(this, amount, note, " ")
         rechargeConfirmDialog.isCancelable = false
         rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
     }
@@ -497,12 +501,13 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         findNavController().navigate(action)
     }
 
-    override fun onBKashClicked(amount: String?) {
-        val checkoutModel = Checkout()
-        checkoutModel.amount = amount
-        checkoutModel.intent = "authorization"
-        val action = PaymentFragmentDirections.actionPaymentScreenToBKashPaymentWebViewFragment(checkoutModel)
-        findNavController().navigate(action)
+    override fun onBKashClicked(amount: String) {
+        viewModel.getBkashToken(amount)
+//        val paymentRequest = PaymentRequest()
+//        paymentRequest.amount = amount
+//        paymentRequest.intent = "sale"
+//        val action = PaymentFragmentDirections.actionPaymentScreenToBKashPaymentWebViewFragment(checkoutModel)
+//        findNavController().navigate(action)
     }
 
     private fun saveNewRecharge(fosterString: String) {

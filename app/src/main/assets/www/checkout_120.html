@@ -31,33 +31,7 @@ $(document).ready(function(){
             paymentMode: 'checkout',
             paymentRequest: paymentRequest,
             createRequest: function(request){
-                console.log('=> createRequest (request) :: ');
-                console.log(request);
-
-                $.ajax({
-                    url: paymentConfig.createCheckoutURL,
-                    type:'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(request),
-                    success: function(data) {
-                        console.log('got data from create  ..');
-                        console.log('data ::=>');
-                        console.log(JSON.stringify(data));
-
-                        if(data && data.paymentID != null){
-                            paymentID = data.paymentID;
-                            bKash.create().onSuccess(data);
-                        }
-                        else {
-							console.log('error');
-                            bKash.create().onError();
-                        }
-                    },
-                    error: function(){
-						console.log('error');
-                        bKash.create().onError();
-                    }
-                });
+                window.AndroidNative.createPayment(JSON.stringify(request));
             },
 
             executeRequestOnAuthorization: function(){
@@ -98,6 +72,13 @@ $(document).ready(function(){
 
     function callReconfigure(val){
         bKash.reconfigure(val);
+    }
+
+    function createBkashPayment(val){
+        var data = JSON.parse(val);
+        data.errorCode = null;
+        data.errorMessage = null;
+        bKash.create().onSuccess(data);
     }
 
     function clickPayButton(){

@@ -97,5 +97,8 @@ interface ApiService {
     @GET("/api/portal/generatebkashtoken")
     suspend fun generatebkashtoken(@Query("param") param: String): Response<BKashTokenResponse>
 
-
+    //API FOR RECHARGE SAVE
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/createbkashpayment")
+    suspend fun createbkashpayment(@Body jsonArray: JsonArray): Response<BKashCreatePaymentResponse>
 }

@@ -35,3 +35,7 @@ data class BKashTokenResponse(val resdata: BKashTokenResdata?)
 data class BKashTokenResdata(val resstate: Boolean?, val tModel: TModel?)
 
 data class TModel(val token: String?, val appKey: String?, val currency: String?, val marchantInvNo: String?)
+
+data class BKashCreatePaymentResponse(val resdata: BKashCreatePaymentResdata?)
+
+data class BKashCreatePaymentResdata(val resstate: Boolean?, val resbKash: String?)

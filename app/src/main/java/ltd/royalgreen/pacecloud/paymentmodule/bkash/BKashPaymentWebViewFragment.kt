@@ -1,15 +1,18 @@
 package ltd.royalgreen.pacecloud.paymentmodule.bkash
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
@@ -36,6 +39,10 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
 
     private var request = ""
 
+    private var createBkash: CreateBkashModel? = null
+
+    private var paymentRequest: PaymentRequest? = null
+
     private val viewModel: BKashPaymentFragmentViewModel by lazy {
         // Get the ViewModel.
         ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentFragmentViewModel::class.java)
@@ -60,13 +67,13 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        val checkout = args.CheckoutModel
+        paymentRequest = args.PaymentRequestModel
+        request = Gson().toJson(paymentRequest)
+        createBkash = args.CreateBkashModel
 
-        val paymentRqst = PaymentRequest()
-        paymentRqst.amount = checkout.amount
-        paymentRqst.intent = checkout.intent
-
-        request = Gson().toJson(paymentRqst)
+        viewModel.resBkash.observe(this, Observer {
+            mWebView.loadUrl("javascript:createBkashPayment($it )")
+        })
 
         val webSettings: WebSettings = mWebView.settings
         webSettings.javaScriptEnabled = true
@@ -83,7 +90,9 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
 
         //To control any kind of interaction from html file
 
-        mWebView.addJavascriptInterface( JavaScriptInterface(requireContext()), "AndroidNative")
+//        mWebView.addJavascriptInterface( JavaScriptInterface(requireContext()), "AndroidNative")
+
+        mWebView.addJavascriptInterface( JavaScriptWebViewInterface(requireContext()), "AndroidNative")
 
         mWebView.webViewClient = object : WebViewClient() {
 
@@ -115,8 +124,8 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
             }
 
             override fun onPageFinished(view: WebView, url: String?) {
-                val paymentRequest = "{paymentRequest:$request}"
-                mWebView.loadUrl("javascript:callReconfigure($paymentRequest )")
+                val paymentRequestJson = "{paymentRequest:$request}"
+                mWebView.loadUrl("javascript:callReconfigure($paymentRequestJson )")
                 mWebView.loadUrl("javascript:clickPayButton()")
                 if (progressBar != null) {
                     progressBar.visibility = View.GONE
@@ -125,5 +134,33 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
         }
 
         mWebView.loadUrl("file:///android_asset/www/checkout_120.html")
+    }
+
+    inner class JavaScriptWebViewInterface(context: Context) {
+        var mContext: Context = context
+
+         // Handle event from the web page
+        @JavascriptInterface
+        fun createPayment(data: String) {
+            print("REQUEST: $data")
+            Log.d("RESPONSE: ", data)
+
+             viewModel.createBkashCheckout(paymentRequest, createBkash)
+//        val intent = Intent(mContext, MainActivity::class.java)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//        mContext.startActivity(intent)
+//        return "{\"amount\":\'555\',\"intent\":\'authorization\'}"
+        }
+
+        @JavascriptInterface
+        fun executePayment(data: String) {
+            print("REQUEST: $data")
+            Log.d("RESPONSE: ", data)
+//        val intent = Intent(mContext, MainActivity::class.java)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+//        mContext.startActivity(intent)
+//        return "{\"amount\":\'555\',\"intent\":\'authorization\'}"
+        }
+
     }
 }

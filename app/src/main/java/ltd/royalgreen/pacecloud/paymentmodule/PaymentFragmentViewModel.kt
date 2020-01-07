@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,14 +17,18 @@ import androidx.paging.PagedList
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -76,12 +81,71 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<Pair<String, String>>()
     }
 
+    val bKashToken: MutableLiveData<Pair<PaymentRequest, CreateBkashModel>> by lazy {
+        MutableLiveData<Pair<PaymentRequest, CreateBkashModel>>()
+    }
+
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
 
     init {
         fromDate.value = "dd/mm/yyyy"
         toDate.value = "dd/mm/yyyy"
         searchValue.value = ""
+    }
+
+    fun getBkashToken(amount: String) {
+        if (isNetworkAvailable(application)) {
+
+            val jsonObject = JsonObject().apply {
+                addProperty("id", 0)
+            }
+
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }.toString()
+
+            val handler = CoroutineExceptionHandler { _, exception ->
+                exception.printStackTrace()
+                apiCallStatus.postValue(ApiCallStatus.ERROR)
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
+                val response = apiService.generatebkashtoken(param)
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        val bKashTokenResponse = apiResponse.body
+                        if (bKashTokenResponse.resdata?.resstate == true && bKashTokenResponse.resdata.tModel != null) {
+                            val paymentRequest = PaymentRequest()
+                            paymentRequest.amount = amount
+
+                            val createBkashModel = CreateBkashModel()
+                            createBkashModel.authToken = JsonParser.parseString(bKashTokenResponse.resdata.tModel.token).asJsonObject.get("id_token").asString
+                            createBkashModel.rechargeAmount = amount
+                            createBkashModel.currency = bKashTokenResponse.resdata.tModel.currency
+                            createBkashModel.mrcntNumber = bKashTokenResponse.resdata.tModel.marchantInvNo
+
+                            bKashToken.postValue(Pair(paymentRequest, createBkashModel))
+                        } else {
+                            apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+                        }
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                    }
+                }
+            }
+        } else {
+            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
+            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
+            toastView.message.text = application.getString(R.string.net_error_msg)
+            toast.view = toastView
+            toast.show()
+        }
     }
 
     fun initializedPagedListBuilder(config: PagedList.Config):

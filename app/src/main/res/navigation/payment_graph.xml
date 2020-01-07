@@ -47,9 +47,12 @@
     <fragment
             android:id="@+id/BKashPaymentWebViewFragment"
             android:name="ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebViewFragment"
-            android:label="BKashPaymentWebViewFragment" >
+            android:label="BKash Payment">
         <argument
-                android:name="CheckoutModel"
-                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.Checkout" />
+                android:name="PaymentRequestModel"
+                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest" />
+        <argument
+                android:name="CreateBkashModel"
+                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel" />
     </fragment>
 </navigation>
