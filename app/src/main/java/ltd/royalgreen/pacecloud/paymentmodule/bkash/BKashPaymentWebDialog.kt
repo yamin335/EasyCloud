@@ -1,68 +1,84 @@
 package ltd.royalgreen.pacecloud.paymentmodule.bkash
 
+import android.app.Dialog
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.webkit.*
 import android.widget.Toast
-import androidx.activity.addCallback
-import androidx.fragment.app.Fragment
+import androidx.databinding.DataBindingComponent
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.payment_bkash_webview_fragment.mWebView
-import kotlinx.android.synthetic.main.payment_bkash_webview_fragment.progressBar
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.R
+import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
+import ltd.royalgreen.pacecloud.databinding.PaymentBkashWebDialogBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
-import ltd.royalgreen.pacecloud.network.ApiService
+import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
 
-class BKashPaymentWebViewFragment: Fragment(), Injectable {
+class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaymentCallback,private val createBkash: CreateBkashModel, private val paymentRequest: PaymentRequest): DialogFragment(), Injectable {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    val args: BKashPaymentWebViewFragmentArgs by navArgs()
-
     private var request = ""
-
-    private var createBkash: CreateBkashModel? = null
-
-    private var paymentRequest: PaymentRequest? = null
 
     private val viewModel: BKashPaymentFragmentViewModel by lazy {
         // Get the ViewModel.
         ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentFragmentViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(this, true) {
-            findNavController().popBackStack()
-        }
+    private var binding by autoCleared<PaymentBkashWebDialogBinding>()
+    private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
+
+    override fun onResume() {
+        super.onResume()
+        val params = dialog?.window?.attributes
+        params?.width = WindowManager.LayoutParams.MATCH_PARENT
+        params?.height = WindowManager.LayoutParams.WRAP_CONTENT
+        dialog?.window?.attributes = params
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
+        return dialog
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.payment_bkash_webview_fragment, container, false)
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.payment_bkash_web_dialog,
+            container,
+            false,
+            dataBindingComponent
+        )
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        paymentRequest = args.PaymentRequestModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = viewModel
+
+        binding.closeDialog.setOnClickListener {
+            callBack.onPaymentCancelled()
+            dismiss()
+        }
+
         request = Gson().toJson(paymentRequest)
-        createBkash = args.CreateBkashModel
 
         viewModel.resBkash.observe(this, Observer {
             val errorCode: String? = null
@@ -73,82 +89,78 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
             }
             viewModel.bkashPaymentExecuteJson = jsonObject
             val jsonString = jsonObject.toString()
-            mWebView.loadUrl("javascript:createBkashPayment($jsonString )")
+            binding.mWebView.loadUrl("javascript:createBkashPayment($jsonString )")
         })
 
         viewModel.bKashPaymentStatus.observe(this, Observer {
             if (it.first) {
-                mWebView.evaluateJavascript("javascript:finishBkashPayment()", null)
+                binding.mWebView.evaluateJavascript("javascript:finishBkashPayment()", null)
             } else {
                 val parent: ViewGroup? = null
                 val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
                 val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
                 val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
                 toastView.message.text = it.second
-                toast.view = toastView
+                toast.view = toastView;
                 toast.show()
 
-                findNavController().popBackStack()
+                callBack.onPaymentError()
+                dismiss()
             }
         })
 
-        val webSettings: WebSettings = mWebView.settings
+        val webSettings: WebSettings = binding.mWebView.settings
         webSettings.javaScriptEnabled = true
 
         //Below part is for enabling webview settings for using javascript and accessing html files and other assets
 
-        mWebView.isClickable = true
-        mWebView.settings.domStorageEnabled = true
-        mWebView.settings.setAppCacheEnabled(true)
-        mWebView.settings.cacheMode = WebSettings.LOAD_DEFAULT
-        mWebView.clearCache(false)
-        mWebView.settings.allowFileAccessFromFileURLs = true
-        mWebView.settings.allowUniversalAccessFromFileURLs = true
+        binding.mWebView.isClickable = true
+        binding.mWebView.settings.domStorageEnabled = true
+        binding.mWebView.settings.setAppCacheEnabled(true)
+        binding.mWebView.settings.cacheMode = WebSettings.LOAD_DEFAULT
+        binding.mWebView.clearCache(false)
+        binding.mWebView.settings.allowFileAccessFromFileURLs = true
+        binding.mWebView.settings.allowUniversalAccessFromFileURLs = true
 
         //To control any kind of interaction from html file
 
 //        mWebView.addJavascriptInterface( JavaScriptInterface(requireContext()), "AndroidNative")
 
-        mWebView.addJavascriptInterface( JavaScriptWebViewInterface(requireContext()), "AndroidNative")
+        binding.mWebView.addJavascriptInterface( JavaScriptWebViewInterface(requireContext()), "AndroidNative")
 
-        mWebView.webViewClient = object : WebViewClient() {
+        binding.mWebView.webViewClient = object : WebViewClient() {
 
             override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler, error: SslError?) {
                 handler.proceed()
             }
 
             override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
-                if (progressBar != null) {
-                    progressBar.visibility = View.VISIBLE
+                if (binding.loader != null) {
+                    binding.loader.visibility = View.VISIBLE
                 }
             }
 
             override fun onPageFinished(view: WebView, url: String?) {
                 val paymentRequestJson = "{paymentRequest:$request}"
-                mWebView.loadUrl("javascript:callReconfigure($paymentRequestJson )")
-                mWebView.loadUrl("javascript:clickPayButton()")
-                if (progressBar != null) {
-                    progressBar.visibility = View.GONE
+                binding.mWebView.loadUrl("javascript:callReconfigure($paymentRequestJson )")
+                binding.mWebView.loadUrl("javascript:clickPayButton()")
+                if (binding.loader != null) {
+                    binding.loader.visibility = View.GONE
                 }
             }
         }
 
-        mWebView.loadUrl("file:///android_asset/www/checkout_120.html")
-    }
-
-    override fun onDestroy() {
-        mWebView.removeJavascriptInterface("AndroidNative")
-        super.onDestroy()
+        binding.mWebView.loadUrl("file:///android_asset/www/checkout_120.html")
     }
 
     inner class JavaScriptWebViewInterface(context: Context) {
         var mContext: Context = context
 
-         // Handle event from the web page
+        // Handle event from the web page
         @JavascriptInterface
         fun createPayment() {
-             viewModel.createBkashCheckout(paymentRequest, createBkash)
-             viewModel.bkashToken = createBkash?.authToken
+            viewModel.createBkashCheckout(paymentRequest, createBkash)
+            viewModel.bkashToken = createBkash.authToken
         }
 
         @JavascriptInterface
@@ -166,8 +178,15 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
             toast.view = toastView
             toast.show()
 
-            findNavController().popBackStack()
+            callBack.onPaymentSuccess()
+            dismiss()
         }
 
+    }
+
+    interface BkashPaymentCallback {
+        fun onPaymentSuccess()
+        fun onPaymentError()
+        fun onPaymentCancelled()
     }
 }

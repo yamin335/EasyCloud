@@ -27,8 +27,10 @@
                 app:destination="@id/aboutFragment" />
         <action
                 android:id="@+id/action_paymentScreen_to_BKashPaymentWebViewFragment"
-                app:destination="@id/BKashPaymentWebViewFragment"
-                app:popUpToInclusive="false" />
+                app:destination="@id/BKashPaymentWebViewFragment" />
+        <action
+                android:id="@+id/action_paymentScreen_to_BKashPaymentWebFragment"
+                app:destination="@id/BKashPaymentWebFragment" />
     </fragment>
     <fragment
             android:id="@+id/paymentFosterWebViewFragment"
@@ -54,5 +56,17 @@
         <argument
                 android:name="CreateBkashModel"
                 app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel" />
+    </fragment>
+    <fragment
+            android:id="@+id/BKashPaymentWebFragment"
+            android:name="ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebFragment"
+            android:label="payment_bkash_web_fragment"
+            tools:layout="@layout/payment_bkash_web_fragment" >
+        <argument
+                android:name="CreateBkashModel"
+                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel" />
+        <argument
+                android:name="PaymentRequestModel"
+                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest" />
     </fragment>
 </navigation>

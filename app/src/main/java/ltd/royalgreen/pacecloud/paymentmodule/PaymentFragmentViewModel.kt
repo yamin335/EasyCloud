@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
@@ -81,9 +82,17 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<Pair<String, String>>()
     }
 
+    var hasBkashToken = false
+
     val bKashToken: MutableLiveData<Pair<PaymentRequest, CreateBkashModel>> by lazy {
         MutableLiveData<Pair<PaymentRequest, CreateBkashModel>>()
     }
+
+    val fosterUrl: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    var paymentNote = ""
 
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
 
@@ -125,7 +134,9 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                             createBkashModel.currency = bKashTokenResponse.resdata.tModel.currency
                             createBkashModel.mrcntNumber = bKashTokenResponse.resdata.tModel.marchantInvNo
 
+                            hasBkashToken = true
                             bKashToken.postValue(Pair(paymentRequest, createBkashModel))
+                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         } else {
                             apiCallStatus.postValue(ApiCallStatus.NO_DATA)
                         }
@@ -167,6 +178,23 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         }
         return LivePagedListBuilder<Long, BilCloudUserLedger>(dataSourceFactory, config)
     }
+
+//    fun getBkashTokenAndFosterUrl(): MediatorLiveData<BkashTokenAndFosterUrlMergedData> {
+//        val mergedData = MediatorLiveData<BkashTokenAndFosterUrlMergedData>()
+//        mergedData.addSource(bKashToken) {
+//            if (it != null) {
+//                mergedData.value = BkashTokenData(it)
+//            }
+//        }
+//
+//        mergedData.addSource(fosterUrl) {
+//            if (it != null) {
+//                mergedData.value = FosterUrlData(it)
+//            }
+//        }
+//
+//        return mergedData
+//    }
 
     fun getUserBalance(user: LoggedUser?) {
         if (isNetworkAvailable(application)) {

@@ -1,5 +1,8 @@
 package ltd.royalgreen.pacecloud.paymentmodule
 
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest
+
 data class PaymentHistory(val resdata: PaymentHistoryResdata?)
 
 data class BilCloudUserLedger(val cloudUserLedgerId: Number?, val cloudUserId: Number?,
@@ -39,3 +42,11 @@ data class TModel(val token: String?, val appKey: String?, val currency: String?
 data class BKashCreatePaymentResponse(val resdata: BKashCreatePaymentResdata?)
 
 data class BKashCreatePaymentResdata(val resstate: Boolean?, val resbKash: String?)
+
+data class BKashExecutePaymentResponse(val resdata: BKashExecutePaymentResdata?)
+
+data class BKashExecutePaymentResdata(val resstate: Boolean?, val resExecuteBk: String?)
+
+sealed class BkashTokenAndFosterUrlMergedData
+data class FosterUrlData(val fosterUrl: String): BkashTokenAndFosterUrlMergedData()
+data class BkashTokenData(val bkashToken: Pair<PaymentRequest, CreateBkashModel>): BkashTokenAndFosterUrlMergedData()

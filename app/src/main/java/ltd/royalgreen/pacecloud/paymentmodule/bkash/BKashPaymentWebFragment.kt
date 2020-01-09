@@ -5,13 +5,13 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.Toast
 import androidx.activity.addCallback
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -19,30 +19,40 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.payment_bkash_webview_fragment.mWebView
-import kotlinx.android.synthetic.main.payment_bkash_webview_fragment.progressBar
+import kotlinx.android.synthetic.main.payment_bkash_web_fragment.*
 import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.network.ApiService
 import javax.inject.Inject
 
-class BKashPaymentWebViewFragment: Fragment(), Injectable {
+class BKashPaymentWebFragment : Fragment(), Injectable {
+
+    @Inject
+    lateinit var apiService: ApiService
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    val args: BKashPaymentWebViewFragmentArgs by navArgs()
+    @Inject
+    lateinit var preferences: SharedPreferences
 
     private var request = ""
 
     private var createBkash: CreateBkashModel? = null
 
     private var paymentRequest: PaymentRequest? = null
+    val args: BKashPaymentWebFragmentArgs by navArgs()
 
     private val viewModel: BKashPaymentFragmentViewModel by lazy {
         // Get the ViewModel.
         ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentFragmentViewModel::class.java)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.payment_bkash_web_fragment, container, false)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,12 +60,6 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
             findNavController().popBackStack()
         }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.payment_bkash_webview_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

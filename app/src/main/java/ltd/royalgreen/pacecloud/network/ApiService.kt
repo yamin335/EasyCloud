@@ -101,4 +101,14 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("/api/portal/createbkashpayment")
     suspend fun createbkashpayment(@Body jsonArray: JsonArray): Response<BKashCreatePaymentResponse>
+
+    //API FOR RECHARGE SAVE
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/executebkashpayment")
+    suspend fun executebkashpayment(@Body jsonArray: JsonArray): Response<BKashExecutePaymentResponse>
+
+    //API FOR RECHARGE SAVE
+    @Headers("Content-Type: application/json")
+    @POST("/api/portal/newrechargebkashpayment")
+    suspend fun newrechargebkashpayment(@Body jsonArray: JsonArray): Response<DefaultResponse>
 }
