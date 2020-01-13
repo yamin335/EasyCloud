@@ -12,7 +12,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_deployment_row.view.*
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +22,7 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.showErrorToast
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -89,7 +89,7 @@ class DeploymentListAdapter(val context: Context,
                           val response = apiService.updatedeploymentname(param)
                           when (val apiResponse = ApiResponse.create(response)) {
                               is ApiSuccessResponse -> {
-                                  if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                                  if (JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                                       renameSuccessCallback.onRenamed()
                                   }
                               }
@@ -102,12 +102,7 @@ class DeploymentListAdapter(val context: Context,
                           }
                       }
                   } else {
-                      val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                      val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                      val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-                      toastView.message.text = context.getString(R.string.net_error_msg)
-                      toast.view = toastView
-                      toast.show()
+                      showErrorToast(context, context.getString(R.string.net_error_msg))
                   }
               }
           }, loggedUser?.fullName, item?.deploymentName)

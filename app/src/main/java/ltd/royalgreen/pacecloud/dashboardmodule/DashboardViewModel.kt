@@ -9,12 +9,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.showErrorToast
 import javax.inject.Inject
 
 class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
@@ -87,12 +87,7 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
 //                }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
@@ -129,12 +124,7 @@ class DashboardViewModel @Inject constructor(app: Application) : ViewModel() {
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 }

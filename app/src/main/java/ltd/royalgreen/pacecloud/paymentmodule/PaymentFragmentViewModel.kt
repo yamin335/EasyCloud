@@ -6,10 +6,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.DataSource
@@ -19,7 +16,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
@@ -27,9 +23,9 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.showErrorToast
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -74,25 +70,11 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<String>()
     }
 
-    val rechargeSuccessFailureStatus: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    val showMessage: MutableLiveData<Pair<String, String>> by lazy {
-        MutableLiveData<Pair<String, String>>()
-    }
-
     var hasBkashToken = false
 
     val bKashToken: MutableLiveData<Pair<PaymentRequest, CreateBkashModel>> by lazy {
         MutableLiveData<Pair<PaymentRequest, CreateBkashModel>>()
     }
-
-    val fosterUrl: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
-
-    var paymentNote = ""
 
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
 
@@ -100,6 +82,61 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         fromDate.value = "dd/mm/yyyy"
         toDate.value = "dd/mm/yyyy"
         searchValue.value = ""
+    }
+
+    val fosterUrl: MutableLiveData<Pair<String, String>> by lazy {
+        MutableLiveData<Pair<String, String>>()
+    }
+
+    fun getFosterPaymentUrl(amount: String, note: String) {
+        if (isNetworkAvailable(application)) {
+            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+            val jsonObject = JsonObject()
+            user?.let {
+                jsonObject.addProperty("UserID", user.resdata?.loggeduser?.userID)
+                jsonObject.addProperty("rechargeAmount", amount)
+                jsonObject.addProperty("Particulars", note)
+                jsonObject.addProperty("IsActive", true)
+            }
+            val param = JsonArray().apply {
+                add(jsonObject)
+            }
+
+            val handler = CoroutineExceptionHandler { _, exception ->
+                exception.printStackTrace()
+                apiCallStatus.postValue(ApiCallStatus.ERROR)
+            }
+
+            CoroutineScope(Dispatchers.IO).launch(handler) {
+                apiCallStatus.postValue(ApiCallStatus.LOADING)
+                val response = apiService.cloudrecharge(param)
+                when (val apiResponse = ApiResponse.create(response)) {
+                    is ApiSuccessResponse -> {
+                        val rechargeResponse = apiResponse.body
+                        if (rechargeResponse.resdata?.resstate == true) {
+//                            preferences.edit().apply {
+//                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
+//                                apply()
+//                            }
+
+                            fosterUrl.postValue(Pair(rechargeResponse.resdata.paymentProcessUrl ?: "", rechargeResponse.resdata.paymentStatusUrl ?: ""))
+
+                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        } else {
+                            apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+                        }
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                    }
+                }
+            }
+        } else {
+            showErrorToast(application, application.getString(R.string.net_error_msg))
+        }
     }
 
     fun getBkashToken(amount: String) {
@@ -150,12 +187,7 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
@@ -233,12 +265,7 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
@@ -273,12 +300,7 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 

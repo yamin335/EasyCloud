@@ -1,6 +1,5 @@
 package ltd.royalgreen.pacecloud.mainactivitymodule
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -23,7 +22,6 @@ import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.android.synthetic.main.main_container.*
 import kotlinx.android.synthetic.main.main_nav_header.view.*
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.dashboardmodule.BalanceModel
@@ -31,9 +29,7 @@ import ltd.royalgreen.pacecloud.databinding.MainActivityBinding
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.loginmodule.LoginActivity
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.util.setupWithNavController
-import ltd.royalgreen.pacecloud.util.ExpandableMenuAdapter
-import ltd.royalgreen.pacecloud.util.ExpandableMenuModel
+import ltd.royalgreen.pacecloud.util.*
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -124,40 +120,19 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         })
 
         viewModel.apiCallStatus.observe(this, Observer {
-            val parent: ViewGroup? = null
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
                 ApiCallStatus.ERROR -> {
-                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
-                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = this@MainActivity.getString(R.string.error_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showErrorToast(this@MainActivity, this@MainActivity.getString(R.string.error_msg))
                 }
                 ApiCallStatus.NO_DATA -> {
-                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
-                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = this@MainActivity.getString(R.string.no_data_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.no_data_msg))
                 }
                 ApiCallStatus.EMPTY -> {
-                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
-                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = this@MainActivity.getString(R.string.empty_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.empty_msg))
                 }
                 ApiCallStatus.TIMEOUT -> {
-                    val toast = Toast.makeText(this@MainActivity, "", Toast.LENGTH_LONG)
-                    val inflater = this@MainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = this@MainActivity.getString(R.string.timeout_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.timeout_msg))
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
             }

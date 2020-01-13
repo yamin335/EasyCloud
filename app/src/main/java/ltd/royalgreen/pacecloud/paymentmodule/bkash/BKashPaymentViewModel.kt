@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +11,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,14 +18,13 @@ import kotlinx.coroutines.launch
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.paymentmodule.FosterModel
-import ltd.royalgreen.pacecloud.paymentmodule.TModel
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.showErrorToast
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class BKashPaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel() {
+class BKashPaymentViewModel @Inject constructor(app: Application) : ViewModel() {
     @Inject
     lateinit var preferences: SharedPreferences
 
@@ -94,12 +91,7 @@ class BKashPaymentFragmentViewModel @Inject constructor(app: Application) : View
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
@@ -142,12 +134,7 @@ class BKashPaymentFragmentViewModel @Inject constructor(app: Application) : View
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
@@ -200,12 +187,7 @@ class BKashPaymentFragmentViewModel @Inject constructor(app: Application) : View
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 }

@@ -14,10 +14,10 @@
 
 <script type="text/javascript">
 
-$(document).ready(function(){
+$(document).ready(function() {
         bKash.init({
             paymentMode: 'checkout',
-            createRequest: function(request){
+            createRequest: function(request) {
                 window.AndroidNative.createPayment();
             },
 
@@ -27,20 +27,20 @@ $(document).ready(function(){
         });
 });
 
-    function callReconfigure(val){
+    function callReconfigure(val) {
         bKash.reconfigure(val);
     }
 
-    function createBkashPayment(val){
+    function createBkashPayment(val) {
         bKash.create().onSuccess(val);
     }
 
-    function finishBkashPayment(){
+    function finishBkashPayment() {
         $('#bKashFrameWrapper').fadeOut();
         window.AndroidNative.finishBkashPayment();
     }
 
-    function clickPayButton(){
+    function clickPayButton() {
         $("#bKash_button").trigger('click');
     }
 

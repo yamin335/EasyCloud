@@ -1,13 +1,11 @@
 package ltd.royalgreen.pacecloud.paymentmodule.bkash
 
-import android.app.Dialog
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Bundle
 import android.view.*
 import android.webkit.*
-import android.widget.Toast
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
@@ -16,12 +14,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.PaymentBkashWebDialogBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.util.autoCleared
+import ltd.royalgreen.pacecloud.util.showErrorToast
+import ltd.royalgreen.pacecloud.util.showSuccessToast
 import javax.inject.Inject
 
 class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaymentCallback,private val createBkash: CreateBkashModel, private val paymentRequest: PaymentRequest): DialogFragment(), Injectable {
@@ -31,27 +30,32 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
 
     private var request = ""
 
-    private val viewModel: BKashPaymentFragmentViewModel by lazy {
+    private val viewModel: BKashPaymentViewModel by lazy {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentFragmentViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentViewModel::class.java)
     }
 
     private var binding by autoCleared<PaymentBkashWebDialogBinding>()
     private var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
-    override fun onResume() {
-        super.onResume()
-        val params = dialog?.window?.attributes
-        params?.width = WindowManager.LayoutParams.MATCH_PARENT
-        params?.height = WindowManager.LayoutParams.WRAP_CONTENT
-        dialog?.window?.attributes = params
+//    override fun onResume() {
+//        super.onResume()
+//        val params = dialog?.window?.attributes
+//        params?.width = WindowManager.LayoutParams.MATCH_PARENT
+//        params?.height = WindowManager.LayoutParams.WRAP_CONTENT
+//        dialog?.window?.attributes = params
+//    }
+//
+//    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+//        val dialog = super.onCreateDialog(savedInstanceState)
+//        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
+//        return dialog
+//    }
+
+    override fun getTheme(): Int {
+        return R.style.DialogFullScreenTheme
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
-        return dialog
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
@@ -96,18 +100,20 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
             if (it.first) {
                 binding.mWebView.evaluateJavascript("javascript:finishBkashPayment()", null)
             } else {
-                val parent: ViewGroup? = null
-                val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                toastView.message.text = it.second
-                toast.view = toastView;
-                toast.show()
+                showErrorToast(requireContext(), it.second)
 
                 callBack.onPaymentError()
                 dismiss()
             }
         })
+
+        binding.goBack.setOnClickListener {
+            if (binding.mWebView.canGoBack()) {
+                binding.mWebView.goBack()
+            } else {
+                dismiss()
+            }
+        }
 
         val webSettings: WebSettings = binding.mWebView.settings
         webSettings.javaScriptEnabled = true
@@ -170,13 +176,7 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
 
         @JavascriptInterface
         fun finishBkashPayment() {
-            val parent: ViewGroup? = null
-            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-            val inflater = mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
-            toastView.message.text = viewModel.bKashPaymentStatus.value?.second
-            toast.view = toastView
-            toast.show()
+            showSuccessToast(requireContext(), viewModel.bKashPaymentStatus.value?.second ?: "UNKNOWN Message!")
 
             callBack.onPaymentSuccess()
             dismiss()

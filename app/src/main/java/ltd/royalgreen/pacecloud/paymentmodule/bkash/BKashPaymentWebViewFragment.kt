@@ -1,7 +1,6 @@
 package ltd.royalgreen.pacecloud.paymentmodule.bkash
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.http.SslError
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -21,10 +19,10 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.payment_bkash_webview_fragment.mWebView
 import kotlinx.android.synthetic.main.payment_bkash_webview_fragment.progressBar
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
-import ltd.royalgreen.pacecloud.network.ApiService
+import ltd.royalgreen.pacecloud.util.showErrorToast
+import ltd.royalgreen.pacecloud.util.showSuccessToast
 import javax.inject.Inject
 
 class BKashPaymentWebViewFragment: Fragment(), Injectable {
@@ -40,9 +38,9 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
 
     private var paymentRequest: PaymentRequest? = null
 
-    private val viewModel: BKashPaymentFragmentViewModel by lazy {
+    private val viewModel: BKashPaymentViewModel by lazy {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentFragmentViewModel::class.java)
+        ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,13 +78,7 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
             if (it.first) {
                 mWebView.evaluateJavascript("javascript:finishBkashPayment()", null)
             } else {
-                val parent: ViewGroup? = null
-                val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showErrorToast(requireContext(), it.second)
 
                 findNavController().popBackStack()
             }
@@ -158,13 +150,7 @@ class BKashPaymentWebViewFragment: Fragment(), Injectable {
 
         @JavascriptInterface
         fun finishBkashPayment() {
-            val parent: ViewGroup? = null
-            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-            val inflater = mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
-            toastView.message.text = viewModel.bKashPaymentStatus.value?.second
-            toast.view = toastView
-            toast.show()
+            showSuccessToast(requireContext(), viewModel.bKashPaymentStatus.value?.second ?: "UNKNOWN Message!")
 
             findNavController().popBackStack()
         }

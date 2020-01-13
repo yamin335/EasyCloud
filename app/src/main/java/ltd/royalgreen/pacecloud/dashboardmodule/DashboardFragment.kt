@@ -30,9 +30,10 @@ import com.github.mikephil.charting.formatter.ValueFormatter
 import kotlin.math.roundToInt
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.BarDataSet
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.ApiCallStatus
+import ltd.royalgreen.pacecloud.util.showErrorToast
+import ltd.royalgreen.pacecloud.util.showWarningToast
 
 
 class DashboardFragment : Fragment(), Injectable {
@@ -91,40 +92,19 @@ class DashboardFragment : Fragment(), Injectable {
         binding.viewModel = viewModel
 
         viewModel.apiCallStatus.observe(this, Observer {
-            val parent: ViewGroup? = null
             when(it) {
                 ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
                 ApiCallStatus.ERROR -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.error_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
                 }
                 ApiCallStatus.NO_DATA -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.no_data_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
                 }
                 ApiCallStatus.EMPTY -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.empty_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
                 }
                 ApiCallStatus.TIMEOUT -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.timeout_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
             }

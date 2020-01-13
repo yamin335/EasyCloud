@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentViewModel"/>
+                type="ltd.royalgreen.pacecloud.paymentmodule.FosterPaymentViewModel"/>
     </data>
     <androidx.cardview.widget.CardView
             android:layout_height="match_parent"
@@ -47,7 +47,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="8dp"
-                            android:text="BKash Payment"
+                            android:text="Foster Payment"
                             android:textColor="@color/colorPrimaryLight"
                             android:textSize="22sp"
                             android:textStyle="normal"

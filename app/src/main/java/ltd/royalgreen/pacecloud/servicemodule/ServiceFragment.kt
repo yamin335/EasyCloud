@@ -1,6 +1,5 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,20 +10,16 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_fragment.*
-import kotlinx.android.synthetic.main.service_vm_row.view.*
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
@@ -33,9 +28,10 @@ import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
 import ltd.royalgreen.pacecloud.util.autoCleared
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.showErrorToast
+import ltd.royalgreen.pacecloud.util.showWarningToast
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -158,13 +154,7 @@ class ServiceFragment : Fragment(), Injectable {
                 adapter.submitList(pagedList)
             })
         } else {
-            val parent: ViewGroup? = null
-            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-            toastView.message.text = requireContext().getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(requireContext(), requireContext().getString(R.string.net_error_msg))
         }
 
         viewModel.deploymentResponse.observe(this, Observer<Deployment> { value ->
@@ -182,42 +172,21 @@ class ServiceFragment : Fragment(), Injectable {
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
-            val parent: ViewGroup? = null
             when(status) {
                 ApiCallStatus.SUCCESS -> {
                     Log.d("NOTHING", "Nothing to do")
                 }
                 ApiCallStatus.ERROR -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.error_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
                 }
                 ApiCallStatus.NO_DATA -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.no_data_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
                 }
                 ApiCallStatus.EMPTY -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.empty_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
                 }
                 ApiCallStatus.TIMEOUT -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.timeout_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
             }
@@ -266,7 +235,7 @@ class ServiceFragment : Fragment(), Injectable {
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        if (JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
+                        if (JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
                             viewModel.deploymentList.value?.dataSource?.invalidate()
                         }
                     }
@@ -279,13 +248,7 @@ class ServiceFragment : Fragment(), Injectable {
                 }
             }
         } else {
-            val parent: ViewGroup? = null
-            val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-            val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-            toastView.message.text = context.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(requireContext(), requireContext().getString(R.string.net_error_msg))
         }
     }
 

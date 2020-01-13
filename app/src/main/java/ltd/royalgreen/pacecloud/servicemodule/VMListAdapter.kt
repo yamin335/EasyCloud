@@ -18,13 +18,14 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_vm_list_action_popup_menu.view.*
 import kotlinx.android.synthetic.main.service_vm_row.view.*
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.mainactivitymodule.ConfirmationCheckingDialog
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.showErrorToast
+import ltd.royalgreen.pacecloud.util.showSuccessToast
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -159,21 +160,11 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 popupMenu.labelStartStop.text = "Stop"
                 popupMenu.switchStartStop.isChecked = true
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showSuccessToast(context, it.second)
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showErrorToast(context, it.second)
             }
         })
 
@@ -186,21 +177,11 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                 popupMenu.switchStartStop.isChecked = false
                 popupMenu.labelStartStop.text = "Start"
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showSuccessToast(context, it.second)
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showErrorToast(context, it.second)
             }
         })
 
@@ -209,21 +190,11 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             if (it.first) {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showSuccessToast(context, it.second)
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showErrorToast(context, it.second)
             }
         })
 
@@ -232,21 +203,11 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
             if (it.first) {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_green, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showSuccessToast(context, it.second)
             } else {
                 holder.itemView.loader.visibility = View.GONE
                 enablePopupMenu()
-                val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = layoutInflater.inflate(R.layout.toast_custom_red, null)
-                toastView.message.text = it.second
-                toast.view = toastView
-                toast.show()
+                showErrorToast(context, it.second)
             }
         })
 
@@ -291,7 +252,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                             val response = apiService.cloudvmstartstop(param)
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
-                                    val responseParsed = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
+                                    val responseParsed = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
                                     if (responseParsed.get("resstate").asBoolean) {
                                         delay(45000L)
                                         vmStopStatus.postValue(Pair(responseParsed.get("resstate").asBoolean, responseParsed.get("message").asString))
@@ -353,7 +314,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                             val response = apiService.cloudvmstartstop(param)
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
-                                    val responseParsed = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
+                                    val responseParsed = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
                                     if (responseParsed.get("resstate").asBoolean) {
                                         delay(70000L)
                                         vmStartStatus.postValue(Pair(responseParsed.get("resstate").asBoolean, responseParsed.get("message").asString))
@@ -414,7 +375,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                         val response = apiService.cloudvmreboot(param)
                         when (val apiResponse = ApiResponse.create(response)) {
                             is ApiSuccessResponse -> {
-                                val responseParsed = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
+                                val responseParsed = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
                                 vmRebootStatus.postValue(Pair(responseParsed.get("resstate").asBoolean, responseParsed.get("message").asString))
                                 callBack.onReboot(responseParsed.get("resstate").asBoolean)
                             }
@@ -461,7 +422,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                             val response = apiService.updatevmnote(param)
                             when (val apiResponse = ApiResponse.create(response)) {
                                 is ApiSuccessResponse -> {
-                                    val responseParsed = JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
+                                    val responseParsed = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata")
                                     vmNoteStatus.postValue(Pair(responseParsed.get("resstate").asBoolean, responseParsed.get("message").asString))
                                     callBack.onNote(responseParsed.get("resstate").asBoolean)
                                 }
@@ -474,12 +435,7 @@ class VMListAdapter internal constructor(private val vmList: List<VM>, private v
                             }
                         }
                     } else {
-                        val toast = Toast.makeText(context, "", Toast.LENGTH_LONG)
-                        val toastInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                        val toastView = toastInflater.inflate(R.layout.toast_custom_red, null)
-                        toastView.message.text = context.getString(R.string.net_error_msg)
-                        toast.view = toastView
-                        toast.show()
+                        showSuccessToast(context, context.getString(R.string.net_error_msg))
                     }
                 }
             }, item.vmNote)

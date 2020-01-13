@@ -1,11 +1,9 @@
 package ltd.royalgreen.pacecloud.paymentmodule
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
@@ -21,7 +19,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.payment_fragment.*
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
@@ -31,16 +28,15 @@ import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebDialog
-import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
-import ltd.royalgreen.pacecloud.util.autoCleared
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import ltd.royalgreen.pacecloud.util.*
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCallback, RechargeConfirmDialog.RechargeConfirmCallback, BKashPaymentWebDialog.BkashPaymentCallback {
+class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCallback, RechargeConfirmDialog.RechargeConfirmCallback, BKashPaymentWebDialog.BkashPaymentCallback,
+    FosterPaymentWebDialog.FosterPaymentCallback {
 
     @Inject
     lateinit var apiService: ApiService
@@ -118,90 +114,25 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             applySearch()
         }
 
-        viewModel.showMessage.observe(this, Observer { (type, message) ->
-            val parent: ViewGroup? = null
-            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            if (type == "SUCCESS") {
-                val toastView = inflater.inflate(R.layout.toast_custom_green, parent)
-                toastView.message.text = message
-                toast.view = toastView
-                toast.show()
-                viewModel.showMessage.postValue(Pair("null", ""))
-            } else if (type == "ERROR") {
-                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                toastView.message.text = message
-                toast.view = toastView
-                toast.show()
-                viewModel.showMessage.postValue(Pair("null", ""))
-            }
+        viewModel.bKashToken.observe(this, Observer { (paymentRequestModel, createBkashModel) ->
+            val bkashPaymentDialog = BKashPaymentWebDialog(this, createBkashModel, paymentRequestModel)
+            bkashPaymentDialog.isCancelable = false
+            bkashPaymentDialog.show(parentFragmentManager, "#bkash_payment_dialog")
         })
 
-        viewModel.bKashToken.observe(this, Observer { (paymentRequestModel, _) ->
-            showRechargeConfirmDialog(null, paymentRequestModel.amount ?: "", viewModel.paymentNote)
-
-//            val action = PaymentFragmentDirections.actionPaymentScreenToBKashPaymentWebViewFragment(paymentRequestModel, createPaymentModel)
-//            findNavController().navigate(action)
+        viewModel.fosterUrl.observe(this, Observer { (paymentProcessUrl, paymentStatusUrl) ->
+            val fosterPaymentDialog = FosterPaymentWebDialog(this, paymentProcessUrl, paymentStatusUrl)
+            fosterPaymentDialog.isCancelable = false
+            fosterPaymentDialog.show(parentFragmentManager, "#foster_payment_dialog")
         })
 
         val paymentStatus = preferences.getString("paymentRechargeStatus", null)
         paymentStatus?.let {
             if (it == "true") {
 
-                if (isNetworkAvailable(requireContext())) {
 
-                    val jsonObject = JsonObject().apply {
-                        addProperty("statusCheckUrl", preferences.getString("paymentStatusUrl", null))
-//                        addProperty("statusCheckUrl", "https://demo.fosterpayments.com.bd/fosterpayments/TransactionStatus/txstatus.php?mcnt_TxnNo=Txn522&mcnt_SecureHashValue=087a0abb04d51c84a952231db8fd5f69")
-                    }
-
-                    val param = JsonArray().apply {
-                        add(jsonObject)
-                    }
-
-                    val handler = CoroutineExceptionHandler { _, exception ->
-                        exception.printStackTrace()
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-
-                    CoroutineScope(Dispatchers.IO).launch(handler) {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-                        val response = apiService.cloudrechargesave(param)
-                        when (val apiResponse = ApiResponse.create(response)) {
-                            is ApiSuccessResponse -> {
-                                viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                                val rechargeStatusFosterResponse = apiResponse.body
-                                if (rechargeStatusFosterResponse.resdata.resstate) {
-                                    saveNewRecharge(rechargeStatusFosterResponse.resdata.fosterRes)
-                                } else {
-                                    viewModel.showMessage.postValue(Pair("ERROR", "Payment not successful !"))
-                                }
-                            }
-                            is ApiEmptyResponse -> {
-                                viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                            }
-                            is ApiErrorResponse -> {
-                                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                            }
-                        }
-                    }
-                } else {
-                    val parent: ViewGroup? = null
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.net_error_msg)
-                    toast.view = toastView
-                    toast.show()
-                }
             } else if (it == "false"){
-                val parent: ViewGroup? = null
-                val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                toastView.message.text = "Payment not successful !"
-                toast.view = toastView
-                toast.show()
+                showErrorToast(requireContext(), "Payment not successful !")
             }
 
             preferences.edit().apply {
@@ -285,47 +216,26 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         })
 
         viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
-            val parent: ViewGroup? = null
             when(status) {
                 ApiCallStatus.SUCCESS -> {
 //                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
 //                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-//                    val toastView = inflater.inflate(R.layout.toast_custom_green, null)
+//                    val toastView = inflater.inflate(R.layout.toast_custom_success, null)
 //                    toastView.message.text = requireContext().getString(R.string.success_msg)
 //                    toast.view = toastView
 //                    toast.show()
                 }
                 ApiCallStatus.ERROR -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.error_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
                 }
                 ApiCallStatus.NO_DATA -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.no_data_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
                 }
                 ApiCallStatus.EMPTY -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.empty_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
                 }
                 ApiCallStatus.TIMEOUT -> {
-                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                    val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-                    toastView.message.text = requireContext().getString(R.string.timeout_msg)
-                    toast.view = toastView
-                    toast.show()
+                    showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
             }
@@ -347,73 +257,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     override fun onSavePressed(date: String, amount: String, note: String) {
-
-        viewModel.paymentNote = note
-
-        if (viewModel.hasBkashToken) {
-            showRechargeConfirmDialog(null, amount, viewModel.paymentNote)
-        } else {
-            viewModel.getBkashToken(amount)
-        }
-
-//        if (isNetworkAvailable(requireContext())) {
-//            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-//            val jsonObject = JsonObject()
-//            user?.let {
-//                jsonObject.addProperty("UserID", user.resdata?.loggeduser?.userID)
-//                jsonObject.addProperty("rechargeAmount", amount)
-////                jsonObject.addProperty("Particulars", note)
-////                jsonObject.addProperty("IsActive", true)
-//            }
-//            val param = JsonArray().apply {
-//                add(jsonObject)
-//            }
-//
-//            val handler = CoroutineExceptionHandler { _, exception ->
-//                exception.printStackTrace()
-//                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-//            }
-//
-//            CoroutineScope(Dispatchers.IO).launch(handler) {
-//                viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-//                val response = apiService.cloudrecharge(param)
-//                when (val apiResponse = ApiResponse.create(response)) {
-//                    is ApiSuccessResponse -> {
-//                        val rechargeResponse = apiResponse.body
-//                        if (rechargeResponse.resdata?.resstate == true) {
-//                            showRechargeConfirmDialog(rechargeResponse, amount, note)
-//                            preferences.edit().apply {
-//                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
-//                                apply()
-//                            }
-//
-//                            viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-////                            user?.let {
-////                                viewModel.getUserBalance(it)
-////                                viewModel.getLastRechargeBalance(it)
-////                            }
-////                            viewModel.paymentList.value?.dataSource?.invalidate()
-//                        } else {
-//                            viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
-//                        }
-//                    }
-//                    is ApiEmptyResponse -> {
-//                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-//                    }
-//                    is ApiErrorResponse -> {
-//                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-//                    }
-//                }
-//            }
-//        } else {
-//            val parent: ViewGroup? = null
-//            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-//            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-//            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-//            toastView.message.text = requireContext().getString(R.string.net_error_msg)
-//            toast.view = toastView
-//            toast.show()
-//        }
+        showRechargeConfirmDialog(amount, note)
     }
 
     private fun refreshUI() {
@@ -449,20 +293,18 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         }
     }
 
-    private fun showRechargeConfirmDialog(rechargeResponse: RechargeResponse?, amount: String, note: String) {
+    private fun showRechargeConfirmDialog(amount: String, note: String) {
 //        val rechargeConfirmDialog = RechargeConfirmDialog(this, rechargeResponse?.resdata?.amount, note, rechargeResponse?.resdata?.paymentProcessUrl)
 //        rechargeConfirmDialog.isCancelable = false
 //        rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
 
-        val rechargeConfirmDialog = RechargeConfirmDialog(this, amount, note, " ")
+        val rechargeConfirmDialog = RechargeConfirmDialog(this, amount, note)
         rechargeConfirmDialog.isCancelable = false
         rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
     }
 
-    override fun onFosterClicked(url: String?) {
-        viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-        val action = PaymentFragmentDirections.actionPaymentScreenToPaymentFosterWebViewFragment(url)
-        findNavController().navigate(action)
+    override fun onFosterClicked(amount: String, note: String) {
+        viewModel.getFosterPaymentUrl(amount, note)
     }
 
     override fun onBKashClicked(amount: String) {
@@ -471,80 +313,13 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             bkashPaymentDialog.isCancelable = false
             bkashPaymentDialog.show(parentFragmentManager, "#bkash_payment_dialog")
         } else {
-
-        }
-//        val action = PaymentFragmentDirections.actionPaymentScreenToBKashPaymentWebFragment()
-//        findNavController().navigate(action)
-    }
-
-    private fun saveNewRecharge(fosterString: String) {
-
-        if (isNetworkAvailable(requireContext())) {
-            val fosterJsonObject = JsonParser.parseString(fosterString).asJsonArray[0].asJsonObject
-            val fosterModel = Gson().fromJson(fosterJsonObject, FosterModel::class.java)
-            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-            //Current Date
-            val todayInMilSec = Calendar.getInstance().time
-            val df = SimpleDateFormat("yyyy-MM-dd")
-            val today = df.format(todayInMilSec)
-            val jsonObject = JsonObject().apply {
-                addProperty("CloudUserID", user?.resdata?.loggeduser?.userID)
-                addProperty("UserTypeId", user?.resdata?.loggeduser?.userType)
-                addProperty("TransactionNo", fosterModel.MerchantTxnNo)
-                addProperty("InvoiceId", 0)
-                addProperty("UserName", user?.resdata?.loggeduser?.displayName)
-                addProperty("TransactionDate", today)
-                addProperty("RechargeType", "foster")
-                addProperty("BalanceAmount", fosterModel.TxnAmount)
-                addProperty("Particulars", "")
-                addProperty("IsActive", true)
-            }
-
-            val param = JsonArray().apply {
-                add(jsonObject)
-                add(fosterJsonObject)
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.newrechargesave(param)
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        val rechargeFinalSaveResponse = apiResponse.body
-                        if (rechargeFinalSaveResponse.resdata.resstate == true) {
-                            viewModel.showMessage.postValue(Pair("SUCCESS", rechargeFinalSaveResponse.resdata.message))
-                            refreshUI()
-                        } else {
-                            viewModel.showMessage.postValue(Pair("ERROR", rechargeFinalSaveResponse.resdata.message))
-                        }
-                    }
-                    is ApiEmptyResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-        } else {
-            val parent: ViewGroup? = null
-            val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
-            val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, parent)
-            toastView.message.text = requireContext().getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            viewModel.getBkashToken(amount)
         }
     }
 
     override fun onPaymentSuccess() {
         viewModel.hasBkashToken = false
+        refreshUI()
     }
 
     override fun onPaymentError() {
@@ -552,6 +327,18 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     override fun onPaymentCancelled() {
+
+    }
+
+    override fun onFosterPaymentSuccess() {
+        refreshUI()
+    }
+
+    override fun onFosterPaymentError() {
+
+    }
+
+    override fun onFosterPaymentCancelled() {
 
     }
 }

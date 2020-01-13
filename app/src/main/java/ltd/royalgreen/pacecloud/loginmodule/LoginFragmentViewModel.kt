@@ -14,8 +14,7 @@ import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import javax.inject.Inject
 import android.content.Context.LAYOUT_INFLATER_SERVICE
-import kotlinx.android.synthetic.main.toast_custom_red.view.*
-import ltd.royalgreen.pacecloud.util.ConnectivityLiveData
+import ltd.royalgreen.pacecloud.util.showErrorToast
 
 
 class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel() {
@@ -117,12 +116,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
@@ -143,7 +137,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        signUpMsg.postValue(JsonParser().parse(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
+                        signUpMsg.postValue(JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
                     }
                     is ApiEmptyResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.EMPTY)
@@ -154,12 +148,7 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
                 }
             }
         } else {
-            val toast = Toast.makeText(application, "", Toast.LENGTH_LONG)
-            val inflater = application.getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val toastView = inflater.inflate(R.layout.toast_custom_red, null)
-            toastView.message.text = application.getString(R.string.net_error_msg)
-            toast.view = toastView
-            toast.show()
+            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 }

@@ -9,8 +9,9 @@ import ltd.royalgreen.pacecloud.aboutmodule.AboutFragmentViewModel
 import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivityViewModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardViewModel
 import ltd.royalgreen.pacecloud.loginmodule.*
+import ltd.royalgreen.pacecloud.paymentmodule.FosterPaymentViewModel
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel
-import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentFragmentViewModel
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentViewModel
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragmentViewModel
 import ltd.royalgreen.pacecloud.supportmodule.SupportFragmentViewModel
 import ltd.royalgreen.pacecloud.util.PaceCloudViewModelFactory
@@ -65,8 +66,13 @@ abstract class ViewModelModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(BKashPaymentFragmentViewModel::class)
-    abstract fun bindBKashPaymentFragmentViewModel(bKashPaymentFragmentViewModel: BKashPaymentFragmentViewModel): ViewModel
+    @ViewModelKey(BKashPaymentViewModel::class)
+    abstract fun bindBKashPaymentFragmentViewModel(bKashPaymentViewModel: BKashPaymentViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(FosterPaymentViewModel::class)
+    abstract fun bindFosterPaymentViewModel(fosterPaymentViewModel: FosterPaymentViewModel): ViewModel
 
     @Binds
     @IntoMap
