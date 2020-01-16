@@ -14,6 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.gson.Gson
 import com.google.gson.JsonParser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.PaymentBkashWebDialogBinding
@@ -148,6 +150,7 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
 
             override fun onPageFinished(view: WebView, url: String?) {
                 val paymentRequestJson = "{paymentRequest:$request}"
+                val temp = "javascript:callReconfigure($paymentRequestJson )"
                 binding.mWebView.loadUrl("javascript:callReconfigure($paymentRequestJson )")
                 binding.mWebView.loadUrl("javascript:clickPayButton()")
                 if (binding.loader != null) {
