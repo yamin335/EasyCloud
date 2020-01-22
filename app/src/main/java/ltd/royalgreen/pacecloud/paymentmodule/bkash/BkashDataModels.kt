@@ -8,3 +8,13 @@ class CreateBkashModel : Serializable {
     var currency: String? = null
     var mrcntNumber: String? = null
 }
+
+class PaymentRequest : Serializable {
+    var amount: String? = null
+    var intent: String? = "sale"
+}
+
+class BkashDataModel {
+    var paymentRequest = PaymentRequest()
+    var createBkashModel = CreateBkashModel()
+}

@@ -58,15 +58,11 @@ class FosterPaymentWebDialog internal constructor(private val callBack: FosterPa
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        binding.closeDialog.setOnClickListener {
-            callBack.onFosterPaymentCancelled()
-            dismiss()
-        }
-
         binding.goBack.setOnClickListener {
             if (binding.mWebView.canGoBack()) {
                 binding.mWebView.goBack()
             } else {
+                callBack.onFosterPaymentCancelled()
                 dismiss()
             }
         }
@@ -77,6 +73,7 @@ class FosterPaymentWebDialog internal constructor(private val callBack: FosterPa
                 callBack.onFosterPaymentSuccess()
                 dismiss()
             } else {
+                callBack.onFosterPaymentError()
                 showErrorToast(requireContext(), "Payment not successful !")
                 dismiss()
             }

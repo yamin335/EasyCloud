@@ -125,7 +125,7 @@ class LoginFragment : Fragment(), Injectable {
 
         binding.loginButton.setOnClickListener {
             hideKeyboard()
-            viewModel.processSignIn()
+            signIn()
         }
 
         binding.forgotPassword.setOnClickListener {
@@ -136,7 +136,7 @@ class LoginFragment : Fragment(), Injectable {
             val signUpDialog = SignUpDialog(object : SignUpDialog.SignUpCallback {
                 override fun onSignUp(newUser: JsonObject) {
                     showErrorToast(requireContext(), requireContext().getString(R.string.loading_msg))
-                    viewModel.processSignUp(newUser)
+                    signUp(newUser)
                 }
             })
             signUpDialog.isCancelable = true
@@ -191,25 +191,19 @@ class LoginFragment : Fragment(), Injectable {
                 else -> Log.d("NOTHING", "Nothing to do")
             }
         })
+    }
 
-        viewModel.signUpMsg.observe(this, Observer {
-            if (it == "Save successfully.") {
-                showSuccessToast(requireContext(), requireContext().getString(R.string.acc_successful))
-            } else {
-                showErrorToast(requireContext(), it)
-            }
-        })
-
-        viewModel.apiResult.observe(this, Observer { loggedUser ->
+    private fun signIn() {
+        viewModel.doSignIn().observe(this, Observer { loggedUser ->
             when (loggedUser?.resdata?.message) {
-                    "Username does not exist." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_USERNAME
-                "Password is wrong." -> viewModel.apiCallStatus.value = ApiCallStatus.INVALID_PASSWORD
+                "Username does not exist." -> viewModel.apiCallStatus.postValue(ApiCallStatus.INVALID_USERNAME)
+                "Password is wrong." -> viewModel.apiCallStatus.postValue(ApiCallStatus.INVALID_PASSWORD)
                 "User not active." -> {
                     viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                     showWarningToast(requireContext(), requireContext().getString(R.string.user_not_active))
                 }
                 else -> {
-                    if (loggedUser?.resdata?.resstate == true) {
+                    if (loggedUser?.resdata?.loggeduser != null) {
                         viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         val handler = CoroutineExceptionHandler { _, exception ->
                             exception.printStackTrace()
@@ -228,6 +222,16 @@ class LoginFragment : Fragment(), Injectable {
                         viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
                     }
                 }
+            }
+        })
+    }
+
+    private fun signUp(jsonObject: JsonObject) {
+        viewModel.doSignUp(jsonObject).observe(this, Observer {
+            if (it == "Save successfully.") {
+                showSuccessToast(requireContext(), requireContext().getString(R.string.acc_successful))
+            } else {
+                showErrorToast(requireContext(), it)
             }
         })
     }

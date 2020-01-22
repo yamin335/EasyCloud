@@ -91,25 +91,6 @@ class DashboardFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        viewModel.apiCallStatus.observe(this, Observer {
-            when(it) {
-                ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
-                ApiCallStatus.ERROR -> {
-                    showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
-                }
-                ApiCallStatus.NO_DATA -> {
-                    showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
-                }
-                ApiCallStatus.EMPTY -> {
-                    showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
-                }
-                ApiCallStatus.TIMEOUT -> {
-                    showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
-                }
-                else -> Log.d("NOTHING", "Nothing to do")
-            }
-        })
-
 //        userActivityLogList.layoutManager = LinearLayoutManager(requireContext())
 //        userActivityLogList.addItemDecoration(RecyclerItemDivider(requireContext(), LinearLayoutManager.VERTICAL, 8))
 //        userActivityLogList.adapter = adapter
@@ -129,35 +110,38 @@ class DashboardFragment : Fragment(), Injectable {
 //        })
 
         //Pie Chart Configuration
-        view.osStatusPieChart.isLogEnabled = false
-        view.osStatusPieChart.holeRadius = 35F
-        view.osStatusPieChart.transparentCircleRadius = 43F
-        view.osStatusPieChart.centerText = "VM Status"
-        view.osStatusPieChart.setNoDataText("No Chart Data Found")
+        binding.osStatusPieChart.isLogEnabled = false
+        binding.osStatusPieChart.holeRadius = 35F
+        binding.osStatusPieChart.transparentCircleRadius = 43F
+        binding.osStatusPieChart.centerText = "VM Status"
+        binding.osStatusPieChart.setNoDataText("No Chart Data Found")
 //        view.osStatusPieChart.setDrawMarkers(false)
-        view.osStatusPieChart.setDrawEntryLabels(true)
-        view.osStatusPieChart.setEntryLabelTextSize(11f)
-        view.osStatusPieChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.pieColor1))
+        binding.osStatusPieChart.setDrawEntryLabels(true)
+        binding.osStatusPieChart.setEntryLabelTextSize(11f)
+        binding.osStatusPieChart.setNoDataTextColor(ContextCompat.getColor(requireContext(), R.color.pieColor1))
 //        view.osStatusPieChart.legend.orientation = Legend.LegendOrientation.VERTICAL
-        view.osStatusPieChart.description.isEnabled = false
-        view.osStatusPieChart.isRotationEnabled = false
-        view.osStatusPieChart.setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.colorWhite))
+        binding.osStatusPieChart.description.isEnabled = false
+        binding.osStatusPieChart.isRotationEnabled = false
+        binding.osStatusPieChart.setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.colorWhite))
 //        view.osStatusPieChart.setUsePercentValues(true)
 
         //Bar Chart Configuration
-        view.osSummaryBarChart.isLogEnabled = false
+        binding.osSummaryBarChart.isLogEnabled = false
 //        view.osSummaryBarChart.xAxis.setCenterAxisLabels(true)
-        view.osSummaryBarChart.setFitBars(true)
-        view.osSummaryBarChart.setNoDataText("No Chart Data Found")
-        view.osSummaryBarChart.description.isEnabled = false
-        view.osSummaryBarChart.setScaleEnabled(false)
-        view.osSummaryBarChart.xAxis.setDrawGridLines(false)
+        binding.osSummaryBarChart.setFitBars(true)
+        binding.osSummaryBarChart.setNoDataText("No Chart Data Found")
+        binding.osSummaryBarChart.description.isEnabled = false
+        binding.osSummaryBarChart.setScaleEnabled(false)
+        binding.osSummaryBarChart.xAxis.setDrawGridLines(false)
 
         refreshUI()
+        binding.versionNo = "Version:1.0.0"
+    }
 
-        viewModel.osStatus.observe(this, Observer { status ->
-            view.osStatusPieChart.legend.resetCustom()
-            view.osStatusPieChart.notifyDataSetChanged()
+    private fun refreshPieChart() {
+        viewModel.getOsStatus().observe(this, Observer { status ->
+            binding.osStatusPieChart.legend.resetCustom()
+            binding.osStatusPieChart.notifyDataSetChanged()
             val dataSet = status?.resdata?.dashboardchartdata
             val entries: List<PieEntry>
             entries = ArrayList<PieEntry>()
@@ -212,14 +196,16 @@ class DashboardFragment : Fragment(), Injectable {
                     ContextCompat.getColor(requireContext(), R.color.barColor3))
                 val pieData = PieData(pieDataSet)
                 pieData.setValueFormatter(CustomValueFormatter())
-                view.osStatusPieChart.data = pieData
-                view.osStatusPieChart.legend.setCustom(legends)
-                view.osStatusPieChart.invalidate()
+                binding.osStatusPieChart.data = pieData
+                binding.osStatusPieChart.legend.setCustom(legends)
+                binding.osStatusPieChart.invalidate()
             }
-            view.osStatusPieChart.animateXY(900, 900)
+            binding.osStatusPieChart.animateXY(900, 900)
         })
+    }
 
-        viewModel.osSummary.observe(this, Observer { summary ->
+    private fun refreshBarChart() {
+        viewModel.getOsSummary().observe(this, Observer { summary ->
             val dataSet = summary?.resdata?.dashboardchartdata
             val entries: List<BarEntry>
             entries = ArrayList<BarEntry>()
@@ -242,24 +228,24 @@ class DashboardFragment : Fragment(), Injectable {
                 barDataSet.colors = arrayListOf(ContextCompat.getColor(requireContext(), R.color.barColor1),
                     ContextCompat.getColor(requireContext(), R.color.barColor2), ContextCompat.getColor(requireContext(), R.color.barColor3),
                     ContextCompat.getColor(requireContext(), R.color.barColor4))
-                view.osSummaryBarChart.xAxis.valueFormatter = IndexAxisValueFormatter(titles)
-                view.osSummaryBarChart.xAxis.labelCount = titles.size
-                view.osSummaryBarChart.data = barData
-                view.osSummaryBarChart.invalidate()
+                binding.osSummaryBarChart.xAxis.valueFormatter = IndexAxisValueFormatter(titles)
+                binding.osSummaryBarChart.xAxis.labelCount = titles.size
+                binding.osSummaryBarChart.data = barData
+                binding.osSummaryBarChart.invalidate()
             }
-            view.osSummaryBarChart.animateY(900)
+            binding.osSummaryBarChart.animateY(900)
         })
     }
 
-    private fun refreshUI() {
-        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+//    private fun getOsStatusChartData() {
+//        viewModel.getOsStatusChart().observe(this, Observer {
+//            val t= it
+//        })
+//    }
 
-        user?.let {
-            viewModel.getOsStatus(user)
-            viewModel.getOsSummary(user)
-//            binding.name = user.resdata?.loggeduser?.fullName
-            binding.versionNo = "Version:1.0.0"
-        }
+    private fun refreshUI() {
+        refreshPieChart()
+        refreshBarChart()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

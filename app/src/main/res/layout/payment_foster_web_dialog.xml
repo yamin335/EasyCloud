@@ -107,23 +107,8 @@
                         android:id="@+id/mWebView"
                         android:background="@color/customColor6"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/header"
-                        android:layout_above="@id/closeDialog"/>
-                <TextView
-                        android:id="@+id/closeDialog"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_alignParentBottom="true"
-                        android:text="Close"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:textSize="17sp"
-                        android:textColor="@color/colorWhite"
-                        android:windowSoftInputMode="adjustResize"
-                        android:textAllCaps="false"
-                        android:background="@drawable/button_background"/>
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/header" />
             </RelativeLayout>
         </RelativeLayout>
     </androidx.cardview.widget.CardView>

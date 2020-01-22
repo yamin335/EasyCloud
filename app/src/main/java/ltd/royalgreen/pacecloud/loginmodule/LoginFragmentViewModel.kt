@@ -17,12 +17,9 @@ import android.content.Context.LAYOUT_INFLATER_SERVICE
 import ltd.royalgreen.pacecloud.util.showErrorToast
 
 
-class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel() {
+class LoginFragmentViewModel @Inject constructor(app: Application, loginRepository: LoginRepository) : ViewModel() {
 
-    @Inject
-    lateinit var apiService: ApiService
-
-    val application = app
+    val repository = loginRepository
 
     val userName: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
@@ -34,10 +31,6 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
 
     val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
         MutableLiveData<ApiCallStatus>()
-    }
-
-    val apiResult: MutableLiveData<LoggedUser> by lazy {
-        MutableLiveData<LoggedUser>()
     }
 
     val errorMessage: MutableLiveData<Boolean> by lazy {
@@ -80,75 +73,79 @@ class LoginFragmentViewModel @Inject constructor(app: Application) : ViewModel()
         MutableLiveData<String>()
     }
 
-    val signUpMsg: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
+    fun doSignIn() = repository.loginRepo(userName.value!!, password.value!!, apiCallStatus)
 
-    fun processSignIn() {
-        if (isNetworkAvailable(application)) {
-            val jsonObject = JsonObject().apply {
-                addProperty("userName", userName.value)
-                addProperty("userPass", password.value)
-            }
+    fun doSignUp(jsonObject: JsonObject) = repository.signUpRepo(jsonObject, apiCallStatus)
 
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }
+//    val signUpMsg: MutableLiveData<String> by lazy {
+//        MutableLiveData<String>()
+//    }
 
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.loginportalusers(param)
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        apiResult.postValue(apiResponse.body)
-                    }
-                    is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
-        }
-    }
-
-    fun processSignUp(jsonObject: JsonObject) {
-        if (isNetworkAvailable(application)) {
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.register(param)
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        signUpMsg.postValue(JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
-                    }
-                    is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
-        }
-    }
+//    fun processSignIn() {
+//        if (isNetworkAvailable(application)) {
+//            val jsonObject = JsonObject().apply {
+//                addProperty("userName", userName.value)
+//                addProperty("userPass", password.value)
+//            }
+//
+//            val param = JsonArray().apply {
+//                add(jsonObject)
+//            }
+//
+//            val handler = CoroutineExceptionHandler { _, exception ->
+//                exception.printStackTrace()
+//                apiCallStatus.postValue(ApiCallStatus.ERROR)
+//            }
+//
+//            CoroutineScope(Dispatchers.IO).launch(handler) {
+//                apiCallStatus.postValue(ApiCallStatus.LOADING)
+//                val response = apiService.loginportalusers(param)
+//                when (val apiResponse = ApiResponse.create(response)) {
+//                    is ApiSuccessResponse -> {
+//                        apiResult.postValue(apiResponse.body)
+//                    }
+//                    is ApiEmptyResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+//                    }
+//                    is ApiErrorResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+//                    }
+//                }
+//            }
+//        } else {
+//            showErrorToast(application, application.getString(R.string.net_error_msg))
+//        }
+//    }
+//
+//    fun processSignUp(jsonObject: JsonObject) {
+//        if (isNetworkAvailable(application)) {
+//            val param = JsonArray().apply {
+//                add(jsonObject)
+//            }
+//
+//            val handler = CoroutineExceptionHandler { _, exception ->
+//                exception.printStackTrace()
+//                apiCallStatus.postValue(ApiCallStatus.ERROR)
+//            }
+//
+//            CoroutineScope(Dispatchers.IO).launch(handler) {
+//                apiCallStatus.postValue(ApiCallStatus.LOADING)
+//                val response = apiService.register(param)
+//                when (val apiResponse = ApiResponse.create(response)) {
+//                    is ApiSuccessResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+//                        signUpMsg.postValue(JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
+//                    }
+//                    is ApiEmptyResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+//                    }
+//                    is ApiErrorResponse -> {
+//                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+//                    }
+//                }
+//            }
+//        } else {
+//            showErrorToast(application, application.getString(R.string.net_error_msg))
+//        }
+//    }
 }

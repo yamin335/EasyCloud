@@ -75,7 +75,7 @@ class BKashPaymentViewModel @Inject constructor(app: Application) : ViewModel() 
                     is ApiSuccessResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         val paymentCreateResponse = apiResponse.body
-                        if (paymentCreateResponse.resdata?.resstate == true) {
+                        if (paymentCreateResponse.resdata?.resbKash != null) {
                             apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                             resBkash.postValue(paymentCreateResponse.resdata.resbKash)
                         } else {
@@ -118,7 +118,7 @@ class BKashPaymentViewModel @Inject constructor(app: Application) : ViewModel() 
                     is ApiSuccessResponse -> {
                         apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         val paymentExecuteResponse = apiResponse.body
-                        if (paymentExecuteResponse.resdata?.resstate == true) {
+                        if (paymentExecuteResponse.resdata?.resExecuteBk != null) {
                             apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                             saveBkashNewRecharge(paymentExecuteResponse.resdata.resExecuteBk)
                         } else {
@@ -138,7 +138,7 @@ class BKashPaymentViewModel @Inject constructor(app: Application) : ViewModel() 
         }
     }
 
-    fun saveBkashNewRecharge(bkashPaymentResponse: String?) {
+    fun saveBkashNewRecharge(bkashPaymentResponse: String) {
         if (isNetworkAvailable(application)) {
             val bkashJsonObject = JsonParser.parseString(bkashPaymentResponse).asJsonObject
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)

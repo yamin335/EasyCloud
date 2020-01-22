@@ -79,11 +79,6 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        binding.closeDialog.setOnClickListener {
-            callBack.onPaymentCancelled()
-            dismiss()
-        }
-
         request = Gson().toJson(paymentRequest)
 
         viewModel.resBkash.observe(this, Observer {
@@ -103,7 +98,6 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
                 binding.mWebView.evaluateJavascript("javascript:finishBkashPayment()", null)
             } else {
                 showErrorToast(requireContext(), it.second)
-
                 callBack.onPaymentError()
                 dismiss()
             }
@@ -113,6 +107,7 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
             if (binding.mWebView.canGoBack()) {
                 binding.mWebView.goBack()
             } else {
+                callBack.onPaymentCancelled()
                 dismiss()
             }
         }
@@ -150,7 +145,6 @@ class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaym
 
             override fun onPageFinished(view: WebView, url: String?) {
                 val paymentRequestJson = "{paymentRequest:$request}"
-                val temp = "javascript:callReconfigure($paymentRequestJson )"
                 binding.mWebView.loadUrl("javascript:callReconfigure($paymentRequestJson )")
                 binding.mWebView.loadUrl("javascript:clickPayButton()")
                 if (binding.loader != null) {

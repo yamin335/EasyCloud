@@ -20,6 +20,7 @@ import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.paymentmodule.bkash.BkashDataModel
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
@@ -70,10 +71,8 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<String>()
     }
 
-    var hasBkashToken = false
-
-    val bKashToken: MutableLiveData<Pair<PaymentRequest, CreateBkashModel>> by lazy {
-        MutableLiveData<Pair<PaymentRequest, CreateBkashModel>>()
+    val bKashToken: MutableLiveData<BkashDataModel?> by lazy {
+        MutableLiveData<BkashDataModel?>()
     }
 
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
@@ -84,8 +83,8 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         searchValue.value = ""
     }
 
-    val fosterUrl: MutableLiveData<Pair<String, String>> by lazy {
-        MutableLiveData<Pair<String, String>>()
+    val fosterUrl: MutableLiveData<Pair<String?, String?>> by lazy {
+        MutableLiveData<Pair<String?, String?>>()
     }
 
     fun getFosterPaymentUrl(amount: String, note: String) {
@@ -161,7 +160,7 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
                         val bKashTokenResponse = apiResponse.body
-                        if (bKashTokenResponse.resdata?.resstate == true && bKashTokenResponse.resdata.tModel != null) {
+                        if (bKashTokenResponse.resdata?.tModel != null) {
                             val paymentRequest = PaymentRequest()
                             paymentRequest.amount = amount
 
@@ -171,8 +170,10 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                             createBkashModel.currency = bKashTokenResponse.resdata.tModel.currency
                             createBkashModel.mrcntNumber = bKashTokenResponse.resdata.tModel.marchantInvNo
 
-                            hasBkashToken = true
-                            bKashToken.postValue(Pair(paymentRequest, createBkashModel))
+                            val bkashDataModel = BkashDataModel()
+                            bkashDataModel.paymentRequest = paymentRequest
+                            bkashDataModel.createBkashModel = createBkashModel
+                            bKashToken.postValue(bkashDataModel)
                             apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         } else {
                             apiCallStatus.postValue(ApiCallStatus.NO_DATA)
