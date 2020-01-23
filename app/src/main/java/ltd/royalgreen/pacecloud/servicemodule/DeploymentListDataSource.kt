@@ -11,10 +11,10 @@ import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 
-class DeploymentListDataSource(private val api: ApiService, private val preferences: SharedPreferences,
-                               deployment: MutableLiveData<Deployment>, apiCallStatus: MutableLiveData<ApiCallStatus>) : PageKeyedDataSource<Long, Deployment>() {
+class DeploymentListDataSource(dispacher: CoroutineDispatcher, private val api: ApiService, private val preferences: SharedPreferences
+                               , apiCallStatus: MutableLiveData<ApiCallStatus>) : PageKeyedDataSource<Long, Deployment>() {
 
-    val tempDeployment = deployment
+    val dispachers = dispacher
     val tempApiCallStatus = apiCallStatus
 
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, Deployment>) {
@@ -36,9 +36,9 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
             tempApiCallStatus.postValue(ApiCallStatus.ERROR)
         }
 
-        CoroutineScope(Dispatchers.IO).launch(handler) {
+        CoroutineScope(dispachers).launch(handler) {
             tempApiCallStatus.postValue(ApiCallStatus.LOADING)
-            val response = api.cloudvmbyuserid(param)
+                val response = api.cloudvmbyuserid(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
                     val stringResponse = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
@@ -48,22 +48,16 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
                         for ((index, jsonObject) in jsonArray.withIndex()) {
                             val deployment = Gson().fromJson(jsonObject, Deployment::class.java)
                             mutableDeploymentList.add(deployment)
-                            if (index == 0)
-                                tempDeployment.postValue(deployment)
                         }
                         callback.onResult(mutableDeploymentList, null, 1)
-                    } else {
-                        tempDeployment.postValue(null)
                     }
                     tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
                 }
                 is ApiEmptyResponse -> {
                     tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    tempDeployment.postValue(null)
                 }
                 is ApiErrorResponse -> {
                     tempApiCallStatus.postValue(ApiCallStatus.ERROR)
-                    tempDeployment.postValue(null)
                 }
             }
         }
@@ -89,7 +83,7 @@ class DeploymentListDataSource(private val api: ApiService, private val preferen
             tempApiCallStatus.postValue(ApiCallStatus.ERROR)
         }
 
-        CoroutineScope(Dispatchers.IO).launch(handler) {
+        CoroutineScope(dispachers).launch(handler) {
             tempApiCallStatus.postValue(ApiCallStatus.LOADING)
             val response = api.cloudvmbyuserid(param)
             when (val apiResponse = ApiResponse.create(response)) {

@@ -1,125 +1,63 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
-import android.content.Context
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
+
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
+
 import kotlinx.android.synthetic.main.service_deployment_row.view.*
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+
 import ltd.royalgreen.pacecloud.R
-import ltd.royalgreen.pacecloud.loginmodule.LoggedUserData
-import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.util.LiveDataCallAdapterFactory
+
 import ltd.royalgreen.pacecloud.util.RecyclerItemDivider
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
-import ltd.royalgreen.pacecloud.util.showErrorToast
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
-import java.util.concurrent.TimeUnit
 
-
-class DeploymentListAdapter(val context: Context,
-                            private val callBack: VMListAdapter.ActionCallback,
+class DeploymentListAdapter(private val callBack: VMListAdapter.ActionCallback,
                             private val renameSuccessCallback: RenameSuccessCallback,
                             private val fragmentManager: FragmentManager,
-                            private val loggedUser: LoggedUserData?) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
+                            private val fullName: String?,
+                            viewModel: ServiceFragmentViewModel,
+                            lifecycleOwner: LifecycleOwner) : PagedListAdapter<Deployment, DeploymentListViewHolder>(DeploymentListDiffUtilCallback()) {
 
-    val interceptor = Interceptor { chain ->
-        val newRequest = chain.request().newBuilder()
-            .addHeader("AuthorizedToken", "cmdsX3NlY3JldF9hcGlfa2V5")
-            .build()
-        chain.proceed(newRequest)
+    val parentViewModel = viewModel
+    val owner = lifecycleOwner
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeploymentListViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.service_deployment_row, parent, false)
+        return DeploymentListViewHolder(view)
     }
 
-    private val client = OkHttpClient().newBuilder()
-        .connectTimeout(5, TimeUnit.SECONDS)
-        .callTimeout(5, TimeUnit.SECONDS)
-        .addInterceptor(interceptor)
-        .build()
+    override fun onBindViewHolder(holder: DeploymentListViewHolder, position: Int) {
+        val item = getItem(position)
+        val context = holder.itemView.context
+        holder.itemView.edit.setOnClickListener {
+            val renameDialog = DeploymentRenameDialog(object : DeploymentRenameDialog.RenameCallback {
+                override fun onSavePressed(renamedValue: String) {
+                    parentViewModel.renameDeployment(item?.deploymentId, renamedValue).observe(owner, Observer {
+                        if (it) {
+                            renameSuccessCallback.onRenamed()
+                        }
+                    })
+                }
+            }, fullName, item?.deploymentName)
+            renameDialog.isCancelable = false
+            renameDialog.show(fragmentManager, "#rename_dialog")
+        }
 
-    val apiService: ApiService = Retrofit.Builder()
-        .client(client)
-        .baseUrl("http://123.136.26.98:8081")
-        .addConverterFactory(ScalarsConverterFactory.create())
-        .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(LiveDataCallAdapterFactory())
-        .build()
-        .create(ApiService::class.java)
+        holder.itemView.deploymentName.text = item?.deploymentName.toString()
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeploymentListViewHolder {
-    val view = LayoutInflater.from(parent.context).inflate(R.layout.service_deployment_row, parent, false)
-    return DeploymentListViewHolder(view)
-  }
+        item?.vmLists?.let {
+            val vmAdapter = VMListAdapter(it, callBack, fragmentManager)
+            holder.itemView.vmRecycler.layoutManager = LinearLayoutManager(context)
+            holder.itemView.vmRecycler.addItemDecoration(RecyclerItemDivider(context, LinearLayoutManager.VERTICAL, 8))
+            holder.itemView.vmRecycler.adapter = vmAdapter
+        }
 
-  override fun onBindViewHolder(holder: DeploymentListViewHolder, position: Int) {
-      val item = getItem(position)
-      val context = holder.itemView.context
-      holder.itemView.edit.setOnClickListener {
-          val renameDialog = DeploymentRenameDialog(object : DeploymentRenameDialog.RenameCallback {
-              override fun onSavePressed(renamedValue: String) {
-                  if (isNetworkAvailable(context)) {
-                      val jsonObject = JsonObject().apply {
-                          addProperty("UserID", loggedUser?.userID)
-                          addProperty("id", item?.deploymentId)
-                          addProperty("Name", renamedValue)
-                      }
-
-                      val param = JsonArray().apply {
-                          add(jsonObject)
-                      }
-
-                      val handler = CoroutineExceptionHandler { _, exception ->
-                          exception.printStackTrace()
-                      }
-
-                      CoroutineScope(Dispatchers.IO).launch(handler) {
-                          val response = apiService.updatedeploymentname(param)
-                          when (val apiResponse = ApiResponse.create(response)) {
-                              is ApiSuccessResponse -> {
-                                  if (JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                                      renameSuccessCallback.onRenamed()
-                                  }
-                              }
-                              is ApiEmptyResponse -> {
-                                  Log.d("EMPTY","EMPTY_VALUE")
-                              }
-                              is ApiErrorResponse -> {
-                                  Log.d("ERROR","ERROR_RESPONSE")
-                              }
-                          }
-                      }
-                  } else {
-                      showErrorToast(context, context.getString(R.string.net_error_msg))
-                  }
-              }
-          }, loggedUser?.fullName, item?.deploymentName)
-          renameDialog.isCancelable = false
-          renameDialog.show(fragmentManager, "#rename_dialog")
-      }
-
-      holder.itemView.deploymentName.text = item?.deploymentName.toString()
-
-      item?.vmLists?.let {
-          val vmAdapter = VMListAdapter(it, callBack, fragmentManager)
-          holder.itemView.vmRecycler.layoutManager = LinearLayoutManager(context)
-          holder.itemView.vmRecycler.addItemDecoration(RecyclerItemDivider(context, LinearLayoutManager.VERTICAL, 8))
-          holder.itemView.vmRecycler.adapter = vmAdapter
-      }
-
-      //      val menuBuilder = MenuBuilder(context)
+        //      val menuBuilder = MenuBuilder(context)
 //      val menuInflater = MenuInflater(context)
 //      menuInflater.inflate(R.menu.vm_list_action, menuBuilder)
 //      val menuHelper = MenuPopupHelper(context, menuBuilder, it)
@@ -187,7 +125,7 @@ class DeploymentListAdapter(val context: Context,
 //      }
 //      popup.setForceShowIcon(true)
 //      popup.show()
-  }
+    }
 
     interface RenameSuccessCallback{
         fun onRenamed()

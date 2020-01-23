@@ -39,9 +39,6 @@ import javax.inject.Inject
 class ServiceFragment : Fragment(), Injectable {
 
     @Inject
-    lateinit var api: ApiService
-
-    @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Inject
@@ -94,70 +91,66 @@ class ServiceFragment : Fragment(), Injectable {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = viewModel
 
-        if (isNetworkAvailable(requireContext())) {
-            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
+        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
 
-            adapter = DeploymentListAdapter(requireContext(), object : VMListAdapter.ActionCallback {
-                override fun onNote(success: Boolean) {
-                    if (success) {
-                        viewModel.deploymentList.value?.dataSource?.invalidate()
-                    }
-                }
-
-                override fun onStop(success: Boolean) {
-//                    if (success) {
-////                    viewModel.deploymentList.value?.dataSource?.invalidate()
-//                    } else {
-//
-//                    }
-                }
-
-                override fun onStart(success: Boolean) {
-//                    if (success) {
-////                    viewModel.deploymentList.value?.dataSource?.invalidate()
-//                    } else {
-//
-//                    }
-                }
-
-                override fun onAttachDetach() {
-//                Toast.makeText(requireContext(), "Attach clicked from interface!", Toast.LENGTH_LONG).show()
-                }
-
-                override fun onReboot(success: Boolean) {
-//                Toast.makeText(requireContext(), "Reboot clicked from interface!", Toast.LENGTH_LONG).show()
-                }
-
-                override fun onTerminate() {
-//                Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
-                }
-            }, object : DeploymentListAdapter.RenameSuccessCallback {
-                override fun onRenamed() {
+        adapter = DeploymentListAdapter(object : VMListAdapter.ActionCallback {
+            override fun onNote(success: Boolean) {
+                if (success) {
                     viewModel.deploymentList.value?.dataSource?.invalidate()
                 }
-            }, parentFragmentManager, user?.resdata?.loggeduser)
+            }
 
-            vmListRecycler.layoutManager = LinearLayoutManager(requireActivity())
-            vmListRecycler.adapter = adapter
+            override fun onStop(success: Boolean) {
+//                    if (success) {
+////                    viewModel.deploymentList.value?.dataSource?.invalidate()
+//                    } else {
+//
+//                    }
+            }
 
-            //1
-            val config = PagedList.Config.Builder()
-                .setPageSize(30)
-                .setEnablePlaceholders(false)
-                .build()
+            override fun onStart(success: Boolean) {
+//                    if (success) {
+////                    viewModel.deploymentList.value?.dataSource?.invalidate()
+//                    } else {
+//
+//                    }
+            }
 
-            //2
-            viewModel.deploymentList = viewModel.initializedPagedListBuilder(config).build()
+            override fun onAttachDetach() {
+//                Toast.makeText(requireContext(), "Attach clicked from interface!", Toast.LENGTH_LONG).show()
+            }
 
-            //3
-            viewModel.deploymentList.observe(this, Observer<PagedList<Deployment>> { pagedList ->
-                adapter.submitList(pagedList)
-            })
-        } else {
-            showErrorToast(requireContext(), requireContext().getString(R.string.net_error_msg))
-        }
+            override fun onReboot(success: Boolean) {
+//                Toast.makeText(requireContext(), "Reboot clicked from interface!", Toast.LENGTH_LONG).show()
+            }
 
-        viewModel.deploymentResponse.observe(this, Observer<Deployment> { value ->
+            override fun onTerminate() {
+//                Toast.makeText(requireContext(), "Terminate clicked from interface!", Toast.LENGTH_LONG).show()
+            }
+        }, object : DeploymentListAdapter.RenameSuccessCallback {
+            override fun onRenamed() {
+                viewModel.deploymentList.value?.dataSource?.invalidate()
+            }
+        }, parentFragmentManager, user.resdata?.loggeduser?.fullName, viewModel, this)
+
+        vmListRecycler.layoutManager = LinearLayoutManager(requireActivity())
+        vmListRecycler.adapter = adapter
+
+        //1
+        val config = PagedList.Config.Builder()
+            .setPageSize(30)
+            .setEnablePlaceholders(false)
+            .build()
+
+        //2
+        viewModel.deploymentList = viewModel.initializedPagedListBuilder(config).build()
+
+        //3
+        viewModel.deploymentList.observe(this, Observer<PagedList<Deployment>> { pagedList ->
+            adapter.submitList(pagedList)
+        })
+
+        viewModel.runningVmStatus.observe(this, Observer<Deployment> { value ->
             value?.let {
                 binding.noVM.visibility = View.GONE
                 binding.tvm = value.totalNumberOfVMs.toString()
@@ -188,7 +181,7 @@ class ServiceFragment : Fragment(), Injectable {
                 ApiCallStatus.TIMEOUT -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
-                else -> Log.d("NOTHING", "Nothing to do")
+                else -> Log.d("ELSE", "Else to do")
             }
         })
     }
@@ -201,55 +194,14 @@ class ServiceFragment : Fragment(), Injectable {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId) {
             R.id.sync_and_refresh -> {
-                syncDatabaseAndRefresh(requireContext())
+                viewModel.refreshDatabaseAndUI.observe(this, Observer {
+                    if (it) {
+                        viewModel.deploymentList.value?.dataSource?.invalidate()
+                    }
+                })
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-    private fun syncDatabaseAndRefresh(context: Context) {
-        if (isNetworkAvailable(context)) {
-            viewModel.apiCallStatus.postValue(ApiCallStatus.LOADING)
-            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-            val jsonObject = JsonObject()
-            user?.let {
-                jsonObject.apply {
-                    addProperty("pageNumber", "1")
-                    addProperty("pageSize", "20")
-                    addProperty("id", it.resdata?.loggeduser?.userID?.toInt() ?: 0)
-                }
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                exception.printStackTrace()
-            }
-
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                val response = api.clouduservmsyncwithlocaldb(param)
-                when (val apiResponse = ApiResponse.create(response)) {
-                    is ApiSuccessResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        if (JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean) {
-                            viewModel.deploymentList.value?.dataSource?.invalidate()
-                        }
-                    }
-                    is ApiEmptyResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
-                    }
-                    is ApiErrorResponse -> {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
-                    }
-                }
-            }
-        } else {
-            showErrorToast(requireContext(), requireContext().getString(R.string.net_error_msg))
-        }
-    }
-
 }

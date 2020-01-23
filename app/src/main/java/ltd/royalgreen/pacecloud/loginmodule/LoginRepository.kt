@@ -20,7 +20,6 @@ import javax.inject.Singleton
 
 @Singleton
 class LoginRepository @Inject constructor(private val apiService: ApiService,
-                                          private val preferences: SharedPreferences,
                                           private val application: Application
 ) {
 
