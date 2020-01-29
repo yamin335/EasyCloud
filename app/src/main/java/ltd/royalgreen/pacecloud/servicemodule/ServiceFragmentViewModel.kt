@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -15,24 +16,15 @@ import ltd.royalgreen.pacecloud.network.ApiCallStatus
 import ltd.royalgreen.pacecloud.network.ApiService
 import javax.inject.Inject
 
-class ServiceFragmentViewModel @Inject constructor(app: Application, vmRepository: VMRepository) : ViewModel() {
-    @Inject
-    lateinit var preferences: SharedPreferences
-
-    @Inject
-    lateinit var apiService: ApiService
-
-    val application = app
+class ServiceFragmentViewModel @Inject constructor(vmRepository: VMRepository) : ViewModel() {
 
     val repository = vmRepository
-
-    val dispachers: CoroutineDispatcher = Dispatchers.IO
 
     val refreshDatabaseAndUI: MutableLiveData<Boolean>
         get() = syncDatabaseAndRefresh()
 
-    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
-        MutableLiveData<ApiCallStatus>()
+    val apiCallStatus: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
     }
 
     val runningVmStatus: MutableLiveData<Deployment>
@@ -42,16 +34,9 @@ class ServiceFragmentViewModel @Inject constructor(app: Application, vmRepositor
 
     fun renameDeployment(deploymentId: Number?, renameValue: String) = repository.deploymentRenameRepo(deploymentId, renameValue)
 
-    fun syncDatabaseAndRefresh() = repository.syncAndRefreshVMRepo(apiCallStatus)
+    fun syncDatabaseAndRefresh() = repository.syncAndRefreshVMRepo()
 
-    fun loadRunnungVMStatus() = repository.runningVMStatusRepo(apiCallStatus)
+    fun loadRunnungVMStatus() = repository.runningVMStatusRepo()
 
-    fun initializedPagedListBuilder(config: PagedList.Config): LivePagedListBuilder<Long, Deployment> {
-        val dataSourceFactory = object : DataSource.Factory<Long, Deployment>() {
-            override fun create(): DataSource<Long, Deployment> {
-                return DeploymentListDataSource(dispachers, apiService, preferences, apiCallStatus)
-            }
-        }
-        return LivePagedListBuilder<Long, Deployment>(dataSourceFactory, config)
-    }
+    suspend fun loadVMListData(param:String) = repository.loadDeploymentPagedListRepo(param)
 }

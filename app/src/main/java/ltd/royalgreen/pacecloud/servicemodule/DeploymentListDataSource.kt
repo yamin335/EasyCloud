@@ -2,6 +2,7 @@ package ltd.royalgreen.pacecloud.servicemodule
 
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PageKeyedDataSource
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -11,13 +12,13 @@ import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
 
-class DeploymentListDataSource(dispacher: CoroutineDispatcher, private val api: ApiService, private val preferences: SharedPreferences
-                               , apiCallStatus: MutableLiveData<ApiCallStatus>) : PageKeyedDataSource<Long, Deployment>() {
+class DeploymentListDataSource(serviceFragmentViewModel: ServiceFragmentViewModel,
+                               private val preferences: SharedPreferences) : PageKeyedDataSource<Long, Deployment>() {
 
-    val dispachers = dispacher
-    val tempApiCallStatus = apiCallStatus
+    val viewModel = serviceFragmentViewModel
 
     override fun loadInitial(params: LoadInitialParams<Long>, callback: LoadInitialCallback<Long, Deployment>) {
+
         var param = "[]"
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
         if (user != null) {
@@ -33,12 +34,12 @@ class DeploymentListDataSource(dispacher: CoroutineDispatcher, private val api: 
 
         val handler = CoroutineExceptionHandler { _, exception ->
             exception.printStackTrace()
-            tempApiCallStatus.postValue(ApiCallStatus.ERROR)
+            //viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
         }
 
-        CoroutineScope(dispachers).launch(handler) {
-            tempApiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = api.cloudvmbyuserid(param)
+        viewModel.viewModelScope.launch(handler) {
+            viewModel.apiCallStatus.postValue("LOADING")
+            val response = viewModel.loadVMListData(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
                     val stringResponse = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
@@ -51,17 +52,16 @@ class DeploymentListDataSource(dispacher: CoroutineDispatcher, private val api: 
                         }
                         callback.onResult(mutableDeploymentList, null, 1)
                     }
-                    tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    viewModel.apiCallStatus.postValue("SUCCESS")
                 }
                 is ApiEmptyResponse -> {
-                    tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    //viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
                 }
                 is ApiErrorResponse -> {
-                    tempApiCallStatus.postValue(ApiCallStatus.ERROR)
+                    //viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
                 }
             }
         }
-
     }
 
     override fun loadAfter(params: LoadParams<Long>, callback: LoadCallback<Long, Deployment>) {
@@ -80,12 +80,12 @@ class DeploymentListDataSource(dispacher: CoroutineDispatcher, private val api: 
 
         val handler = CoroutineExceptionHandler { _, exception ->
             exception.printStackTrace()
-            tempApiCallStatus.postValue(ApiCallStatus.ERROR)
+            //viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
         }
 
-        CoroutineScope(dispachers).launch(handler) {
-            tempApiCallStatus.postValue(ApiCallStatus.LOADING)
-            val response = api.cloudvmbyuserid(param)
+        viewModel.viewModelScope.launch(handler) {
+            viewModel.apiCallStatus.postValue("LOADING")
+            val response = viewModel.loadVMListData(param)
             when (val apiResponse = ApiResponse.create(response)) {
                 is ApiSuccessResponse -> {
                     val stringResponse = JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("listCloudvm").asString
@@ -98,13 +98,13 @@ class DeploymentListDataSource(dispacher: CoroutineDispatcher, private val api: 
                         }
                         callback.onResult(mutableDeploymentList, params.key + 1)
                     }
-                    tempApiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    viewModel.apiCallStatus.postValue("SUCCESS")
                 }
                 is ApiEmptyResponse -> {
-                    tempApiCallStatus.postValue(ApiCallStatus.EMPTY)
+                    //viewModel.apiCallStatus.postValue(ApiCallStatus.EMPTY)
                 }
                 is ApiErrorResponse -> {
-                    tempApiCallStatus.postValue(ApiCallStatus.ERROR)
+                    //viewModel.apiCallStatus.postValue(ApiCallStatus.ERROR)
                 }
             }
         }

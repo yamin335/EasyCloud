@@ -9,10 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.network.*
@@ -65,10 +62,10 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
         return result
     }
 
-    fun syncAndRefreshVMRepo(apiCallStatus: MutableLiveData<ApiCallStatus>): MutableLiveData<Boolean> {
+    fun syncAndRefreshVMRepo(): MutableLiveData<Boolean> {
         val result = MutableLiveData<Boolean>()
         if (isNetworkAvailable(application)) {
-            apiCallStatus.postValue(ApiCallStatus.LOADING)
+            //apiCallStatus.postValue(ApiCallStatus.LOADING)
             val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
             val jsonObject = JsonObject()
             user?.let {
@@ -80,7 +77,7 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
             }
 
             val handler = CoroutineExceptionHandler { _, exception ->
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
+                //apiCallStatus.postValue(ApiCallStatus.ERROR)
                 exception.printStackTrace()
             }
 
@@ -92,14 +89,14 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
                 val response = apiService.clouduservmsyncwithlocaldb(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        //apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         result.postValue(JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("resstate").asBoolean)
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        //apiCallStatus.postValue(ApiCallStatus.EMPTY)
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        //apiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }
@@ -109,7 +106,7 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
         return result
     }
 
-    fun runningVMStatusRepo(apiCallStatus: MutableLiveData<ApiCallStatus>): MutableLiveData<Deployment> {
+    fun runningVMStatusRepo(): MutableLiveData<Deployment> {
         val result = MutableLiveData<Deployment>()
         if (isNetworkAvailable(application)) {
             var param = "[]"
@@ -127,11 +124,11 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
 
             val handler = CoroutineExceptionHandler { _, exception ->
                 exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
+                //apiCallStatus.postValue(ApiCallStatus.ERROR)
             }
 
             CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
+                //apiCallStatus.postValue(ApiCallStatus.LOADING)
                 val response = apiService.cloudvmbyuserid(param)
                 when (val apiResponse = ApiResponse.create(response)) {
                     is ApiSuccessResponse -> {
@@ -145,13 +142,13 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
                             }
                             result.postValue(mutableDeploymentList[0])
                         }
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        //apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        //apiCallStatus.postValue(ApiCallStatus.EMPTY)
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        //apiCallStatus.postValue(ApiCallStatus.ERROR)
                     }
                 }
             }
@@ -160,4 +157,6 @@ class VMRepository @Inject constructor(private val apiService: ApiService,
         }
         return result
     }
+
+    suspend fun loadDeploymentPagedListRepo(param: String) = withContext(Dispatchers.IO) { apiService.cloudvmbyuserid(param) }
 }

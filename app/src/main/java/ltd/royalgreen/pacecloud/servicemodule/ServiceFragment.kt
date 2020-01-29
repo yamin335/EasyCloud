@@ -1,26 +1,22 @@
 package ltd.royalgreen.pacecloud.servicemodule
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.service_fragment.*
-import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.ServiceFragmentBinding
@@ -29,7 +25,6 @@ import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.util.autoCleared
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import ltd.royalgreen.pacecloud.util.showErrorToast
 import ltd.royalgreen.pacecloud.util.showWarningToast
 import java.math.BigDecimal
@@ -44,9 +39,12 @@ class ServiceFragment : Fragment(), Injectable {
     @Inject
     lateinit var preferences: SharedPreferences
 
-    private val viewModel: ServiceFragmentViewModel by lazy {
-        // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(ServiceFragmentViewModel::class.java)
+//    val viewModel: ServiceFragmentViewModel by viewModels()
+
+    val viewModelReference by viewModels<ServiceFragmentViewModel>()
+
+    val viewModel: ServiceFragmentViewModel by viewModels {
+        viewModelFactory
     }
 
     private var binding by autoCleared<ServiceFragmentBinding>()
@@ -87,9 +85,17 @@ class ServiceFragment : Fragment(), Injectable {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.lifecycleOwner = null
+        //binding.viewModel = null
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.viewModel = viewModel
+        //binding.viewModel = viewModel
+
+
 
         val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
 
@@ -143,7 +149,7 @@ class ServiceFragment : Fragment(), Injectable {
             .build()
 
         //2
-        viewModel.deploymentList = viewModel.initializedPagedListBuilder(config).build()
+        viewModel.deploymentList = initializedPagedListBuilder(config).build()
 
         //3
         viewModel.deploymentList.observe(this, Observer<PagedList<Deployment>> { pagedList ->
@@ -164,22 +170,10 @@ class ServiceFragment : Fragment(), Injectable {
             }
         })
 
-        viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
+        viewModel.apiCallStatus.observe(this, Observer<String> { status ->
             when(status) {
-                ApiCallStatus.SUCCESS -> {
+                "SUCCESS" -> {
                     Log.d("NOTHING", "Nothing to do")
-                }
-                ApiCallStatus.ERROR -> {
-                    showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
-                }
-                ApiCallStatus.NO_DATA -> {
-                    showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
-                }
-                ApiCallStatus.EMPTY -> {
-                    showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
-                }
-                ApiCallStatus.TIMEOUT -> {
-                    showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
                 else -> Log.d("ELSE", "Else to do")
             }
@@ -203,5 +197,14 @@ class ServiceFragment : Fragment(), Injectable {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun initializedPagedListBuilder(config: PagedList.Config): LivePagedListBuilder<Long, Deployment> {
+        val dataSourceFactory = object : DataSource.Factory<Long, Deployment>() {
+            override fun create(): DataSource<Long, Deployment> {
+                return DeploymentListDataSource(viewModelReference, preferences)
+            }
+        }
+        return LivePagedListBuilder<Long, Deployment>(dataSourceFactory, config)
     }
 }

@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -44,9 +45,12 @@ class DashboardFragment : Fragment(), Injectable {
     @Inject
     lateinit var preferences: SharedPreferences
 
-    private val viewModel: DashboardViewModel by lazy {
-        // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(DashboardViewModel::class.java)
+//    val viewModel: DashboardViewModel by viewModels()
+
+//    val viewModel by viewModels<DashboardViewModel>()
+
+    val viewModel: DashboardViewModel by viewModels {
+        viewModelFactory
     }
 
     private var binding by autoCleared<DashboardFragmentBinding>()
