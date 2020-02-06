@@ -1,7 +1,5 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
-
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,14 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -32,15 +29,11 @@ import ltd.royalgreen.pacecloud.databinding.LoginFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivity
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
-import ltd.royalgreen.pacecloud.network.ApiService
 import ltd.royalgreen.pacecloud.util.*
 import javax.inject.Inject
 
 class LoginFragment : Fragment(), Injectable {
 
-    @Inject
-    lateinit var apiService: ApiService
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -48,9 +41,9 @@ class LoginFragment : Fragment(), Injectable {
     @Inject
     lateinit var preferences: SharedPreferences
 
-    private val viewModel: LoginFragmentViewModel by lazy {
+    private val viewModel: LoginFragmentViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(LoginFragmentViewModel::class.java)
+        viewModelFactory
     }
 
     private var binding by autoCleared<LoginFragmentBinding>()
@@ -63,10 +56,7 @@ class LoginFragment : Fragment(), Injectable {
         requireActivity().onBackPressedDispatcher.addCallback(this, true) {
             val exitDialog = CustomAlertDialog(object :  CustomAlertDialog.YesCallback{
                 override fun onYes() {
-                    preferences.edit().apply {
-                        putString("LoggedUser", "")
-                        apply()
-                    }
+                    viewModel.onAppExit(preferences)
                     requireActivity().finish()
                 }
             }, "Do you want to exit?", "")
@@ -169,23 +159,23 @@ class LoginFragment : Fragment(), Injectable {
 
         viewModel.apiCallStatus.observe(this, Observer {
             when(it) {
-                ApiCallStatus.SUCCESS -> Log.d("SUCCESSFUL", "Nothing to do")
-                ApiCallStatus.ERROR -> {
+                "SUCCESS" -> Log.d("SUCCESSFUL", "Nothing to do")
+                "ERROR" -> {
                     showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
                 }
-                ApiCallStatus.NO_DATA -> {
+                "NO_DATA" -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
                 }
-                ApiCallStatus.EMPTY -> {
+                "EMPTY" -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
                 }
-                ApiCallStatus.TIMEOUT -> {
+                "TIMEOUT" -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
-                ApiCallStatus.INVALID_USERNAME -> {
+                "INVALID_USERNAME" -> {
                     viewModel.errorMessage.value = true
                 }
-                ApiCallStatus.INVALID_PASSWORD -> {
+                "INVALID_PASSWORD" -> {
                     viewModel.errorMessage.value = true
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
@@ -196,15 +186,15 @@ class LoginFragment : Fragment(), Injectable {
     private fun signIn() {
         viewModel.doSignIn().observe(this, Observer { loggedUser ->
             when (loggedUser?.resdata?.message) {
-                "Username does not exist." -> viewModel.apiCallStatus.postValue(ApiCallStatus.INVALID_USERNAME)
-                "Password is wrong." -> viewModel.apiCallStatus.postValue(ApiCallStatus.INVALID_PASSWORD)
+                "Username does not exist." -> viewModel.apiCallStatus.postValue("INVALID_USERNAME")
+                "Password is wrong." -> viewModel.apiCallStatus.postValue("INVALID_PASSWORD")
                 "User not active." -> {
-                    viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                    viewModel.apiCallStatus.postValue("SUCCESS")
                     showWarningToast(requireContext(), requireContext().getString(R.string.user_not_active))
                 }
                 else -> {
                     if (loggedUser?.resdata?.loggeduser != null) {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        viewModel.apiCallStatus.postValue("SUCCESS")
                         val handler = CoroutineExceptionHandler { _, exception ->
                             exception.printStackTrace()
                         }
@@ -219,7 +209,7 @@ class LoginFragment : Fragment(), Injectable {
                         startActivity(Intent(requireActivity(), MainActivity::class.java))
                         requireActivity().finish()
                     } else {
-                        viewModel.apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+                        viewModel.apiCallStatus.postValue("NO_DATA")
                     }
                 }
             }

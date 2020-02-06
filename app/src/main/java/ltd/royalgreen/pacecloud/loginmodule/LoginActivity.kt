@@ -1,31 +1,18 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
-import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.WindowManager
-import android.widget.Toast
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.gson.Gson
 import dagger.android.AndroidInjection
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
 import kotlinx.android.synthetic.main.login_container_activity.*
-import kotlinx.android.synthetic.main.login_fragment.*
-import kotlinx.coroutines.*
-import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivity
 import ltd.royalgreen.pacecloud.R
-import ltd.royalgreen.pacecloud.databinding.LoginFragmentBinding
 import ltd.royalgreen.pacecloud.network.*
 import javax.inject.Inject
 
@@ -39,11 +26,11 @@ class LoginActivity : AppCompatActivity(), HasAndroidInjector {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    lateinit var exitDialog: NetworkStatusDialog
+    private lateinit var exitDialog: NetworkStatusDialog
 
-    private val viewModel: LoginViewModel by lazy {
+    private val viewModel: LoginViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(LoginViewModel::class.java)
+        viewModelFactory
     }
 
     @Inject

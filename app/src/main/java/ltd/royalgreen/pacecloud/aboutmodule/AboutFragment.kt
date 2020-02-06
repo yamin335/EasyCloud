@@ -3,7 +3,6 @@ package ltd.royalgreen.pacecloud.aboutmodule
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -16,15 +15,14 @@ import androidx.core.content.PermissionChecker
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.AboutFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
-import ltd.royalgreen.pacecloud.network.ApiService
 import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
 
@@ -33,17 +31,12 @@ class AboutFragment : Fragment(), Injectable {
     val CALL_REQUEST_CODE = 222
 
     @Inject
-    lateinit var apiService: ApiService
-
-    @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    @Inject
-    lateinit var preferences: SharedPreferences
 
-    private val viewModel: AboutFragmentViewModel by lazy {
+    private val viewModel: AboutFragmentViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(AboutFragmentViewModel::class.java)
+        viewModelFactory
     }
 
     private var binding by autoCleared<AboutFragmentBinding>()
@@ -151,7 +144,7 @@ class AboutFragment : Fragment(), Injectable {
         }
     }
 
-    private fun mailTo(recipient: String) {
+    private fun mailTo(@Suppress("SameParameterValue") recipient: String) {
         try {
             val mailIntent = Intent(Intent.ACTION_SENDTO).apply {
                 // The intent does not have a URI, so declare the "text/plain" MIME type
@@ -170,7 +163,7 @@ class AboutFragment : Fragment(), Injectable {
         }
     }
 
-    private fun openWebPage(url: String) {
+    private fun openWebPage(@Suppress("SameParameterValue") url: String) {
         val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://$url"))
         val chooser = Intent.createChooser(webIntent, "View Website Using")
         // Verify the intent will resolve to at least one activity

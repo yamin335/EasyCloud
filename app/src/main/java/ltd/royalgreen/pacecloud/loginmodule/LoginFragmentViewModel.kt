@@ -1,25 +1,20 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
 import android.app.Application
-import android.view.LayoutInflater
-import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.google.gson.JsonArray
+import androidx.lifecycle.viewModelScope
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import kotlinx.coroutines.*
-import ltd.royalgreen.pacecloud.R
-import ltd.royalgreen.pacecloud.network.*
-import ltd.royalgreen.pacecloud.util.isNetworkAvailable
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import android.content.Context.LAYOUT_INFLATER_SERVICE
-import ltd.royalgreen.pacecloud.util.showErrorToast
+import ltd.royalgreen.pacecloud.mainactivitymodule.BaseViewModel
+import ltd.royalgreen.pacecloud.network.ApiEmptyResponse
+import ltd.royalgreen.pacecloud.network.ApiErrorResponse
+import ltd.royalgreen.pacecloud.network.ApiResponse
+import ltd.royalgreen.pacecloud.network.ApiSuccessResponse
 
-
-class LoginFragmentViewModel @Inject constructor(app: Application, loginRepository: LoginRepository) : ViewModel() {
-
-    val repository = loginRepository
+class LoginFragmentViewModel @Inject constructor(private val application: Application, private val repository: LoginRepository) : BaseViewModel() {
 
     val userName: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
@@ -27,10 +22,6 @@ class LoginFragmentViewModel @Inject constructor(app: Application, loginReposito
 
     val password: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
-    }
-
-    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
-        MutableLiveData<ApiCallStatus>()
     }
 
     val errorMessage: MutableLiveData<Boolean> by lazy {
@@ -73,7 +64,47 @@ class LoginFragmentViewModel @Inject constructor(app: Application, loginReposito
         MutableLiveData<String>()
     }
 
-    fun doSignIn() = repository.loginRepo(userName.value!!, password.value!!, apiCallStatus)
+    fun doSignIn(): LiveData<LoggedUser> {
+        val loggedUser = MutableLiveData<LoggedUser>()
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.loginRepo(userName.value!!, password.value!!))) {
+                    is ApiSuccessResponse -> {
+                        loggedUser.postValue(apiResponse.body)
+                        apiCallStatus.postValue("SUCCESS")
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue("EMPTY")
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue("ERROR")
+                    }
+                }
+            }
+        }
+        return loggedUser
+    }
 
-    fun doSignUp(jsonObject: JsonObject) = repository.signUpRepo(jsonObject, apiCallStatus)
+    fun doSignUp(jsonObject: JsonObject): LiveData<String> {
+        val response = MutableLiveData<String>()
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.signUpRepo(jsonObject))) {
+                    is ApiSuccessResponse -> {
+                        response.postValue(JsonParser.parseString(apiResponse.body).asJsonObject.getAsJsonObject("resdata").get("message").asString)
+                        apiCallStatus.postValue("SUCCESS")
+                    }
+                    is ApiEmptyResponse -> {
+                        apiCallStatus.postValue("EMPTY")
+                    }
+                    is ApiErrorResponse -> {
+                        apiCallStatus.postValue("ERROR")
+                    }
+                }
+            }
+        }
+        return response
+    }
 }

@@ -20,7 +20,7 @@ import ltd.royalgreen.pacecloud.util.showErrorToast
 import retrofit2.Response
 
 ///A generic class that can provide a resource by the network.
-abstract class NetworkBoundResource<RequestType, ResultType> constructor(private val context: Application, private val apiService: ApiService, apiCallStatus: MutableLiveData<ApiCallStatus>) {
+abstract class NetworkBoundResource<RequestType, ResultType> constructor(private val context: Application, private val apiService: ApiService, apiCallStatus: MutableLiveData<String>) {
 
     private val result = MutableLiveData<ResultType>()
     private val loadingStatus = apiCallStatus

@@ -7,6 +7,7 @@ import android.view.*
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -25,9 +26,9 @@ class SignUpDialog internal constructor(private val callBack: SignUpCallback) : 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val viewModel: LoginFragmentViewModel by lazy {
+    private val viewModel: LoginFragmentViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(LoginFragmentViewModel::class.java)
+        viewModelFactory
     }
 
     private var binding by autoCleared<SignUpDialogBinding>()

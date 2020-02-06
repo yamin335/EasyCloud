@@ -9,6 +9,7 @@ import android.webkit.*
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -25,16 +26,16 @@ import ltd.royalgreen.pacecloud.util.showErrorToast
 import ltd.royalgreen.pacecloud.util.showSuccessToast
 import javax.inject.Inject
 
-class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaymentCallback,private val createBkash: CreateBkashModel, private val paymentRequest: PaymentRequest): DialogFragment(), Injectable {
+class BKashPaymentWebDialog internal constructor(private val callBack: BkashPaymentCallback, private val createBkash: CreateBkashModel, private val paymentRequest: PaymentRequest): DialogFragment(), Injectable {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private var request = ""
 
-    private val viewModel: BKashPaymentViewModel by lazy {
+    private val viewModel: BKashPaymentViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(BKashPaymentViewModel::class.java)
+        viewModelFactory
     }
 
     private var binding by autoCleared<PaymentBkashWebDialogBinding>()

@@ -1,10 +1,9 @@
-package ltd.royalgreen.pacecloud.paymentmodule
+package ltd.royalgreen.pacecloud.paymentmodule.foster
 
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.*
 import android.webkit.*
-import androidx.activity.addCallback
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment

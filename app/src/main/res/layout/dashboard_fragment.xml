@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
@@ -12,6 +13,16 @@
             android:orientation="vertical"
             android:layout_height="match_parent"
             android:layout_width="match_parent">
+
+        <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:id="@+id/loader"
+                android:layout_width="match_parent"
+                android:layout_marginTop="-6dp"
+                android:layout_marginBottom="-6dp"
+                android:layout_height="17dp"
+                android:indeterminate="true"
+                app:isVisible="@{viewModel.apiCallStatus}"/>
 
         <TextView
                 android:id="@+id/version"

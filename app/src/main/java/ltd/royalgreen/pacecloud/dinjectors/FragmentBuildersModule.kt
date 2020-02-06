@@ -5,12 +5,9 @@ import dagger.android.ContributesAndroidInjector
 import ltd.royalgreen.pacecloud.aboutmodule.AboutFragment
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardFragment
 import ltd.royalgreen.pacecloud.loginmodule.*
-import ltd.royalgreen.pacecloud.paymentmodule.FosterPaymentWebDialog
-import ltd.royalgreen.pacecloud.paymentmodule.PaymentFosterWebViewFragment
+import ltd.royalgreen.pacecloud.paymentmodule.foster.FosterPaymentWebDialog
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragment
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebDialog
-import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebFragment
-import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebViewFragment
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragment
 import ltd.royalgreen.pacecloud.supportmodule.SupportFragment
 
@@ -43,9 +40,6 @@ abstract class FragmentBuildersModule {
     abstract fun contributePaymentFragment(): PaymentFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeBKashPaymentWebViewFragment(): BKashPaymentWebViewFragment
-
-    @ContributesAndroidInjector
     abstract fun contributeFosterPaymentWebDialog(): FosterPaymentWebDialog
 
     @ContributesAndroidInjector
@@ -56,7 +50,4 @@ abstract class FragmentBuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeAboutFragment(): AboutFragment
-
-    @ContributesAndroidInjector
-    abstract fun contributePaymentFosterFragment(): PaymentFosterWebViewFragment
 }

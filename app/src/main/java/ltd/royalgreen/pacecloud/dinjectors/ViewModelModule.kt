@@ -9,7 +9,7 @@ import ltd.royalgreen.pacecloud.aboutmodule.AboutFragmentViewModel
 import ltd.royalgreen.pacecloud.mainactivitymodule.MainActivityViewModel
 import ltd.royalgreen.pacecloud.dashboardmodule.DashboardViewModel
 import ltd.royalgreen.pacecloud.loginmodule.*
-import ltd.royalgreen.pacecloud.paymentmodule.FosterPaymentViewModel
+import ltd.royalgreen.pacecloud.paymentmodule.foster.FosterPaymentViewModel
 import ltd.royalgreen.pacecloud.paymentmodule.PaymentFragmentViewModel
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentViewModel
 import ltd.royalgreen.pacecloud.servicemodule.ServiceFragmentViewModel

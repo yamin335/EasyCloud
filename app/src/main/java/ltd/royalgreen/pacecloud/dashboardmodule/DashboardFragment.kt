@@ -1,11 +1,8 @@
 package ltd.royalgreen.pacecloud.dashboardmodule
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingComponent
@@ -14,17 +11,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.github.mikephil.charting.components.LegendEntry
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import kotlinx.android.synthetic.main.dashboard_fragment.view.*
 import ltd.royalgreen.pacecloud.R
-import com.google.gson.Gson
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.DashboardFragmentBinding
 import ltd.royalgreen.pacecloud.dinjectors.Injectable
-import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.util.autoCleared
 import javax.inject.Inject
 import com.github.mikephil.charting.formatter.ValueFormatter
@@ -32,9 +25,6 @@ import kotlin.math.roundToInt
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.BarDataSet
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
-import ltd.royalgreen.pacecloud.util.showErrorToast
-import ltd.royalgreen.pacecloud.util.showWarningToast
 
 
 class DashboardFragment : Fragment(), Injectable {
@@ -47,7 +37,7 @@ class DashboardFragment : Fragment(), Injectable {
 
 //    val viewModel: DashboardViewModel by viewModels()
 
-//    val viewModel by viewModels<DashboardViewModel>()
+//    val viewModelRef by viewModels<DashboardViewModel>()
 
     val viewModel: DashboardViewModel by viewModels {
         viewModelFactory
@@ -143,7 +133,7 @@ class DashboardFragment : Fragment(), Injectable {
     }
 
     private fun refreshPieChart() {
-        viewModel.getOsStatus().observe(this, Observer { status ->
+        viewModel.getOsStatus().observe(viewLifecycleOwner, Observer { status ->
             binding.osStatusPieChart.legend.resetCustom()
             binding.osStatusPieChart.notifyDataSetChanged()
             val dataSet = status?.resdata?.dashboardchartdata
@@ -209,7 +199,7 @@ class DashboardFragment : Fragment(), Injectable {
     }
 
     private fun refreshBarChart() {
-        viewModel.getOsSummary().observe(this, Observer { summary ->
+        viewModel.getOsSummary().observe(viewLifecycleOwner, Observer { summary ->
             val dataSet = summary?.resdata?.dashboardchartdata
             val entries: List<BarEntry>
             entries = ArrayList<BarEntry>()
@@ -240,12 +230,6 @@ class DashboardFragment : Fragment(), Injectable {
             binding.osSummaryBarChart.animateY(900)
         })
     }
-
-//    private fun getOsStatusChartData() {
-//        viewModel.getOsStatusChart().observe(this, Observer {
-//            val t= it
-//        })
-//    }
 
     private fun refreshUI() {
         refreshPieChart()

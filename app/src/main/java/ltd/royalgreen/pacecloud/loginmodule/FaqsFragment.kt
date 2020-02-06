@@ -6,8 +6,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
-import kotlinx.android.synthetic.main.faqs_fragment.*
 import ltd.royalgreen.pacecloud.R
 
 class FaqsFragment : Fragment() {

@@ -7,7 +7,6 @@ import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestListener
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
 import javax.inject.Inject
 
 /**
@@ -16,8 +15,8 @@ import javax.inject.Inject
 class FragmentBindingAdapters @Inject constructor(val fragment: Fragment) {
     // Shows and hides progressbar
     @BindingAdapter("showLoader")
-    fun showLoader(view: View, apiCallStatus: ApiCallStatus?) {
-        view.visibility = if (apiCallStatus?.equals(ApiCallStatus.LOADING) == true) View.VISIBLE else View.GONE
+    fun showLoader(view: View, apiCallStatus: String?) {
+        view.visibility = if (apiCallStatus?.equals("LOADING") == true) View.VISIBLE else View.GONE
     }
 //    @BindingAdapter(value = ["imageUrl", "imageRequestListener"], requireAll = false)
 //    fun bindImage(imageView: ImageView, url: String?, listener: RequestListener<Drawable?>?) {

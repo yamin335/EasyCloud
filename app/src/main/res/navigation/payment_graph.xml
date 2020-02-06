@@ -13,60 +13,11 @@
             android:label="@string/payment"
     >
         <action
-                android:id="@+id/action_paymentScreen_to_paymentFosterWebViewFragment"
-                app:destination="@id/paymentFosterWebViewFragment"
-                app:popUpToInclusive="false">
-            <argument
-                    android:name="FosterProcessLink"
-                    android:defaultValue="@null"
-                    app:argType="string"
-                    app:nullable="true" />
-        </action>
-        <action
                 android:id="@+id/action_paymentScreen_to_aboutFragment"
                 app:destination="@id/aboutFragment" />
-        <action
-                android:id="@+id/action_paymentScreen_to_BKashPaymentWebViewFragment"
-                app:destination="@id/BKashPaymentWebViewFragment" />
-        <action
-                android:id="@+id/action_paymentScreen_to_BKashPaymentWebFragment"
-                app:destination="@id/BKashPaymentWebFragment" />
-    </fragment>
-    <fragment
-            android:id="@+id/paymentFosterWebViewFragment"
-            android:name="ltd.royalgreen.pacecloud.paymentmodule.PaymentFosterWebViewFragment"
-            android:label="Payment" >
-        <argument
-                android:name="FosterProcessLink"
-                android:defaultValue="@null"
-                app:argType="string"
-                app:nullable="true" />
     </fragment>
     <fragment
             android:id="@+id/aboutFragment"
             android:name="ltd.royalgreen.pacecloud.aboutmodule.AboutFragment"
             android:label="About" />
-    <fragment
-            android:id="@+id/BKashPaymentWebViewFragment"
-            android:name="ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebViewFragment"
-            android:label="BKash Payment">
-        <argument
-                android:name="PaymentRequestModel"
-                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest" />
-        <argument
-                android:name="CreateBkashModel"
-                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel" />
-    </fragment>
-    <fragment
-            android:id="@+id/BKashPaymentWebFragment"
-            android:name="ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebFragment"
-            android:label="payment_bkash_web_fragment"
-            tools:layout="@layout/payment_bkash_web_fragment" >
-        <argument
-                android:name="CreateBkashModel"
-                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel" />
-        <argument
-                android:name="PaymentRequestModel"
-                app:argType="ltd.royalgreen.pacecloud.paymentmodule.bkash.PaymentRequest" />
-    </fragment>
 </navigation>

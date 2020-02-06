@@ -2,13 +2,11 @@ package ltd.royalgreen.pacecloud.paymentmodule
 
 import android.app.Application
 import android.app.DatePickerDialog
-import android.content.Context
 import android.content.SharedPreferences
-import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
@@ -19,6 +17,7 @@ import com.google.gson.JsonParser
 import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.mainactivitymodule.BaseViewModel
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.BkashDataModel
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.CreateBkashModel
@@ -30,25 +29,12 @@ import java.math.RoundingMode
 import java.util.*
 import javax.inject.Inject
 
-class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel() {
+class PaymentFragmentViewModel @Inject constructor(private val application: Application, private val repository: PaymentRepository) : BaseViewModel() {
     @Inject
     lateinit var preferences: SharedPreferences
 
-    @Inject
-    lateinit var apiService: ApiService
-
-    val application = app
-
-    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
-        MutableLiveData<ApiCallStatus>()
-    }
-
     val lastRechargeResponse: MutableLiveData<LastRechargeBalance> by lazy {
         MutableLiveData<LastRechargeBalance>()
-    }
-
-    val fromDate: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
     }
 
     val lastPaymentAmount: MutableLiveData<String> by lazy {
@@ -63,6 +49,10 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<String>()
     }
 
+    val fromDate: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
     val searchValue: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
@@ -71,9 +61,11 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
         MutableLiveData<String>()
     }
 
-    val bKashToken: MutableLiveData<BkashDataModel?> by lazy {
-        MutableLiveData<BkashDataModel?>()
+    val bKashToken: MutableLiveData<BkashDataModel> by lazy {
+        MutableLiveData<BkashDataModel>()
     }
+
+    var hasBkashToken = false
 
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
 
@@ -88,79 +80,42 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
     }
 
     fun getFosterPaymentUrl(amount: String, note: String) {
-        if (isNetworkAvailable(application)) {
-            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-            val jsonObject = JsonObject()
-            user?.let {
-                jsonObject.addProperty("UserID", user.resdata?.loggeduser?.userID)
-                jsonObject.addProperty("rechargeAmount", amount)
-                jsonObject.addProperty("Particulars", note)
-                jsonObject.addProperty("IsActive", true)
-            }
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.cloudrecharge(param)
-                when (val apiResponse = ApiResponse.create(response)) {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.fosterUrlRepo(amount, note))) {
                     is ApiSuccessResponse -> {
                         val rechargeResponse = apiResponse.body
-                        if (rechargeResponse.resdata?.resstate == true) {
+                        if (rechargeResponse.resdata != null) {
 //                            preferences.edit().apply {
 //                                putString("paymentStatusUrl", rechargeResponse.resdata.paymentStatusUrl)
 //                                apply()
 //                            }
 
-                            fosterUrl.postValue(Pair(rechargeResponse.resdata.paymentProcessUrl ?: "", rechargeResponse.resdata.paymentStatusUrl ?: ""))
-
-                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        } else {
-                            apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+                            fosterUrl.postValue(Pair(rechargeResponse.resdata.paymentProcessUrl, rechargeResponse.resdata.paymentStatusUrl))
                         }
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
     fun getBkashToken(amount: String) {
-        if (isNetworkAvailable(application)) {
-
-            val jsonObject = JsonObject().apply {
-                addProperty("id", 0)
-            }
-
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }.toString()
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.generatebkashtoken(param)
-                when (val apiResponse = ApiResponse.create(response)) {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.bkashTokenRepo(amount))) {
                     is ApiSuccessResponse -> {
                         val bKashTokenResponse = apiResponse.body
                         if (bKashTokenResponse.resdata?.tModel != null) {
+                            hasBkashToken = true
                             val paymentRequest = PaymentRequest()
                             paymentRequest.amount = amount
 
@@ -174,43 +129,39 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                             bkashDataModel.paymentRequest = paymentRequest
                             bkashDataModel.createBkashModel = createBkashModel
                             bKashToken.postValue(bkashDataModel)
-                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
-                        } else {
-                            apiCallStatus.postValue(ApiCallStatus.NO_DATA)
                         }
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
-    fun initializedPagedListBuilder(config: PagedList.Config):
-            LivePagedListBuilder<Long, BilCloudUserLedger> {
-        val dataSourceFactory = object : DataSource.Factory<Long, BilCloudUserLedger>() {
-            override fun create(): DataSource<Long, BilCloudUserLedger> {
-                val jsonObject = JsonObject().apply {
-                    addProperty("values", searchValue.value)
-                    if (fromDate.value != "dd/mm/yyyy" && toDate.value != "dd/mm/yyyy") {
-                        addProperty("SDate", fromDate.value)
-                        addProperty("EDate", toDate.value)
-                    } else {
-                        addProperty("SDate", "")
-                        addProperty("EDate", "")
-                    }
-                }
-                return PaymentListDataSource(apiService, preferences, apiCallStatus, jsonObject)
-            }
-        }
-        return LivePagedListBuilder<Long, BilCloudUserLedger>(dataSourceFactory, config)
-    }
+//    fun initializedPagedListBuilder(config: PagedList.Config):
+//            LivePagedListBuilder<Long, BilCloudUserLedger> {
+//        val dataSourceFactory = object : DataSource.Factory<Long, BilCloudUserLedger>() {
+//            override fun create(): DataSource<Long, BilCloudUserLedger> {
+//                val jsonObject = JsonObject().apply {
+//                    addProperty("values", searchValue.value)
+//                    if (fromDate.value != "dd/mm/yyyy" && toDate.value != "dd/mm/yyyy") {
+//                        addProperty("SDate", fromDate.value)
+//                        addProperty("EDate", toDate.value)
+//                    } else {
+//                        addProperty("SDate", "")
+//                        addProperty("EDate", "")
+//                    }
+//                }
+//                return PaymentListDataSource(apiService, preferences, apiCallStatus, jsonObject)
+//            }
+//        }
+//        return LivePagedListBuilder<Long, BilCloudUserLedger>(dataSourceFactory, config)
+//    }
 
 //    fun getBkashTokenAndFosterUrl(): MediatorLiveData<BkashTokenAndFosterUrlMergedData> {
 //        val mergedData = MediatorLiveData<BkashTokenAndFosterUrlMergedData>()
@@ -229,24 +180,11 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
 //        return mergedData
 //    }
 
-    fun getUserBalance(user: LoggedUser?) {
-        if (isNetworkAvailable(application)) {
-            val jsonObject = JsonObject().apply {
-                addProperty("UserID", user?.resdata?.loggeduser?.userID)
-            }
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }.toString()
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.billclouduserbalance(param)
-                when (val apiResponse = ApiResponse.create(response)) {
+    fun getUserBalance() {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.usrBalanceRepo())) {
                     is ApiSuccessResponse -> {
                         val balanceModel = apiResponse.body
                         userBalance.postValue(BigDecimal(balanceModel.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
@@ -255,53 +193,36 @@ class PaymentFragmentViewModel @Inject constructor(app: Application) : ViewModel
                             putString("UserBalance", userBalanceSerialized)
                             apply()
                         }
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
-    fun getLastRechargeBalance(user: LoggedUser?) {
-        if (isNetworkAvailable(application)) {
-            val jsonObject = JsonObject().apply {
-                addProperty("UserId", user?.resdata?.loggeduser?.userID)
-            }
-            val param = JsonArray().apply {
-                add(jsonObject)
-            }.toString()
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.lastbillbyuser(param)
-                when (val apiResponse = ApiResponse.create(response)) {
+    fun getLastRechargeBalance() {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.usrLastRechargeRepo())) {
                     is ApiSuccessResponse -> {
                         lastRechargeResponse.postValue(apiResponse.body)
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 

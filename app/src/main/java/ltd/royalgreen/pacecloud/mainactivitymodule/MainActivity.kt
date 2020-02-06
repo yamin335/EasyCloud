@@ -1,12 +1,10 @@
 package ltd.royalgreen.pacecloud.mainactivitymodule
 
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
@@ -37,14 +35,11 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     @Inject
-    lateinit var apiService: ApiService
-
-    @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val viewModel: MainActivityViewModel by lazy {
+    private val viewModel: MainActivityViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
+        viewModelFactory
     }
 
     @Inject
@@ -64,7 +59,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
             "UserBalance" -> {
                 val userBalance = Gson().fromJson(prefs.getString("UserBalance", null), BalanceModel::class.java)
                 userBalance?.let {
-                    viewModel.userBalance.value = it
+                    nav_view.getHeaderView(0).loggedUserBalance.text = BigDecimal(it.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
                 }
             }
         }
@@ -98,7 +93,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
             nav_view.getHeaderView(0).loggedUserEmail.text = it.resdata?.loggeduser?.email
         }
         prepareSideNavMenu()
-        viewModel.userBalance.observe(this, Observer { balance ->
+        viewModel.getUserBalance().observe(this, Observer { balance ->
             nav_view.getHeaderView(0).loggedUserBalance.text = BigDecimal(balance.resdata?.billCloudUserBalance?.balanceAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString()
         })
 
@@ -119,27 +114,26 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
             }
         })
 
-        viewModel.apiCallStatus.observe(this, Observer {
-            when(it) {
-                ApiCallStatus.SUCCESS -> Log.d("Successful", "Nothing to do")
-                ApiCallStatus.ERROR -> {
-                    showErrorToast(this@MainActivity, this@MainActivity.getString(R.string.error_msg))
-                }
-                ApiCallStatus.NO_DATA -> {
-                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.no_data_msg))
-                }
-                ApiCallStatus.EMPTY -> {
-                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.empty_msg))
-                }
-                ApiCallStatus.TIMEOUT -> {
-                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.timeout_msg))
-                }
-                else -> Log.d("NOTHING", "Nothing to do")
-            }
-        })
+//        viewModel.apiCallStatus.observe(this, Observer {
+//            when(it) {
+//                "SUCCESS" -> Log.d("Successful", "Nothing to do")
+//                "ERROR" -> {
+//                    showErrorToast(this@MainActivity, this@MainActivity.getString(R.string.error_msg))
+//                }
+//                "NO_DATA" -> {
+//                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.no_data_msg))
+//                }
+//                "EMPTY" -> {
+//                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.empty_msg))
+//                }
+//                "TIMEOUT" -> {
+//                    showWarningToast(this@MainActivity, this@MainActivity.getString(R.string.timeout_msg))
+//                }
+//                else -> Log.d("NOTHING", "Nothing to do")
+//            }
+//        })
 
         if (savedInstanceState == null) {
-            viewModel.getUserBalance(user)
             setupBottomNavigationBar()
         } // Else, need to wait for onRestoreInstanceState
 

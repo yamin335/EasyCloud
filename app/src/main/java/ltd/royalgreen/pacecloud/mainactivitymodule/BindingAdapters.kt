@@ -7,7 +7,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
 
 /**
  * Data Binding adapters specific to the app.
@@ -38,16 +37,16 @@ object BindingAdapters {
     // Shows and hides progressbar
     @JvmStatic
     @BindingAdapter("isVisible")
-    fun isVisible(view: View, apiCallStatus: ApiCallStatus?) {
-        view.visibility = if (apiCallStatus?.equals(ApiCallStatus.LOADING) == true) View.VISIBLE else View.GONE
+    fun isVisible(view: View, apiCallStatus: String?) {
+        view.visibility = if (apiCallStatus?.equals("LOADING") == true) View.VISIBLE else View.GONE
     }
 
     // Shows and hides progressbar
-    @JvmStatic
-    @BindingAdapter("isVisibleOrGone")
-    fun isVisibleOrGone(view: View, apiCallStatus: String?) {
-        view.visibility = if (apiCallStatus?.equals("LOADING") == true) View.VISIBLE else View.GONE
-    }
+//    @JvmStatic
+//    @BindingAdapter("isVisibleOrGone")
+//    fun isVisibleOrGone(view: View, apiCallStatus: String?) {
+//        view.visibility = if (apiCallStatus?.equals("LOADING") == true) View.VISIBLE else View.GONE
+//    }
 
     // Shows and hides progressbar
 //    @JvmStatic

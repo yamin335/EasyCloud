@@ -5,7 +5,7 @@
     <data>
         <variable
                 name="viewModel"
-                type="ltd.royalgreen.pacecloud.paymentmodule.FosterPaymentViewModel"/>
+                type="ltd.royalgreen.pacecloud.paymentmodule.foster.FosterPaymentViewModel"/>
     </data>
     <androidx.cardview.widget.CardView
             android:layout_height="match_parent"

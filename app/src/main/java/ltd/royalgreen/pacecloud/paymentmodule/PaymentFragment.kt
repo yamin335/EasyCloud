@@ -1,6 +1,5 @@
 package ltd.royalgreen.pacecloud.paymentmodule
 
-import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -9,18 +8,13 @@ import androidx.activity.addCallback
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import kotlinx.android.synthetic.main.payment_fragment.*
-import kotlinx.coroutines.*
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.PaymentFragmentBinding
@@ -29,18 +23,14 @@ import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
 import ltd.royalgreen.pacecloud.mainactivitymodule.CustomAlertDialog
 import ltd.royalgreen.pacecloud.network.*
 import ltd.royalgreen.pacecloud.paymentmodule.bkash.BKashPaymentWebDialog
+import ltd.royalgreen.pacecloud.paymentmodule.foster.FosterPaymentWebDialog
 import ltd.royalgreen.pacecloud.util.*
 import java.math.BigDecimal
 import java.math.RoundingMode
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
 
 class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCallback, RechargeConfirmDialog.RechargeConfirmCallback, BKashPaymentWebDialog.BkashPaymentCallback,
     FosterPaymentWebDialog.FosterPaymentCallback {
-
-    @Inject
-    lateinit var apiService: ApiService
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -50,11 +40,9 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
     lateinit var bottomSheetBehaviour: BottomSheetBehavior<View>
 
-
-
-    private val viewModel: PaymentFragmentViewModel by lazy {
+    private val viewModel: PaymentFragmentViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(PaymentFragmentViewModel::class.java)
+        viewModelFactory
     }
 
     //For Payment History
@@ -97,6 +85,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.includedBottomSheet.viewModel = viewModel
+        binding.includedContentMain.viewModel = viewModel
+
         bottomSheetBehaviour = BottomSheetBehavior.from(binding.includedBottomSheet.bottomSheet)
         binding.searchFab.setOnClickListener{
             if (bottomSheetBehaviour.state != BottomSheetBehavior.STATE_EXPANDED) {
@@ -128,7 +120,12 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 
         viewModel.fosterUrl.observe(this, Observer { (paymentProcessUrl, paymentStatusUrl) ->
             if (paymentProcessUrl != null && paymentStatusUrl != null) {
-                val fosterPaymentDialog = FosterPaymentWebDialog(this, paymentProcessUrl, paymentStatusUrl)
+                val fosterPaymentDialog =
+                    FosterPaymentWebDialog(
+                        this,
+                        paymentProcessUrl,
+                        paymentStatusUrl
+                    )
                 fosterPaymentDialog.isCancelable = false
                 fosterPaymentDialog.show(parentFragmentManager, "#foster_payment_dialog")
             }
@@ -159,10 +156,6 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 //                searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, activity!!.theme))
 //            }
 //        }
-
-        binding.lifecycleOwner = viewLifecycleOwner
-        binding.includedBottomSheet.viewModel = viewModel
-        binding.includedContentMain.viewModel = viewModel
 
         adapter = PaymentListAdapter()
 
@@ -223,9 +216,9 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             }
         })
 
-        viewModel.apiCallStatus.observe(this, Observer<ApiCallStatus> { status ->
+        viewModel.apiCallStatus.observe(this, Observer<String> { status ->
             when(status) {
-                ApiCallStatus.SUCCESS -> {
+                "SUCCESS" -> {
 //                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
 //                    val inflater = requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 //                    val toastView = inflater.inflate(R.layout.toast_custom_success, null)
@@ -233,27 +226,24 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 //                    toast.view = toastView
 //                    toast.show()
                 }
-                ApiCallStatus.ERROR -> {
+                "ERROR" -> {
                     showErrorToast(requireContext(), requireContext().getString(R.string.error_msg))
                 }
-                ApiCallStatus.NO_DATA -> {
+                "NO_DATA" -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.no_data_msg))
                 }
-                ApiCallStatus.EMPTY -> {
+                "EMPTY" -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.empty_msg))
                 }
-                ApiCallStatus.TIMEOUT -> {
+                "TIMEOUT" -> {
                     showWarningToast(requireContext(), requireContext().getString(R.string.timeout_msg))
                 }
                 else -> Log.d("NOTHING", "Nothing to do")
             }
         })
 
-        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-        user?.let {
-            viewModel.getUserBalance(it)
-            viewModel.getLastRechargeBalance(it)
-        }
+        viewModel.getUserBalance()
+        viewModel.getLastRechargeBalance()
     }
 
     private fun applySearch() {
@@ -269,11 +259,8 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     private fun refreshUI() {
-        val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-        user?.let {
-            viewModel.getUserBalance(it)
-            viewModel.getLastRechargeBalance(it)
-        }
+        viewModel.getUserBalance()
+        viewModel.getLastRechargeBalance()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -316,20 +303,26 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     override fun onBKashClicked(amount: String) {
-        viewModel.getBkashToken(amount)
+        if (viewModel.hasBkashToken) {
+            val bkashPaymentDialog = BKashPaymentWebDialog(this, viewModel.bKashToken.value?.createBkashModel!!, viewModel.bKashToken.value?.paymentRequest!!)
+            bkashPaymentDialog.isCancelable = false
+            bkashPaymentDialog.show(parentFragmentManager, "#bkash_payment_dialog")
+        } else {
+            viewModel.getBkashToken(amount)
+        }
     }
 
     override fun onPaymentSuccess() {
-        viewModel.bKashToken.postValue(null)
+        viewModel.hasBkashToken = false
         refreshUI()
     }
 
     override fun onPaymentError() {
-        viewModel.bKashToken.postValue(null)
+        //viewModel.hasBkashToken = false
     }
 
     override fun onPaymentCancelled() {
-        viewModel.bKashToken.postValue(null)
+        //viewModel.hasBkashToken = false
     }
 
     override fun onFosterPaymentSuccess() {

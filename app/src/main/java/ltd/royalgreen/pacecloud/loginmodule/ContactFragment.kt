@@ -12,14 +12,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresPermission
-import androidx.core.app.ActivityCompat
 import androidx.core.content.PermissionChecker
 import androidx.core.content.PermissionChecker.checkSelfPermission
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.binding.FragmentDataBindingComponent
 import ltd.royalgreen.pacecloud.databinding.ContactFragmentBinding
@@ -37,9 +35,9 @@ class ContactFragment : Fragment(), Injectable {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val viewModel: ContactFragmentViewModel by lazy {
+    private val viewModel: ContactFragmentViewModel by viewModels {
         // Get the ViewModel.
-        ViewModelProviders.of(this, viewModelFactory).get(ContactFragmentViewModel::class.java)
+        viewModelFactory
     }
 
     private var binding by autoCleared<ContactFragmentBinding>()
@@ -142,7 +140,7 @@ class ContactFragment : Fragment(), Injectable {
         }
     }
 
-    private fun mailTo(recipient: String) {
+    private fun mailTo(@Suppress("SameParameterValue") recipient: String) {
         try {
             val mailIntent = Intent(Intent.ACTION_SENDTO).apply {
                 // The intent does not have a URI, so declare the "text/plain" MIME type
@@ -161,6 +159,7 @@ class ContactFragment : Fragment(), Injectable {
         }
     }
 
+    @Suppress("SameParameterValue")
     private fun openWebPage(url: String) {
         val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://$url"))
         val chooser = Intent.createChooser(webIntent, "View Website Using")

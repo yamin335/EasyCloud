@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -17,25 +18,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ltd.royalgreen.pacecloud.R
 import ltd.royalgreen.pacecloud.loginmodule.LoggedUser
+import ltd.royalgreen.pacecloud.mainactivitymodule.BaseViewModel
 import ltd.royalgreen.pacecloud.network.*
+import ltd.royalgreen.pacecloud.paymentmodule.PaymentRepository
 import ltd.royalgreen.pacecloud.util.isNetworkAvailable
 import ltd.royalgreen.pacecloud.util.showErrorToast
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
-class BKashPaymentViewModel @Inject constructor(app: Application) : ViewModel() {
-    @Inject
-    lateinit var preferences: SharedPreferences
-
-    @Inject
-    lateinit var apiService: ApiService
-
-    val application = app
-
-    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
-        MutableLiveData<ApiCallStatus>()
-    }
+class BKashPaymentViewModel @Inject constructor(private val application: Application, private val repository: PaymentRepository) : BaseViewModel() {
 
     val resBkash: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
@@ -50,144 +42,76 @@ class BKashPaymentViewModel @Inject constructor(app: Application) : ViewModel() 
     var bkashToken: String? = ""
 
     fun createBkashCheckout(paymentRequest: PaymentRequest?, createBkash: CreateBkashModel?) {
-        if (isNetworkAvailable(application)) {
-            val jsonObject = JsonObject().apply {
-                addProperty("authToken", createBkash?.authToken)
-                addProperty("rechargeAmount", createBkash?.rechargeAmount)
-                addProperty("Name", paymentRequest?.intent)
-                addProperty("currency", createBkash?.currency)
-                addProperty("mrcntNumber", createBkash?.mrcntNumber)
-            }
-
-            val body = JsonArray().apply {
-                add(jsonObject)
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.createbkashpayment(body)
-                when (val apiResponse = ApiResponse.create(response)) {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.bkashCreatePaymentRepo(paymentRequest, createBkash))) {
                     is ApiSuccessResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                        apiCallStatus.postValue("SUCCESS")
                         val paymentCreateResponse = apiResponse.body
                         if (paymentCreateResponse.resdata?.resbKash != null) {
-                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                            apiCallStatus.postValue("SUCCESS")
                             resBkash.postValue(paymentCreateResponse.resdata.resbKash)
                         } else {
-                            apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+                            apiCallStatus.postValue("NO_DATA")
                         }
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
     fun executeBkashPayment() {
-        if (isNetworkAvailable(application)) {
-            val jsonObject = JsonObject().apply {
-                addProperty("authToken", bkashToken)
-                addProperty("paymentID", bkashPaymentExecuteJson.get("paymentID").asString)
-            }
-
-            val body = JsonArray().apply {
-                add(jsonObject)
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.executebkashpayment(body)
-                when (val apiResponse = ApiResponse.create(response)) {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.bkashExecutePaymentRepo(bkashPaymentExecuteJson, bkashToken))) {
                     is ApiSuccessResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         val paymentExecuteResponse = apiResponse.body
                         if (paymentExecuteResponse.resdata?.resExecuteBk != null) {
-                            apiCallStatus.postValue(ApiCallStatus.SUCCESS)
+                            apiCallStatus.postValue("SUCCESS")
                             saveBkashNewRecharge(paymentExecuteResponse.resdata.resExecuteBk)
                         } else {
-                            apiCallStatus.postValue(ApiCallStatus.NO_DATA)
+                            apiCallStatus.postValue("NO_DATA")
                         }
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 
     fun saveBkashNewRecharge(bkashPaymentResponse: String) {
-        if (isNetworkAvailable(application)) {
-            val bkashJsonObject = JsonParser.parseString(bkashPaymentResponse).asJsonObject
-            val user = Gson().fromJson(preferences.getString("LoggedUser", null), LoggedUser::class.java)
-            //Current Date
-            val todayInMilSec = Calendar.getInstance().time
-            val df = SimpleDateFormat("yyyy-MM-dd")
-            val today = df.format(todayInMilSec)
-            val jsonObject = JsonObject().apply {
-                addProperty("CloudUserID", user?.resdata?.loggeduser?.userID)
-                addProperty("UserTypeId", user?.resdata?.loggeduser?.userType)
-                addProperty("TransactionNo", bkashJsonObject.get("trxID").asString)
-                addProperty("InvoiceId", 0)
-                addProperty("UserName", user?.resdata?.loggeduser?.displayName)
-                addProperty("TransactionDate", today)
-                addProperty("RechargeType", "bKash")
-                addProperty("BalanceAmount", bkashJsonObject.get("amount").asString)
-                addProperty("Particulars", "")
-                addProperty("IsActive", true)
-            }
-
-            val param = JsonArray().apply {
-                add(jsonObject)
-                add(bkashJsonObject)
-            }
-
-            val handler = CoroutineExceptionHandler { _, exception ->
-                exception.printStackTrace()
-                apiCallStatus.postValue(ApiCallStatus.ERROR)
-            }
-
-            CoroutineScope(Dispatchers.IO).launch(handler) {
-                apiCallStatus.postValue(ApiCallStatus.LOADING)
-                val response = apiService.newrechargebkashpayment(param)
-                when (val apiResponse = ApiResponse.create(response)) {
+        if (checkNetworkStatus(application)) {
+            apiCallStatus.postValue("LOADING")
+            viewModelScope.launch {
+                when (val apiResponse = ApiResponse.create(repository.bkashPaymentSaveRepo(bkashPaymentResponse))) {
                     is ApiSuccessResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.SUCCESS)
                         val rechargeFinalSaveResponse = apiResponse.body
                         bKashPaymentStatus.postValue(Pair(rechargeFinalSaveResponse.resdata.resstate ?: false, rechargeFinalSaveResponse.resdata.message))
+                        apiCallStatus.postValue("SUCCESS")
                     }
                     is ApiEmptyResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.EMPTY)
+                        apiCallStatus.postValue("EMPTY")
                     }
                     is ApiErrorResponse -> {
-                        apiCallStatus.postValue(ApiCallStatus.ERROR)
+                        apiCallStatus.postValue("ERROR")
                     }
                 }
             }
-        } else {
-            showErrorToast(application, application.getString(R.string.net_error_msg))
         }
     }
 }

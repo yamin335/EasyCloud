@@ -1,25 +1,11 @@
 package ltd.royalgreen.pacecloud.loginmodule
 
 import android.app.Application
-import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import ltd.royalgreen.pacecloud.network.ApiCallStatus
-import ltd.royalgreen.pacecloud.network.ApiService
+import ltd.royalgreen.pacecloud.mainactivitymodule.BaseViewModel
 import javax.inject.Inject
 
-class ContactFragmentViewModel @Inject constructor(app: Application) : ViewModel() {
-    @Inject
-    lateinit var preferences: SharedPreferences
-
-    @Inject
-    lateinit var apiService: ApiService
-
-    val application = app
-
-    val apiCallStatus: MutableLiveData<ApiCallStatus> by lazy {
-        MutableLiveData<ApiCallStatus>()
-    }
+class ContactFragmentViewModel @Inject constructor(private val application: Application) : BaseViewModel() {
 
     val currentNumber: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
