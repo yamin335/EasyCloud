@@ -12,11 +12,6 @@ data class BilCloudUserLedger(val cloudUserLedgerId: Number?, val cloudUserId: N
 
 data class PaymentHistoryResdata(val listBilCloudUserLedger: List<BilCloudUserLedger>?, val recordsTotal: Number?)
 
-//Recharge response model
-data class RechargeResponse(val resdata: RechargeResdata?)
-
-data class RechargeResdata(val message: String?, val resstate: Boolean?, val paymentProcessUrl: String?, val paymentStatusUrl: String?, val amount: String?)
-
 data class LastRechargeBalance(val resdata: LastRechargeResdata?)
 
 data class LastRechargeUserLedger(val cloudUserLedgerId: Number?, val cloudUserId: Number?,
@@ -25,6 +20,11 @@ data class LastRechargeUserLedger(val cloudUserLedgerId: Number?, val cloudUserI
                                   val isActive: Boolean?, val companyId: Number?, val createDate: String?, val createdBy: Number?)
 
 data class LastRechargeResdata(val objBilCloudUserLedger: LastRechargeUserLedger?)
+
+//Foster Recharge response model
+data class RechargeResponse(val resdata: RechargeResdata?)
+
+data class RechargeResdata(val message: String?, val resstate: Boolean?, val paymentProcessUrl: String?, val paymentStatusUrl: String?, val amount: String?)
 
 data class RechargeStatusFosterCheckModel(val resdata: RechargeStatusFosterResdata)
 
