@@ -67,16 +67,16 @@ class PaymentFragmentViewModel @Inject constructor(private val application: Appl
 
     var hasBkashToken = false
 
+    val fosterUrl: MutableLiveData<Pair<String?, String?>> by lazy {
+        MutableLiveData<Pair<String?, String?>>()
+    }
+
 //    lateinit var paymentList: LiveData<PagedList<BilCloudUserLedger>>
 
     init {
         fromDate.value = "dd/mm/yyyy"
         toDate.value = "dd/mm/yyyy"
         searchValue.value = ""
-    }
-
-    val fosterUrl: MutableLiveData<Pair<String?, String?>> by lazy {
-        MutableLiveData<Pair<String?, String?>>()
     }
 
     fun getFosterPaymentUrl(amount: String, note: String) {

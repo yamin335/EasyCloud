@@ -110,7 +110,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             applySearch()
         }
 
-        viewModel.bKashToken.observe(this, Observer { bkashDataModel ->
+        viewModel.bKashToken.observe(viewLifecycleOwner, Observer { bkashDataModel ->
             if (bkashDataModel != null) {
                 val bkashPaymentDialog = BKashPaymentWebDialog(this, bkashDataModel.createBkashModel, bkashDataModel.paymentRequest)
                 bkashPaymentDialog.isCancelable = false
@@ -118,7 +118,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             }
         })
 
-        viewModel.fosterUrl.observe(this, Observer { (paymentProcessUrl, paymentStatusUrl) ->
+        viewModel.fosterUrl.observe(viewLifecycleOwner, Observer { (paymentProcessUrl, paymentStatusUrl) ->
             if (paymentProcessUrl != null && paymentStatusUrl != null) {
                 val fosterPaymentDialog =
                     FosterPaymentWebDialog(
@@ -177,7 +177,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 //            adapter.submitList(pagedList)
 //        })
 
-        viewModel.lastRechargeResponse.observe(this, Observer { lastRecharge ->
+        viewModel.lastRechargeResponse.observe(viewLifecycleOwner, Observer { lastRecharge ->
             lastRecharge.resdata?.objBilCloudUserLedger?.let {
                 viewModel.lastPaymentAmount.postValue(BigDecimal(it.creditAmount?.toDouble()?:0.00).setScale(2, RoundingMode.HALF_UP).toString())
                 val date = it.transactionDate
@@ -216,7 +216,7 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
             }
         })
 
-        viewModel.apiCallStatus.observe(this, Observer<String> { status ->
+        viewModel.apiCallStatus.observe(viewLifecycleOwner, Observer<String> { status ->
             when(status) {
                 "SUCCESS" -> {
 //                    val toast = Toast.makeText(requireContext(), "", Toast.LENGTH_LONG)
@@ -252,10 +252,6 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
 //            bottomSheeetBehaviour.state = BottomSheetBehavior.STATE_COLLAPSED
 //            searchFab.setImageDrawable(resources.getDrawable(R.drawable.ic_search_black_24dp, requireContext().theme))
 //        }
-    }
-
-    override fun onSavePressed(date: String, amount: String, note: String) {
-        showRechargeConfirmDialog(amount, note)
     }
 
     private fun refreshUI() {
@@ -296,6 +292,10 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
         val rechargeConfirmDialog = RechargeConfirmDialog(this, amount, note)
         rechargeConfirmDialog.isCancelable = false
         rechargeConfirmDialog.show(parentFragmentManager, "#recharge_confirm_dialog")
+    }
+
+    override fun onSavePressed(date: String, amount: String, note: String) {
+        showRechargeConfirmDialog(amount, note)
     }
 
     override fun onFosterClicked(amount: String, note: String) {
