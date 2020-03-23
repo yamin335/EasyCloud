@@ -318,11 +318,11 @@ class PaymentFragment : Fragment(), Injectable, PaymentRechargeDialog.RechargeCa
     }
 
     override fun onPaymentError() {
-        //viewModel.hasBkashToken = false
+        viewModel.hasBkashToken = false
     }
 
     override fun onPaymentCancelled() {
-        //viewModel.hasBkashToken = false
+        viewModel.hasBkashToken = false
     }
 
     override fun onFosterPaymentSuccess() {
